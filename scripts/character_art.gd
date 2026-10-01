@@ -3,6 +3,7 @@ extends RefCounted
 const HENRIQUE_TEXTURE = preload("res://assets/characters/henrique-detailed.png")
 const HENRIQUE_SCALE := 0.36
 var henrique_frames: Array = JSON.parse_string(FileAccess.get_file_as_string("res://assets/characters/henrique-frames.json"))["frames"]
+var henrique_actions: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/characters/henrique-actions.json"))["actions"]
 var mugen_actions: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/mugen/naruto/animations.json"))
 var texture_cache := {}
 
@@ -19,14 +20,25 @@ func shadow(host: Node2D, at: Vector2) -> void:
 	host.draw_circle(Vector2.ZERO, 23, Color(0.06, 0.10, 0.14, 0.38))
 	host.draw_set_transform(Vector2.ZERO)
 
-func henrique_frame(host: Node2D) -> int:
+func frame_for_action(action_name: String, clock: float) -> int:
+	var entry: Dictionary = henrique_actions.get(action_name, henrique_actions["idle"])
+	var frames: Array = entry.get("frames", [0])
+	if frames.is_empty():
+		return 0
+	var fps := float(entry.get("fps", 8.0))
+	return int(frames[int(clock * fps) % frames.size()])
+
+func current_henrique_action(host: Node2D) -> String:
 	if host.attack_flash > 0:
-		var duration := 0.5 if host.effect_kind == "katon" else 0.2
-		var progress: float = clampf(1.0 - host.attack_flash / duration, 0.0, 0.999)
-		return (21 if host.effect_kind == "katon" else 18) + int(progress * 3.0)
+		return "katon_fireball" if host.effect_kind == "katon" else "kunai"
 	if host.movement != Vector2.ZERO and host.lines.is_empty():
-		return (12 if host.sprinting else 6) + int(host.visual_clock * (13 if host.sprinting else 9)) % 6
-	return (3 if host.facing.y < -0.4 else 0) + int(host.visual_clock * 2) % 3
+		return "run" if host.sprinting else "walk"
+	if host.facing.y < -0.4:
+		return "idle_back"
+	return "idle"
+
+func henrique_frame(host: Node2D) -> int:
+	return frame_for_action(current_henrique_action(host), host.visual_clock)
 
 func draw_henrique(host: Node2D) -> void:
 	var frame: Dictionary = henrique_frames[henrique_frame(host)]
