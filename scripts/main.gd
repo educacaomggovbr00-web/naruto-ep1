@@ -24,6 +24,9 @@ var sprinting := false
 var effect_kind := "kunai"
 var effect_origin := Vector2.ZERO
 var effect_direction := Vector2.RIGHT
+var sharingan_awakened := false
+var naruto_pos := Vector2(640, 260)
+var naruto_action := "idle"
 var art = preload("res://scripts/visuals.gd").new()
 var background = preload("res://scripts/background.gd").new()
 const OBJECTIVES := [
@@ -119,6 +122,9 @@ func _process(delta: float) -> void:
 	cooldown = maxf(0.0, cooldown - delta)
 	attack_flash = maxf(0.0, attack_flash - delta)
 	chakra = minf(100.0, chakra + delta * 5.0)
+	if stage == 2:
+		naruto_pos = Vector2(640 + sin(visual_clock * 0.85) * 34, 260 + sin(visual_clock * 0.42) * 5)
+		naruto_action = "walk" if absf(cos(visual_clock * 0.85)) > 0.18 else "idle"
 	if lines.is_empty() and stage < 6:
 		movement = Vector2(float(down("right", KEY_D, KEY_RIGHT)) - float(down("left", KEY_A, KEY_LEFT)), float(down("down", KEY_S, KEY_DOWN)) - float(down("up", KEY_W, KEY_UP))).normalized()
 		if movement != Vector2.ZERO:
@@ -147,7 +153,8 @@ func _process(delta: float) -> void:
 					stage = 4
 					target = mizuki
 					say(["Henrique: Ele sumiu entre as árvores...", "Há uma kunai no chão. Será que ele deixou cair?"])
-	hud.text = "HENRIQUE UCHIHA  •  12 anos     |     CHAKRA %d" % int(chakra)
+	var eye_status := "SHARINGAN 1T" if sharingan_awakened else "OLHOS NORMAIS"
+	hud.text = "HENRIQUE UCHIHA  •  12 anos     |     CHAKRA %d     |     %s" % [int(chakra), eye_status]
 	objective.text = OBJECTIVES[stage]
 	if stage == 3:
 		objective.text += "  %d%%" % int(trail_progress / 12 * 100)
@@ -177,11 +184,12 @@ func act(action: String) -> void:
 		effect_origin = player
 		effect_direction = facing
 		if stage == 1 and player.distance_to(target) < 150:
+			sharingan_awakened = true
 			stage = 2
 			player = Vector2(170, 270)
 			say(["Henrique: Katon!", "As chamas escapam por um instante. Seus olhos ficam vermelhos: Sharingan de um tomoe.", "Henrique: O que foi isso...? Melhor voltar para a vila."])
 	elif action == "interact":
-		if stage == 2 and player.distance_to(Vector2(640, 260)) < 95:
+		if stage == 2 and player.distance_to(naruto_pos) < 95:
 			stage = 3
 			player = Vector2(450, 270)
 			say(["Naruto: Ei! Por que você está sempre com essa cara séria?", "Henrique: E você, por que está sempre arrumando confusão?", "Iruka: Naruto! Volte para a Academia!", "Mais tarde, ao anoitecer...", "Henrique: Mizuki? O que um instrutor está fazendo perto da floresta a esta hora?"])
