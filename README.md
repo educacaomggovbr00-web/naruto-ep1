@@ -56,3 +56,10 @@ A branch `naruto-2d-expansion` adds reusable world/progression foundations: Kono
 ## Episódio 1 jogável
 
 Depois do EP -1, o jogo entra automaticamente no EP 1. Henrique presencia a reprovação de Naruto na Academia, percebe a manipulação de Mizuki, segue o alarme do Pergaminho dos Selos até a floresta e ajuda Iruka a ganhar tempo. O momento decisivo permanece com Naruto, que usa a técnica aprendida no pergaminho e encerra o confronto. A adaptação é original do projeto e resume/reinterpreta os acontecimentos sem reproduzir o roteiro oficial palavra por palavra.
+
+
+## Menu de progressão — começo de Naruto Clássico
+
+O HUD agora inclui o botão `PROGRESSO` (tecla `P`). O painel mostra idade, rank, nível, XP, ryo, chakra, avanço da história, missões, inventário e arsenal liberado. Como o jogo ainda está no começo do Episódio 1 de Naruto Clássico, técnicas muito avançadas permanecem explicitamente bloqueadas para fases futuras.
+
+Os ciclos MUGEN já importados do Naruto Kid também ganharam mais uso contextual: idle/caminhada na vila, agachamento na clareira do pergaminho e corrida durante o confronto. Nenhum segundo pack sem licença aberta foi adicionado nesta etapa.
