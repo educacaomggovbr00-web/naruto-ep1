@@ -22,8 +22,10 @@ func run_checks() -> void:
 	game.cooldown = 0.0
 	game.act("katon")
 	assert(game.stage == 2, "Katon must unlock the village")
+	assert(game.sharingan_awakened, "Katon milestone must awaken the one-tomoe Sharingan")
 	assert(game.chakra < 100, "Katon must consume chakra")
 	close_dialogue(game)
+	game.naruto_pos = Vector2(640, 260)
 	game.player = Vector2(620, 260)
 	game.act("interact")
 	assert(game.stage == 3, "Naruto dialogue must unlock stealth")
