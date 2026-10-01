@@ -19,6 +19,9 @@ var hud: Label
 var objective: Label
 var dialogue: Button
 var restart: Button
+var progress_button: Button
+var progress_panel: Panel
+var progress_text: RichTextLabel
 var visual_clock := 0.0
 var sprinting := false
 var effect_kind := "kunai"
@@ -93,6 +96,49 @@ func _ready() -> void:
 		button.pressed.connect(func(): act(action))
 		style_button(button)
 		layer.add_child(button)
+	progress_button = Button.new()
+	progress_button.text = "PROGRESSO"
+	progress_button.position = Vector2(475, 460)
+	progress_button.size = Vector2(125, 64)
+	progress_button.pressed.connect(toggle_progression)
+	style_button(progress_button)
+	layer.add_child(progress_button)
+
+	progress_panel = Panel.new()
+	progress_panel.position = Vector2(120, 72)
+	progress_panel.size = Vector2(720, 372)
+	progress_panel.visible = false
+	var panel_style := StyleBoxFlat.new()
+	panel_style.bg_color = Color("10232d")
+	panel_style.border_color = Color("b29a6c")
+	panel_style.set_border_width_all(3)
+	panel_style.set_corner_radius_all(8)
+	progress_panel.add_theme_stylebox_override("panel", panel_style)
+	layer.add_child(progress_panel)
+
+	var title := Label.new()
+	title.text = "PROGRESSÃO • HENRIQUE UCHIHA"
+	title.position = Vector2(24, 18)
+	title.add_theme_font_size_override("font_size", 24)
+	title.add_theme_color_override("font_color", Color("f3dfb4"))
+	progress_panel.add_child(title)
+
+	progress_text = RichTextLabel.new()
+	progress_text.bbcode_enabled = true
+	progress_text.fit_content = false
+	progress_text.position = Vector2(24, 58)
+	progress_text.size = Vector2(672, 254)
+	progress_text.add_theme_font_size_override("normal_font_size", 16)
+	progress_text.add_theme_color_override("default_color", Color("dbe4e6"))
+	progress_panel.add_child(progress_text)
+
+	var close_progress := Button.new()
+	close_progress.text = "FECHAR"
+	close_progress.position = Vector2(560, 318)
+	close_progress.size = Vector2(136, 42)
+	close_progress.pressed.connect(toggle_progression)
+	style_button(close_progress)
+	progress_panel.add_child(close_progress)
 	restart = Button.new()
 	restart.text = "Jogar novamente"
 	restart.position = Vector2(375, 240)
@@ -134,9 +180,13 @@ func begin_episode_1() -> void:
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:
-			KEY_E, KEY_SPACE: act("interact")
-			KEY_J: act("kunai")
-			KEY_K: act("katon")
+			KEY_P: toggle_progression()
+			KEY_E, KEY_SPACE:
+				if not progress_panel.visible: act("interact")
+			KEY_J:
+				if not progress_panel.visible: act("kunai")
+			KEY_K:
+				if not progress_panel.visible: act("katon")
 
 func down(action: String, key: Key, alternate: Key = KEY_NONE) -> bool:
 	return held.get(action, false) or Input.is_physical_key_pressed(key) or (alternate != KEY_NONE and Input.is_physical_key_pressed(alternate))
@@ -153,7 +203,13 @@ func _process(delta: float) -> void:
 	elif stage == 7:
 		naruto_pos = Vector2(620 + sin(visual_clock * 0.7) * 18, 265)
 		naruto_action = "walk" if absf(cos(visual_clock * 0.7)) > 0.25 else "idle"
-	if lines.is_empty() and stage < 12:
+	elif stage == 9:
+		naruto_action = "crouch"
+	elif stage == 10:
+		naruto_action = "run" if lines.is_empty() else "idle"
+	elif stage >= 11:
+		naruto_action = "idle"
+	if lines.is_empty() and stage < 12 and not progress_panel.visible:
 		movement = Vector2(float(down("right", KEY_D, KEY_RIGHT)) - float(down("left", KEY_A, KEY_LEFT)), float(down("down", KEY_S, KEY_DOWN)) - float(down("up", KEY_W, KEY_UP))).normalized()
 		if movement != Vector2.ZERO:
 			facing = movement
@@ -198,6 +254,8 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func act(action: String) -> void:
+	if progress_panel.visible:
+		return
 	if not lines.is_empty():
 		if action == "interact": next_line()
 		return
@@ -261,6 +319,28 @@ func act(action: String) -> void:
 			stage = 12
 			rpg.complete_mission("academy_day", 60, 20)
 			say(["Depois da luta, Iruka reconhece o esforço de Naruto e entrega a ele sua própria bandana da Folha.", "Naruto finalmente consegue o símbolo de que tanto precisava: agora pode começar seu caminho como ninja.", "Henrique observa em silêncio, ainda pensando no Sharingan recém-desperto e nas intenções de Mizuki.", "NARUTO EP 1 CONCLUÍDO — adaptação jogável de fã pelo ponto de vista de Henrique Uchiha.", "Próximo: EP 2 — Konohamaru e os primeiros passos de Naruto como ninja."])
+
+func toggle_progression() -> void:
+	progress_panel.visible = not progress_panel.visible
+	if progress_panel.visible:
+		held.clear()
+		movement = Vector2.ZERO
+		refresh_progression()
+
+func refresh_progression() -> void:
+	var chapter := "PRÓLOGO • A Noite Antes do Começo" if stage < 7 else "NARUTO CLÁSSICO • EP 1"
+	if stage >= 12:
+		chapter = "NARUTO CLÁSSICO • EP 1 CONCLUÍDO"
+	var story_percent := int(clampf(float(stage) / 12.0, 0.0, 1.0) * 100.0)
+	var sharingan_text := "Sharingan 1 Tomoe" if sharingan_awakened else "Bloqueado • despertar ainda não ocorreu"
+	var jutsu_text := "Kunai • Katon: Bola de Fogo"
+	if sharingan_awakened:
+		jutsu_text += " • Sharingan 1T"
+	progress_text.text = "[b]ERA:[/b] %s\n[b]IDADE:[/b] 12 anos     [b]RANK:[/b] Aluno da Academia\n[b]NÍVEL:[/b] %d     [b]XP:[/b] %d / %d     [b]RYO:[/b] %d     [b]CHAKRA:[/b] %d / 100\n[b]HISTÓRIA:[/b] %d%%     [b]MISSÕES CONCLUÍDAS:[/b] %d\n\n[b]ARSENAL ATUAL[/b]\n%s\n%s\nKunai x%d • Shuriken x%d • Pílula do Soldado x%d\n\n[b]BLOQUEADO NESTA FASE[/b]\nChidori • Mangekyō • Amaterasu • Susanoo • técnicas avançadas\n[i]Essas habilidades ficam para fases futuras; o jogo ainda está no começo de Naruto Clássico.[/i]" % [
+		chapter, rpg.level, rpg.xp, rpg.level * 100, rpg.ryo, int(chakra),
+		story_percent, rpg.completed_missions.size(), jutsu_text, sharingan_text,
+		int(rpg.inventory.get("kunai", 0)), int(rpg.inventory.get("shuriken", 0)), int(rpg.inventory.get("soldier_pill", 0))
+	]
 
 func style_button(button: Button, is_dialogue: bool = false) -> void:
 	button.focus_mode = Control.FOCUS_NONE
