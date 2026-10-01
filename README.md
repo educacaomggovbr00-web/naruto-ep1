@@ -33,6 +33,10 @@ Verificação: `godot --headless --path . --editor --quit`, depois `godot --head
 
 Esses links foram referências para a primeira versão visual. A atualização detalhada inclui arte gerada do Henrique baseada na imagem enviada pelo usuário e sprites do Naruto convertidos do pack MUGEN Real Naruto. Consulte `assets/mugen/CREDITS.md` para a origem e créditos do pack. Naruto e personagens associados pertencem aos respectivos titulares. Projeto independente de fã.
 
+### Continuação visual
+
+A praça de Konoha agora ganhou placas da Folha, quadro de missões e marcadores visuais do distrito Uchiha. Naruto deixou de ficar totalmente parado: usa os ciclos MUGEN já importados para alternar idle/caminhada enquanto patrulha a praça. O HUD também passa a mostrar o Sharingan de 1 tomoe depois do primeiro Katon bem-sucedido, sem adicionar pós-processamento pesado.
+
 
 ## Sprites detalhados e MUGEN
 
