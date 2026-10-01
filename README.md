@@ -46,3 +46,8 @@ A praça de Konoha agora ganhou placas da Folha, quadro de missões e marcadores
 - Henrique usa poses próprias de idle, caminhada, corrida, kunai e Katon. Não é um personagem baixado do MUGEN. O jogo permanece em visão de cima; os movimentos laterais usam o atlas detalhado e o idle de costas aparece ao olhar para cima. Ciclos de caminhada vertical exclusivos ainda não estão disponíveis.
 
 Teste atualizado passou no Godot 4.3: importação RGBA, atlas de 24 poses, AIR idle de quatro quadros, seleção de sprint/Katon e sequência completa do prólogo. Não há exportação APK nesta mudança.
+
+
+## Naruto 2D RPG expansion
+
+A branch `naruto-2d-expansion` adds reusable world/progression foundations: Konoha location registry, classic-era cast registry, mission ranks, XP/level/ryo, inventory and jutsu unlocks. The playable prologue now awards progression for kunai training, Katon, stealth pursuit and the Scroll alarm, then unlocks story era 1 for the Episode 1 continuation. See `docs/NARUTO_2D_ROADMAP.md`.
