@@ -18,11 +18,13 @@ func run_checks() -> void:
 		game.cooldown = 0.0
 		game.act("kunai")
 	assert(game.stage == 1, "Three kunai hits must unlock Katon")
+	assert(game.rpg.completed_missions.has("training_kunai"), "Kunai training must reward RPG progression")
 	close_dialogue(game)
 	game.cooldown = 0.0
 	game.act("katon")
 	assert(game.stage == 2, "Katon must unlock the village")
 	assert(game.sharingan_awakened, "Katon milestone must awaken the one-tomoe Sharingan")
+	assert(game.rpg.unlocked_jutsu.has("sharingan"), "Sharingan must enter the unlocked jutsu list")
 	assert(game.chakra < 100, "Katon must consume chakra")
 	close_dialogue(game)
 	game.naruto_pos = Vector2(640, 260)
@@ -43,6 +45,8 @@ func run_checks() -> void:
 	game.player = Vector2(110, 240)
 	game.act("interact")
 	assert(game.stage == 6, "Resting at home must complete the prologue")
+	assert(game.story_era == 1, "Finishing the prologue must unlock the episode-1 era")
+	assert(game.rpg.completed_missions.size() == 4, "Prologue must register all four progression milestones")
 	close_dialogue(game)
 	# Exercise every graphical branch and load every imported resource.
 	for area in range(7):
