@@ -48,8 +48,35 @@ func run_checks() -> void:
 	assert(game.story_era == 1, "Finishing the prologue must unlock the episode-1 era")
 	assert(game.rpg.completed_missions.size() == 4, "Prologue must register all four progression milestones")
 	close_dialogue(game)
+	assert(game.stage == 7, "Closing the prologue must begin Episode 1")
+	assert(game.episode_1_started, "Episode 1 flag must be enabled")
+	game.player = game.naruto_pos
+	game.act("interact")
+	assert(game.stage == 8, "Academy scene must trigger the scroll alarm")
+	close_dialogue(game)
+	game.player = Vector2(885, 275)
+	game._process(0.1)
+	assert(game.stage == 9, "Village exit must lead to Naruto in the forest")
+	close_dialogue(game)
+	game.player = game.naruto_pos
+	game.act("interact")
+	assert(game.stage == 10, "Talking to Naruto must begin the Mizuki confrontation")
+	close_dialogue(game)
+	for i in range(3):
+		game.player = game.mizuki - Vector2(80, 0)
+		game.facing = Vector2.RIGHT
+		game.cooldown = 0.0
+		game.act("kunai")
+	assert(game.stage == 11, "Three kunai hits must open Naruto's decisive moment")
+	close_dialogue(game)
+	game.player = game.naruto_pos
+	game.act("interact")
+	assert(game.stage == 12, "Talking after the fight must complete Episode 1")
+	assert(game.rpg.completed_missions.has("academy_day"), "Episode 1 completion must reward the academy mission")
+	close_dialogue(game)
+	assert(game.restart.visible, "Episode 1 ending must expose replay")
 	# Exercise every graphical branch and load every imported resource.
-	for area in range(7):
+	for area in range(13):
 		game.stage = area
 		game.background.set_area(area)
 		await process_frame
@@ -64,7 +91,7 @@ func run_checks() -> void:
 	game.effect_kind = "katon"
 	game.attack_flash = 0.5
 	assert(game.art.character_art.henrique_frame(game) == 21, "Katon must select jutsu poses")
-	print("PASS: complete prologue progression, chakra, area transitions and SVG atlas import")
+	print("PASS: complete EP -1 + EP 1 progression, RPG rewards, combat beat and 2D visual branches")
 	game.queue_free()
 	await process_frame
 	quit()
