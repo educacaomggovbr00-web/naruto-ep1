@@ -6,7 +6,7 @@ var ryo := 100
 var mission_rank := "Academia"
 var inventory := {"kunai": 10, "shuriken": 5, "soldier_pill": 1}
 var completed_missions: Array[String] = []
-var unlocked_jutsu := ["kunai", "katon"]
+var unlocked_jutsu := ["kunai", "shuriken", "katon"]
 
 func add_xp(amount: int) -> void:
 	xp += maxi(amount, 0)
