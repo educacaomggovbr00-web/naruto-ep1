@@ -48,35 +48,37 @@ func draw_henrique(host: Node2D) -> void:
 	var mirror: bool = host.facing.x < 0
 	shadow(host, host.player)
 	host.draw_set_transform(host.player + Vector2(0, 14), 0, Vector2(-1 if mirror else 1, 1))
-	host.draw_texture_rect_region(HENRIQUE_TEXTURE, Rect2(Vector2(-size.x / 2, -size.y), size), region, Color("b7c1d8") if host.stage >= 3 else Color.WHITE)
+	host.draw_texture_rect_region(HENRIQUE_TEXTURE, Rect2(Vector2(-size.x / 2, -size.y), size), region, Color("b7c1d8") if host.stage >= 8 else Color.WHITE)
 	host.draw_set_transform(Vector2.ZERO)
 	host.draw_string(ThemeDB.fallback_font, host.player + Vector2(-28, -90), "Henrique", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
 
-func draw_naruto(host: Node2D, at: Vector2) -> void:
-	var action_name: String = host.naruto_action if mugen_actions.has(host.naruto_action) else "idle"
-	var frames: Array = mugen_actions[action_name]
+func select_mugen_frame(action_name: String, clock: float) -> Dictionary:
+	var resolved := action_name if mugen_actions.has(action_name) else "idle"
+	var frames: Array = mugen_actions[resolved]
 	var cycle := 0
 	for frame in frames:
 		cycle += int(frame["ticks"])
-	var tick := int(host.visual_clock * 60) % maxi(cycle, 1)
+	var tick := int(clock * 60) % maxi(cycle, 1)
 	var selected: Dictionary = frames[0]
 	for frame in frames:
 		selected = frame
 		tick -= int(frame["ticks"])
 		if tick < 0:
 			break
+	return selected
+
+func draw_naruto_mugen(host: Node2D, at: Vector2, action_name: String = "run", scale_factor: float = 0.52) -> void:
+	var selected := select_mugen_frame(action_name, host.visual_clock)
 	var texture: Texture2D = selected["texture"]
 	var axis: Array = selected["axis"]
 	var offset: Array = selected["offset"]
-	var scale_factor := 0.7
-	var moving_left := cos(host.visual_clock * 0.85) < 0.0
-	shadow(host, at)
-	host.draw_set_transform(at + Vector2(0, 14), 0, Vector2(-1 if moving_left and action_name != "idle" else 1, 1))
+	host.draw_rect(Rect2(at + Vector2(-92, -138), Vector2(184, 158)), Color(0.035, 0.08, 0.11, 0.78))
+	host.draw_rect(Rect2(at + Vector2(-92, -138), Vector2(184, 4)), Color("d4a54f"))
+	host.draw_string(ThemeDB.fallback_font, at + Vector2(-78, -112), "NARUTO • BATALHA 2D", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("f6e4bc"))
+	host.draw_set_transform(at + Vector2(0, 12), 0, Vector2(1, 1))
 	host.draw_texture_rect(texture, Rect2(Vector2((offset[0] - axis[0]) * scale_factor, (offset[1] - axis[1]) * scale_factor), texture.get_size() * scale_factor), false)
 	host.draw_set_transform(Vector2.ZERO)
-	host.draw_string(ThemeDB.fallback_font, at + Vector2(-23, -90), "Naruto", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
 
 func portrait(host: Node2D) -> void:
 	var bounds: Array = henrique_frames[0]["rect"]
-	# Region of the original texture; no baked crops or background removal.
 	host.draw_texture_rect_region(HENRIQUE_TEXTURE, Rect2(16, 10, 44, 54), Rect2(bounds[0] + 10, bounds[1], bounds[2] - 20, 135))
