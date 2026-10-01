@@ -1,0 +1,11 @@
+config_version=5
+[application]
+config/name="Naruto EP -1 — A Noite Antes do Começo"
+run/main_scene="res://scenes/main.tscn"
+[display]
+window/size/viewport_width=960
+window/size/viewport_height=540
+window/stretch/mode="canvas_items"
+[rendering]
+renderer/rendering_method="gl_compatibility"
+textures/default_filters/use_nearest_mipmap_filter=false
