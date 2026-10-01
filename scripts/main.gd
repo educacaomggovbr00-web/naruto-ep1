@@ -19,6 +19,12 @@ var hud: Label
 var objective: Label
 var dialogue: Button
 var restart: Button
+var visual_clock := 0.0
+var effect_kind := "kunai"
+var effect_origin := Vector2.ZERO
+var effect_direction := Vector2.RIGHT
+var art = preload("res://scripts/visuals.gd").new()
+var background = preload("res://scripts/background.gd").new()
 const OBJECTIVES := [
 	"TREINO • Acerte 3 vezes o alvo com kunai (J / botão KUNAI).",
 	"CHAKRA • Use Katon perto do alvo (K / botão KATON).",
@@ -30,21 +36,28 @@ const OBJECTIVES := [
 ]
 
 func _ready() -> void:
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	add_child(background)
+	background.z_index = -1
+	background.set_area(stage)
 	var layer := CanvasLayer.new()
 	add_child(layer)
 	hud = Label.new()
-	hud.position = Vector2(18, 12)
+	hud.position = Vector2(74, 10)
 	hud.add_theme_font_size_override("font_size", 20)
 	layer.add_child(hud)
 	objective = Label.new()
-	objective.position = Vector2(18, 43)
-	objective.add_theme_font_size_override("font_size", 16)
+	objective.position = Vector2(74, 40)
+	objective.add_theme_font_size_override("font_size", 15)
+	objective.size = Vector2(870, 34)
+	objective.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	layer.add_child(objective)
 	dialogue = Button.new()
 	dialogue.position = Vector2(120, 325)
 	dialogue.size = Vector2(720, 100)
 	dialogue.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	dialogue.pressed.connect(next_line)
+	style_button(dialogue, true)
 	layer.add_child(dialogue)
 	for item in [["←", Vector2(18, 460), "left"], ["→", Vector2(150, 460), "right"], ["↑", Vector2(84, 394), "up"], ["↓", Vector2(84, 460), "down"], ["FURTIVO", Vector2(244, 460), "sneak"]]:
 		var button := Button.new()
@@ -54,6 +67,7 @@ func _ready() -> void:
 		var action: String = item[2]
 		button.button_down.connect(func(): held[action] = true)
 		button.button_up.connect(func(): held[action] = false)
+		style_button(button)
 		layer.add_child(button)
 	for item in [["KUNAI", 610, "kunai"], ["KATON", 720, "katon"], ["AÇÃO", 830, "interact"]]:
 		var button := Button.new()
@@ -62,6 +76,7 @@ func _ready() -> void:
 		button.size = Vector2(105, 64)
 		var action: String = item[2]
 		button.pressed.connect(func(): act(action))
+		style_button(button)
 		layer.add_child(button)
 	restart = Button.new()
 	restart.text = "Jogar novamente"
@@ -69,6 +84,7 @@ func _ready() -> void:
 	restart.size = Vector2(210, 50)
 	restart.visible = false
 	restart.pressed.connect(func(): get_tree().reload_current_scene())
+	style_button(restart)
 	layer.add_child(restart)
 	say(["NARUTO EP -1 — A Noite Antes do Começo", "Henrique Uchiha, 12 anos. Um fim de tarde em Konoha, antes do início da história de Naruto.", "Henrique: Ainda tenho muito para aprender. Vou começar pelo treino de kunai.", "Mova-se com WASD/setas ou os botões. Clique no diálogo ou pressione E para avançar."])
 
@@ -97,6 +113,8 @@ func down(action: String, key: Key, alternate: Key = KEY_NONE) -> bool:
 	return held.get(action, false) or Input.is_physical_key_pressed(key) or (alternate != KEY_NONE and Input.is_physical_key_pressed(alternate))
 
 func _process(delta: float) -> void:
+	visual_clock += delta
+	background.set_area(stage)
 	cooldown = maxf(0.0, cooldown - delta)
 	attack_flash = maxf(0.0, attack_flash - delta)
 	chakra = minf(100.0, chakra + delta * 5.0)
@@ -105,7 +123,12 @@ func _process(delta: float) -> void:
 		if movement != Vector2.ZERO:
 			facing = movement
 		var sneaking := down("sneak", KEY_SHIFT)
+		var previous_position := player
 		player += movement * (95.0 if sneaking else 180.0) * delta
+		if stage == 2 or stage >= 5:
+			for house_rect in [Rect2(36, 91, 152, 130), Rect2(268, 85, 152, 130), Rect2(460, 91, 152, 130), Rect2(714, 82, 152, 130)]:
+				if house_rect.grow(8).has_point(player):
+					player = previous_position
 		player = player.clamp(Vector2(35, 110), Vector2(925, 375))
 		if stage == 3:
 			var distance := player.distance_to(mizuki)
@@ -122,7 +145,7 @@ func _process(delta: float) -> void:
 					stage = 4
 					target = mizuki
 					say(["Henrique: Ele sumiu entre as árvores...", "Há uma kunai no chão. Será que ele deixou cair?"])
-	hud.text = "HENRIQUE UCHIHA • 12 anos    |    Chakra %d/100" % int(chakra)
+	hud.text = "HENRIQUE UCHIHA  •  12 anos     |     CHAKRA %d" % int(chakra)
 	objective.text = OBJECTIVES[stage]
 	if stage == 3:
 		objective.text += "  %d%%" % int(trail_progress / 12 * 100)
@@ -136,6 +159,9 @@ func act(action: String) -> void:
 	if action == "kunai" and cooldown <= 0:
 		cooldown = 0.4
 		attack_flash = 0.2
+		effect_kind = "kunai"
+		effect_origin = player
+		effect_direction = facing
 		if stage == 0 and player.distance_to(target) < 150 and facing.dot((target - player).normalized()) > 0.35:
 			hits += 1
 			if hits >= 3:
@@ -145,6 +171,9 @@ func act(action: String) -> void:
 		chakra -= 25
 		cooldown = 1.0
 		attack_flash = 0.5
+		effect_kind = "katon"
+		effect_origin = player
+		effect_direction = facing
 		if stage == 1 and player.distance_to(target) < 150:
 			stage = 2
 			player = Vector2(170, 270)
@@ -162,41 +191,21 @@ func act(action: String) -> void:
 			say(["Henrique adormece. No sonho: fogo, o símbolo Uchiha e uma silhueta com olhos vermelhos.", "Sinos de emergência rompem o silêncio da madrugada.", "Ninja no telhado: O Pergaminho dos Selos foi roubado!", "Henrique corre até a janela. Uma figura de roupa laranja desaparece em direção à floresta.", "Henrique: Naruto...?", "FIM DO EP -1 — A Noite Antes do Começo. Prólogo original de fã. O episódio 1 ainda não está implementado."])
 			restart.show()
 
-func ninja(at: Vector2, color: Color, label: String) -> void:
-	draw_rect(Rect2(at + Vector2(-12, -7), Vector2(24, 27)), color)
-	draw_rect(Rect2(at + Vector2(-10, -26), Vector2(20, 19)), Color("e1ac87"))
-	draw_rect(Rect2(at + Vector2(-12, -30), Vector2(24, 10)), Color("182031"))
-	draw_rect(Rect2(at + Vector2(-12, 20), Vector2(9, 10)), Color("182031"))
-	draw_rect(Rect2(at + Vector2(3, 20), Vector2(9, 10)), Color("182031"))
-	draw_string(ThemeDB.fallback_font, at + Vector2(-32, -38), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color.WHITE)
+func style_button(button: Button, is_dialogue: bool = false) -> void:
+	button.focus_mode = Control.FOCUS_NONE
+	button.add_theme_font_size_override("font_size", 18 if is_dialogue else 15)
+	button.add_theme_color_override("font_color", Color("f3dfb4"))
+	for state in ["normal", "hover", "pressed", "focus"]:
+		var style := StyleBoxFlat.new()
+		style.bg_color = Color("203b48") if state != "pressed" else Color("496066")
+		style.border_color = Color("b29a6c") if is_dialogue else Color("6d8788")
+		style.set_border_width_all(2)
+		style.set_corner_radius_all(5)
+		style.content_margin_left = 18 if is_dialogue else 6
+		style.content_margin_right = 18 if is_dialogue else 6
+		style.content_margin_top = 10
+		style.content_margin_bottom = 10
+		button.add_theme_stylebox_override(state, style)
 
 func _draw() -> void:
-	var night := stage >= 3
-	draw_rect(Rect2(0, 0, 960, 540), Color("172936") if night else Color("688c5b"))
-	draw_rect(Rect2(0, 205, 960, 100), Color("35414c") if night else Color("b29971"))
-	for i in range(12):
-		var pos := Vector2(30 + i * 82, 130 if i % 2 == 0 else 360)
-		draw_rect(Rect2(pos, Vector2(10, 38)), Color("694d39"))
-		draw_circle(pos + Vector2(5, -3), 26, Color("243f38") if night else Color("365c3f"))
-	if stage <= 1:
-		draw_circle(target, 23, Color("decda4"))
-		draw_circle(target, 15, Color("ad4841"))
-		draw_circle(target, 6, Color("decda4"))
-		draw_string(ThemeDB.fallback_font, target + Vector2(-25, -32), "%d/3" % hits)
-	elif stage == 2:
-		for i in range(3):
-			draw_rect(Rect2(350 + i * 165, 105, 110, 75), Color("c2a183"))
-			draw_rect(Rect2(340 + i * 165, 95, 130, 18), Color("784a43"))
-		ninja(Vector2(640, 260), Color("ec8b35"), "Naruto")
-		ninja(Vector2(730, 260), Color("597449"), "Iruka")
-	elif stage == 3:
-		ninja(mizuki, Color("969ab4"), "Mizuki")
-	elif stage == 4:
-		draw_line(target - Vector2(12, 0), target + Vector2(12, 0), Color("cedce3"), 4)
-	if stage >= 5:
-		draw_rect(Rect2(65, 170, 90, 80), Color("6c5860"))
-		draw_rect(Rect2(95, 210, 25, 40), Color("252536"))
-		draw_string(ThemeDB.fallback_font, Vector2(75, 158), "Casa", HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
-	ninja(player, Color("243550"), "Henrique")
-	if attack_flash > 0:
-		draw_line(player, player + facing * 110, Color("f5a34a"), 5)
+	art.render(self)
