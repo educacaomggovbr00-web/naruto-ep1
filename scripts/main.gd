@@ -29,6 +29,9 @@ var naruto_pos := Vector2(640, 260)
 var naruto_action := "idle"
 var art = preload("res://scripts/visuals.gd").new()
 var background = preload("res://scripts/background.gd").new()
+var naruto_world = preload("res://scripts/naruto_world.gd").new()
+var rpg = preload("res://scripts/rpg_systems.gd").new()
+var story_era := 0
 const OBJECTIVES := [
 	"TREINO • Acerte 3 vezes o alvo com kunai (J / botão KUNAI).",
 	"CHAKRA • Use Katon perto do alvo (K / botão KATON).",
@@ -150,11 +153,12 @@ func _process(delta: float) -> void:
 				mizuki.x = 660 + sin(trail_progress * 0.35) * 140
 				mizuki.y = 260 + sin(trail_progress * 0.5) * 65
 				if trail_progress >= 12:
+					rpg.complete_mission("shadow_mizuki", 50, 30)
 					stage = 4
 					target = mizuki
 					say(["Henrique: Ele sumiu entre as árvores...", "Há uma kunai no chão. Será que ele deixou cair?"])
 	var eye_status := "SHARINGAN 1T" if sharingan_awakened else "OLHOS NORMAIS"
-	hud.text = "HENRIQUE UCHIHA  •  12 anos     |     CHAKRA %d     |     %s" % [int(chakra), eye_status]
+	hud.text = "HENRIQUE • NV %d • %d RYO     | CHAKRA %d | %s" % [rpg.level, rpg.ryo, int(chakra), eye_status]
 	objective.text = OBJECTIVES[stage]
 	if stage == 3:
 		objective.text += "  %d%%" % int(trail_progress / 12 * 100)
@@ -174,6 +178,7 @@ func act(action: String) -> void:
 		if stage == 0 and player.distance_to(target) < 150 and facing.dot((target - player).normalized()) > 0.35:
 			hits += 1
 			if hits >= 3:
+				rpg.complete_mission("training_kunai", 30, 20)
 				stage = 1
 				say(["Henrique: Três acertos! Agora vou tentar o Katon."])
 	elif action == "katon" and cooldown <= 0 and chakra >= 25:
@@ -185,6 +190,8 @@ func act(action: String) -> void:
 		effect_direction = facing
 		if stage == 1 and player.distance_to(target) < 150:
 			sharingan_awakened = true
+			rpg.unlock_jutsu("sharingan")
+			rpg.complete_mission("first_katon", 40, 25)
 			stage = 2
 			player = Vector2(170, 270)
 			say(["Henrique: Katon!", "As chamas escapam por um instante. Seus olhos ficam vermelhos: Sharingan de um tomoe.", "Henrique: O que foi isso...? Melhor voltar para a vila."])
@@ -198,6 +205,8 @@ func act(action: String) -> void:
 			say(["Henrique: Uma kunai... Não consigo descobrir o que ele estava planejando.", "Está tarde. Vou para casa."])
 		elif stage == 5 and player.distance_to(Vector2(110, 230)) < 95:
 			stage = 6
+			rpg.complete_mission("scroll_alarm", 80, 0)
+			story_era = 1
 			say(["Henrique adormece. No sonho: fogo, o símbolo Uchiha e uma silhueta com olhos vermelhos.", "Sinos de emergência rompem o silêncio da madrugada.", "Ninja no telhado: O Pergaminho dos Selos foi roubado!", "Henrique corre até a janela. Uma figura de roupa laranja desaparece em direção à floresta.", "Henrique: Naruto...?", "FIM DO EP -1 — A Noite Antes do Começo. Prólogo original de fã. O episódio 1 ainda não está implementado."])
 			restart.show()
 
