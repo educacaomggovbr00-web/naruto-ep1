@@ -47,7 +47,17 @@ func run_checks() -> void:
 		game.stage = area
 		game.background.set_area(area)
 		await process_frame
-	assert(game.art.HENRIQUE.get_width() == 216, "Character atlas must contain nine frames")
+	assert(game.art.HENRIQUE.get_width() == 1536, "Detailed character atlas must import correctly")
+	assert(game.art.character_art.henrique_frames.size() == 24, "All Henrique poses must be mapped")
+	assert(game.art.character_art.mugen_actions["idle"].size() == 4, "Original MUGEN AIR idle cycle must be loaded")
+	game.attack_flash = 0.0
+	game.movement = Vector2.RIGHT
+	game.lines.clear()
+	game.sprinting = true
+	assert(game.art.character_art.henrique_frame(game) >= 12, "Sprint must select running frames")
+	game.effect_kind = "katon"
+	game.attack_flash = 0.5
+	assert(game.art.character_art.henrique_frame(game) == 21, "Katon must select jutsu poses")
 	print("PASS: complete prologue progression, chakra, area transitions and SVG atlas import")
 	game.queue_free()
 	await process_frame

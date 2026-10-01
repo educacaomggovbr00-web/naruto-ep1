@@ -20,6 +20,7 @@ var objective: Label
 var dialogue: Button
 var restart: Button
 var visual_clock := 0.0
+var sprinting := false
 var effect_kind := "kunai"
 var effect_origin := Vector2.ZERO
 var effect_direction := Vector2.RIGHT
@@ -59,11 +60,11 @@ func _ready() -> void:
 	dialogue.pressed.connect(next_line)
 	style_button(dialogue, true)
 	layer.add_child(dialogue)
-	for item in [["←", Vector2(18, 460), "left"], ["→", Vector2(150, 460), "right"], ["↑", Vector2(84, 394), "up"], ["↓", Vector2(84, 460), "down"], ["FURTIVO", Vector2(244, 460), "sneak"]]:
+	for item in [["←", Vector2(18, 460), "left"], ["→", Vector2(150, 460), "right"], ["↑", Vector2(84, 394), "up"], ["↓", Vector2(84, 460), "down"], ["FURTIVO", Vector2(244, 460), "sneak"], ["CORRER", Vector2(365, 460), "run"]]:
 		var button := Button.new()
 		button.text = item[0]
 		button.position = item[1]
-		button.size = Vector2(64 if item[2] != "sneak" else 110, 64)
+		button.size = Vector2(110 if item[2] == "sneak" else 95 if item[2] == "run" else 64, 64)
 		var action: String = item[2]
 		button.button_down.connect(func(): held[action] = true)
 		button.button_up.connect(func(): held[action] = false)
@@ -123,8 +124,9 @@ func _process(delta: float) -> void:
 		if movement != Vector2.ZERO:
 			facing = movement
 		var sneaking := down("sneak", KEY_SHIFT)
+		sprinting = down("run", KEY_R) and not sneaking
 		var previous_position := player
-		player += movement * (95.0 if sneaking else 180.0) * delta
+		player += movement * (95.0 if sneaking else 240.0 if sprinting else 180.0) * delta
 		if stage == 2 or stage >= 5:
 			for house_rect in [Rect2(36, 91, 152, 130), Rect2(268, 85, 152, 130), Rect2(460, 91, 152, 130), Rect2(714, 82, 152, 130)]:
 				if house_rect.grow(8).has_point(player):

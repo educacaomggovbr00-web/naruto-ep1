@@ -31,4 +31,14 @@ Verificação: `godot --headless --path . --editor --quit`, depois `godot --head
 - [The Fight of Konoha](https://timyfreak.itch.io/the-fight-of-konoha): referência de apresentação de Naruto/Sasuke em pixel art.
 - [Simple NES-like Village Tiles, surt / OpenGameArt](https://opengameart.org/content/simple-nes-like-village-tiles): pesquisa de tilesets retro.
 
-Esses links são referências de pesquisa, não fornecedores das imagens incluídas. Toda a arte desta atualização foi criada no código do projeto; nenhum sprite ou cenário desses jogos foi copiado. Naruto e personagens associados pertencem aos respectivos titulares. Projeto independente de fã.
+Esses links foram referências para a primeira versão visual. A atualização detalhada inclui arte gerada do Henrique baseada na imagem enviada pelo usuário e sprites do Naruto convertidos do pack MUGEN Real Naruto. Consulte `assets/mugen/CREDITS.md` para a origem e créditos do pack. Naruto e personagens associados pertencem aos respectivos titulares. Projeto independente de fã.
+
+
+## Sprites detalhados e MUGEN
+
+- `assets/characters/henrique-detailed.png`: atlas RGBA com 24 poses do Henrique, criado com a ferramenta integrada de geração de imagens a partir da referência enviada. `henrique-frames.json` mapeia os recortes reais da textura, mantendo o PNG original intacto.
+- `assets/mugen/naruto/`: 14 sprites originais decodificados do SFF do pack Real Naruto, com quatro animações e os tempos/eixos do AIR preservados. A espera do Naruto usa esses quadros na praça; caminhada, corrida e agachamento ficam disponíveis no manifesto, sem novas cenas para o NPC.
+- CORRER na tela ou R: sprint do Henrique. FURTIVO/Shift continua tendo prioridade na perseguição.
+- Henrique usa poses próprias de idle, caminhada, corrida, kunai e Katon. Não é um personagem baixado do MUGEN. O jogo permanece em visão de cima; os movimentos laterais usam o atlas detalhado e o idle de costas aparece ao olhar para cima. Ciclos de caminhada vertical exclusivos ainda não estão disponíveis.
+
+Teste atualizado passou no Godot 4.3: importação RGBA, atlas de 24 poses, AIR idle de quatro quadros, seleção de sprint/Katon e sequência completa do prólogo. Não há exportação APK nesta mudança.

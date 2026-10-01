@@ -1,6 +1,7 @@
 extends RefCounted
 
-const HENRIQUE = preload("res://assets/art/henrique.svg")
+const HENRIQUE = preload("res://assets/characters/henrique-detailed.png")
+var character_art = preload("res://scripts/character_art.gd").new()
 const NARUTO = preload("res://assets/art/naruto.svg")
 const IRUKA = preload("res://assets/art/iruka.svg")
 const MIZUKI = preload("res://assets/art/mizuki.svg")
@@ -18,12 +19,12 @@ func actor(host: Node2D, at: Vector2, texture: Texture2D, direction: Vector2, mo
 	host.draw_set_transform(at + Vector2(0, 12), 0, Vector2(1, 0.3))
 	host.draw_circle(Vector2.ZERO, 17, Color(0.07, 0.13, 0.17, 0.38))
 	host.draw_set_transform(at + Vector2(0, bob), 0, Vector2(-1 if row == 2 and direction.x < 0 else 1, 1))
-	host.draw_texture_rect_region(texture, Rect2(-24, -42, 48, 56), Rect2((row * 3 + frame) * 24, 0, 24, 28), Color("b1bbd2") if night else Color.WHITE)
+	host.draw_texture_rect_region(texture, Rect2(-36, -70, 72, 84), Rect2((row * 3 + frame) * 24, 0, 24, 28), Color("b1bbd2") if night else Color.WHITE)
 	host.draw_set_transform(Vector2.ZERO)
-	host.draw_string(ThemeDB.fallback_font, at + Vector2(-28, -49), name_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
+	host.draw_string(ThemeDB.fallback_font, at + Vector2(-28, -90), name_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
 
 func marker(host: Node2D, at: Vector2, clock: float) -> void:
-	var y := at.y - 63 + sin(clock * 3.5) * 3
+	var y := at.y - 100 + sin(clock * 3.5) * 3
 	host.draw_colored_polygon(PackedVector2Array([Vector2(at.x - 6, y), Vector2(at.x + 6, y), Vector2(at.x, y + 7)]), Color("f4d085"))
 
 func render(host: Node2D) -> void:
@@ -33,7 +34,7 @@ func render(host: Node2D) -> void:
 		marker(host, host.target, host.visual_clock)
 		host.draw_string(ThemeDB.fallback_font, host.target + Vector2(-16, 45), "%d / 3" % host.hits, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("fcdfa2"))
 	elif host.stage == 2:
-		actor(host, Vector2(640, 260), NARUTO, Vector2.DOWN, false, host.visual_clock, "Naruto", false)
+		character_art.draw_naruto(host, Vector2(640, 260))
 		actor(host, Vector2(730, 260), IRUKA, Vector2.DOWN, false, host.visual_clock, "Iruka", false)
 		marker(host, Vector2(640, 260), host.visual_clock)
 	elif host.stage == 3:
@@ -43,7 +44,7 @@ func render(host: Node2D) -> void:
 		marker(host, host.target + Vector2(0, 36), host.visual_clock)
 	if host.stage == 5:
 		marker(host, Vector2(110, 240), host.visual_clock)
-	actor(host, host.player, HENRIQUE, host.facing, host.movement != Vector2.ZERO and host.lines.is_empty(), host.visual_clock, "Henrique", night)
+	character_art.draw_henrique(host)
 	if host.attack_flash > 0:
 		var progress: float = 1.0 - host.attack_flash / (0.5 if host.effect_kind == "katon" else 0.2)
 		var at: Vector2 = host.effect_origin + host.effect_direction * progress * 125
@@ -70,7 +71,7 @@ func render(host: Node2D) -> void:
 	host.draw_rect(Rect2(0, 0, 960, 78), Color("142c35"))
 	host.draw_rect(Rect2(0, 76, 960, 2), Color("9e885c"))
 	host.draw_rect(Rect2(13, 9, 48, 55), Color("29414b"))
-	host.draw_texture_rect_region(HENRIQUE, Rect2(13, 9, 48, 56), Rect2(0, 0, 24, 28))
+	character_art.portrait(host)
 	host.draw_rect(Rect2(610, 16, 166, 10), Color("314952"))
 	host.draw_rect(Rect2(612, 18, 162 * host.chakra / 100.0, 6), Color("66b8bd"))
 	var place := "CAMPO DE TREINO" if host.stage <= 1 else "KONOHA • PRAÇA" if host.stage == 2 else "FLORESTA • NOITE" if host.stage <= 4 else "KONOHA • CASA"
