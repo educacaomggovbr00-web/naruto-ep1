@@ -28,7 +28,7 @@ func marker(host: Node2D, at: Vector2, clock: float) -> void:
 	host.draw_colored_polygon(PackedVector2Array([Vector2(at.x - 6, y), Vector2(at.x + 6, y), Vector2(at.x, y + 7)]), Color("f4d085"))
 
 func render(host: Node2D) -> void:
-	var night: bool = host.stage >= 3
+	var night: bool = host.stage == 3 or host.stage == 4 or host.stage == 5 or host.stage == 6 or host.stage >= 8
 	if host.stage <= 1:
 		host.draw_texture_rect(TARGET, Rect2(host.target - Vector2(28, 37), Vector2(56, 64)), false)
 		marker(host, host.target, host.visual_clock)
@@ -42,6 +42,27 @@ func render(host: Node2D) -> void:
 	elif host.stage == 4:
 		host.draw_texture_rect(KUNAI, Rect2(host.target - Vector2(16, 8), Vector2(32, 16)), false)
 		marker(host, host.target + Vector2(0, 36), host.visual_clock)
+	elif host.stage == 7:
+		character_art.draw_naruto(host, host.naruto_pos)
+		actor(host, Vector2(360, 260), IRUKA, Vector2.DOWN, false, host.visual_clock, "Iruka", false)
+		marker(host, host.naruto_pos, host.visual_clock)
+	elif host.stage == 8:
+		marker(host, Vector2(885, 275), host.visual_clock)
+	elif host.stage == 9:
+		character_art.draw_naruto(host, host.naruto_pos)
+		host.draw_rect(Rect2(host.naruto_pos + Vector2(-32, 18), Vector2(30, 20)), Color("d9c89a"))
+		host.draw_line(host.naruto_pos + Vector2(-27, 23), host.naruto_pos + Vector2(-8, 23), Color("735f45"), 2)
+		marker(host, host.naruto_pos, host.visual_clock)
+	elif host.stage == 10:
+		character_art.draw_naruto(host, host.naruto_pos)
+		actor(host, Vector2(430, 265), IRUKA, Vector2.RIGHT, false, host.visual_clock, "Iruka", true)
+		actor(host, host.mizuki, MIZUKI, Vector2.LEFT, false, host.visual_clock, "Mizuki", true)
+		marker(host, host.mizuki, host.visual_clock)
+	elif host.stage == 11 or host.stage == 12:
+		character_art.draw_naruto(host, host.naruto_pos)
+		actor(host, Vector2(430, 265), IRUKA, Vector2.RIGHT, false, host.visual_clock, "Iruka", true)
+		if host.stage == 11:
+			marker(host, host.naruto_pos, host.visual_clock)
 	if host.stage == 5:
 		marker(host, Vector2(110, 240), host.visual_clock)
 	character_art.draw_henrique(host)
@@ -79,6 +100,18 @@ func render(host: Node2D) -> void:
 		host.draw_string(ThemeDB.fallback_font, Vector2(566, 45), "1 TOMOE", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("e7c7b2"))
 	host.draw_rect(Rect2(610, 16, 166, 10), Color("314952"))
 	host.draw_rect(Rect2(612, 18, 162 * host.chakra / 100.0, 6), Color("66b8bd"))
-	var place := "CAMPO DE TREINO" if host.stage <= 1 else "KONOHA • PRAÇA" if host.stage == 2 else "FLORESTA • NOITE" if host.stage <= 4 else "KONOHA • CASA"
+	var place := "CAMPO DE TREINO"
+	if host.stage == 2:
+		place = "KONOHA • PRAÇA"
+	elif host.stage == 3 or host.stage == 4:
+		place = "FLORESTA • NOITE"
+	elif host.stage == 5 or host.stage == 6:
+		place = "KONOHA • CASA"
+	elif host.stage == 7:
+		place = "ACADEMIA NINJA"
+	elif host.stage == 8:
+		place = "KONOHA • ALARME"
+	elif host.stage >= 9:
+		place = "FLORESTA • PERGAMINHO"
 	host.draw_string(ThemeDB.fallback_font, Vector2(790, 26), place, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("d6c89f"))
 	host.draw_rect(Rect2(0, 445, 960, 95), Color(0.045, 0.10, 0.15, 0.70))
