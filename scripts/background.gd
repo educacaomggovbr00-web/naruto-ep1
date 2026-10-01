@@ -55,9 +55,19 @@ func _draw() -> void:
 		building(Vector2(268, 85))
 		building(Vector2(460, 91), Color("e0d2b8"))
 		building(Vector2(714, 82))
-		# Village signage, ramen stall, small wooden bridge over canal.
+		# Village signage, ramen stall, mission board, clan banners and small bridge over canal.
 		draw_rect(Rect2(286, 167, 116, 19), Color("4c493f"))
 		draw_string(ThemeDB.fallback_font, Vector2(299, 182), "ACADEMIA", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f3d599"))
+		# Konoha leaf plaques beside the academy and central street.
+		for plaque in [Vector2(258, 154), Vector2(674, 154)]:
+			draw_circle(plaque, 10, Color("c7b17e"))
+			draw_arc(plaque, 5, -1.8, 1.8, 12, Color("46595a"), 2)
+			draw_line(plaque + Vector2(4, 3), plaque + Vector2(10, 3), Color("46595a"), 2)
+		# Mission board gives the plaza more RPG identity.
+		draw_rect(Rect2(470, 226, 76, 50), Color("755638"))
+		draw_rect(Rect2(476, 232, 64, 34), Color("d2bd8c"))
+		for note in [Rect2(481, 237, 16, 10), Rect2(503, 239, 13, 13), Rect2(520, 236, 15, 11), Rect2(487, 252, 20, 9)]:
+			draw_rect(note, Color("eee0b8"))
 		draw_rect(Rect2(797, 186, 84, 35), Color("ae734b"))
 		draw_rect(Rect2(791, 177, 96, 14), Color("d2c095"))
 		for i in range(6):
@@ -71,6 +81,12 @@ func _draw() -> void:
 			draw_rect(Rect2(536 + i * 9, 340, 1, 45), Color("c1a574"))
 		draw_rect(Rect2(534, 337, 94, 3), Color("504b3e"))
 		draw_rect(Rect2(534, 381, 94, 3), Color("504b3e"))
+		# Uchiha district markers: red/white fan motif, kept simple for pixel-art readability.
+		for banner in [Vector2(205, 128), Vector2(690, 128)]:
+			draw_rect(Rect2(banner.x - 2, banner.y, 4, 45), Color("4d3c34"))
+			draw_circle(banner + Vector2(0, 8), 9, Color("b54c48"))
+			draw_rect(Rect2(banner.x - 9, banner.y + 8, 18, 8), Color("e6ded0"))
+			draw_circle(banner + Vector2(0, 16), 9, Color("e6ded0"))
 	else:
 		for i in range(14):
 			tree(Vector2(12 + i * 72, 120 + (i % 3) * 7), 1.3)
