@@ -87,6 +87,26 @@ func _draw() -> void:
 			draw_circle(banner + Vector2(0, 8), 9, Color("b54c48"))
 			draw_rect(Rect2(banner.x - 9, banner.y + 8, 18, 8), Color("e6ded0"))
 			draw_circle(banner + Vector2(0, 16), 9, Color("e6ded0"))
+		# Old-school RPG street dressing: alleys, signs, benches, crates and route markers.
+		for x in range(36, 924, 48):
+			draw_rect(Rect2(x, 303 + int(x / 48) % 2 * 3, 18, 3), Color("817d70"))
+		for at in [Vector2(222, 300), Vector2(650, 304)]:
+			draw_rect(Rect2(at.x, at.y, 54, 7), Color("795f45"))
+			draw_rect(Rect2(at.x + 4, at.y + 7, 5, 13), Color("5b4938"))
+			draw_rect(Rect2(at.x + 45, at.y + 7, 5, 13), Color("5b4938"))
+		for at in [Vector2(52, 286), Vector2(878, 288), Vector2(608, 248)]:
+			draw_rect(Rect2(at.x, at.y, 22, 18), Color("8a6a45"))
+			draw_rect(Rect2(at.x + 3, at.y + 3, 16, 12), Color("a98555"))
+			draw_line(at + Vector2(3, 3), at + Vector2(19, 15), Color("684e36"), 2)
+		draw_rect(Rect2(575, 286, 5, 35), Color("604a37"))
+		draw_rect(Rect2(550, 286, 57, 12), Color("b79c6c"))
+		draw_string(ThemeDB.fallback_font, Vector2(555, 296), "ACADEMIA", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color("4c4035"))
+		draw_rect(Rect2(559, 300, 48, 12), Color("aa8b61"))
+		draw_string(ThemeDB.fallback_font, Vector2(564, 310), "RAMEN >", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color("4c4035"))
+		for at in [Vector2(150, 322), Vector2(330, 315), Vector2(735, 314)]:
+			draw_rect(Rect2(at.x, at.y, 78, 16), Color("62784f"))
+			for j in range(6):
+				draw_rect(Rect2(at.x + 5 + j * 12, at.y + 4 + (j % 2) * 4, 5, 4), Color("82905b"))
 	else:
 		for i in range(14):
 			tree(Vector2(12 + i * 72, 120 + (i % 3) * 7), 1.3)
