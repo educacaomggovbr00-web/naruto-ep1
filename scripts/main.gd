@@ -1,8 +1,8 @@
 extends Node2D
 
 # Original playable fan-game prologue, before the events of episode 1.
-var player := Vector2(140, 270)
-var stage := 0
+var player := Vector2(185, 270)
+var stage := 7
 var hits := 0
 var chakra := 100.0
 var cooldown := 0.0
@@ -28,15 +28,16 @@ var effect_kind := "kunai"
 var effect_origin := Vector2.ZERO
 var effect_direction := Vector2.RIGHT
 var sharingan_awakened := false
-var naruto_pos := Vector2(640, 260)
+var naruto_pos := Vector2(620, 265)
 var naruto_action := "idle"
+var naruto_battle_flash := 0.0
 var art = preload("res://scripts/visuals.gd").new()
 var background = preload("res://scripts/background.gd").new()
 var naruto_world = preload("res://scripts/naruto_world.gd").new()
 var rpg = preload("res://scripts/rpg_systems.gd").new()
-var story_era := 0
+var story_era := 1
 var mizuki_hits := 0
-var episode_1_started := false
+var episode_1_started := true
 const OBJECTIVES := [
 	"TREINO • Acerte 3 vezes o alvo com kunai (J / botão KUNAI).",
 	"CHAKRA • Use Katon perto do alvo (K / botão KATON).",
@@ -147,7 +148,7 @@ func _ready() -> void:
 	restart.pressed.connect(func(): get_tree().reload_current_scene())
 	style_button(restart)
 	layer.add_child(restart)
-	say(["NARUTO EP -1 — A Noite Antes do Começo", "Henrique Uchiha, 12 anos. Um fim de tarde em Konoha, antes do início da história de Naruto.", "Henrique: Ainda tenho muito para aprender. Vou começar pelo treino de kunai.", "Mova-se com WASD/setas ou os botões. Clique no diálogo ou pressione E para avançar."])
+	say(["NARUTO CLÁSSICO • EP 1", "Henrique Uchiha, 12 anos. Manhã em Konoha, no dia da prova de graduação da Academia.", "Naruto ainda é um aluno da Academia e acaba de falhar na prova. Sasuke e Sakura também estão por perto.", "Explore a praça em visão de cima, fale com Naruto e acompanhe os acontecimentos do começo da série."])
 
 func say(texts: Array[String]) -> void:
 	lines = texts
@@ -196,6 +197,7 @@ func _process(delta: float) -> void:
 	background.set_area(stage)
 	cooldown = maxf(0.0, cooldown - delta)
 	attack_flash = maxf(0.0, attack_flash - delta)
+	naruto_battle_flash = maxf(0.0, naruto_battle_flash - delta)
 	chakra = minf(100.0, chakra + delta * 5.0)
 	if stage == 2:
 		naruto_pos = Vector2(640 + sin(visual_clock * 0.85) * 34, 260 + sin(visual_clock * 0.42) * 5)
@@ -276,6 +278,7 @@ func act(action: String) -> void:
 			mizuki_hits += 1
 			if mizuki_hits >= 3:
 				stage = 11
+				naruto_battle_flash = 1.7
 				naruto_pos = Vector2(535, 275)
 				say(["Henrique força Mizuki a recuar e ganha alguns segundos para Iruka e Naruto.", "Mizuki tenta atacar novamente, mas Naruto finalmente entende quem estava tentando usá-lo.", "Naruto usa a técnica que aprendeu no pergaminho e a clareira se enche de clones das sombras.", "A luta termina com Mizuki derrotado. O golpe decisivo foi de Naruto."])
 	elif action == "katon" and cooldown <= 0 and chakra >= 25:
@@ -328,12 +331,12 @@ func toggle_progression() -> void:
 		refresh_progression()
 
 func refresh_progression() -> void:
-	var chapter := "PRÓLOGO • A Noite Antes do Começo" if stage < 7 else "NARUTO CLÁSSICO • EP 1"
+	var chapter := "NARUTO CLÁSSICO • EP 1"
 	if stage >= 12:
 		chapter = "NARUTO CLÁSSICO • EP 1 CONCLUÍDO"
 	var story_percent := int(clampf(float(stage) / 12.0, 0.0, 1.0) * 100.0)
-	var sharingan_text := "Sharingan 1 Tomoe" if sharingan_awakened else "Bloqueado • despertar ainda não ocorreu"
-	var jutsu_text := "Kunai • Katon: Bola de Fogo"
+	var sharingan_text := "Sharingan 1 Tomoe" if sharingan_awakened else "Ainda não despertado nesta linha do tempo"
+	var jutsu_text := "Kunai • Shuriken • Katon: Bola de Fogo"
 	if sharingan_awakened:
 		jutsu_text += " • Sharingan 1T"
 	progress_text.text = "[b]ERA:[/b] %s\n[b]IDADE:[/b] 12 anos     [b]RANK:[/b] Aluno da Academia\n[b]NÍVEL:[/b] %d     [b]XP:[/b] %d / %d     [b]RYO:[/b] %d     [b]CHAKRA:[/b] %d / 100\n[b]HISTÓRIA:[/b] %d%%     [b]MISSÕES CONCLUÍDAS:[/b] %d\n\n[b]ARSENAL ATUAL[/b]\n%s\n%s\nKunai x%d • Shuriken x%d • Pílula do Soldado x%d\n\n[b]BLOQUEADO NESTA FASE[/b]\nChidori • Mangekyō • Amaterasu • Susanoo • técnicas avançadas\n[i]Essas habilidades ficam para fases futuras; o jogo ainda está no começo de Naruto Clássico.[/i]" % [
