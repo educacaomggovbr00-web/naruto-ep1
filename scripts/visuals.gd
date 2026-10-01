@@ -34,9 +34,9 @@ func render(host: Node2D) -> void:
 		marker(host, host.target, host.visual_clock)
 		host.draw_string(ThemeDB.fallback_font, host.target + Vector2(-16, 45), "%d / 3" % host.hits, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("fcdfa2"))
 	elif host.stage == 2:
-		character_art.draw_naruto(host, Vector2(640, 260))
+		character_art.draw_naruto(host, host.naruto_pos)
 		actor(host, Vector2(730, 260), IRUKA, Vector2.DOWN, false, host.visual_clock, "Iruka", false)
-		marker(host, Vector2(640, 260), host.visual_clock)
+		marker(host, host.naruto_pos, host.visual_clock)
 	elif host.stage == 3:
 		actor(host, host.mizuki, MIZUKI, Vector2.RIGHT, host.lines.is_empty(), host.visual_clock, "Mizuki", true)
 	elif host.stage == 4:
@@ -72,6 +72,11 @@ func render(host: Node2D) -> void:
 	host.draw_rect(Rect2(0, 76, 960, 2), Color("9e885c"))
 	host.draw_rect(Rect2(13, 9, 48, 55), Color("29414b"))
 	character_art.portrait(host)
+	if host.sharingan_awakened:
+		host.draw_circle(Vector2(585, 21), 11, Color("a92f2f"))
+		host.draw_circle(Vector2(585, 21), 4, Color("1b1719"))
+		host.draw_circle(Vector2(591, 17), 2, Color("1b1719"))
+		host.draw_string(ThemeDB.fallback_font, Vector2(566, 45), "1 TOMOE", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("e7c7b2"))
 	host.draw_rect(Rect2(610, 16, 166, 10), Color("314952"))
 	host.draw_rect(Rect2(612, 18, 162 * host.chakra / 100.0, 6), Color("66b8bd"))
 	var place := "CAMPO DE TREINO" if host.stage <= 1 else "KONOHA • PRAÇA" if host.stage == 2 else "FLORESTA • NOITE" if host.stage <= 4 else "KONOHA • CASA"
