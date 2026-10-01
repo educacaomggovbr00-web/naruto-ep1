@@ -1,0 +1,70 @@
+{
+  "character": "Henrique Uchiha",
+  "age": 12,
+  "source": "visual sprite reference supplied by the project owner",
+  "notes": "All visual categories from the reference are registered here. The current 24-frame gameplay atlas is reused until each high-detail pose is exported as its own transparent frame.",
+  "actions": {
+    "idle": {"frames":[0,1,2],"fps":2.0},
+    "idle_back": {"frames":[3,4,5],"fps":2.0},
+    "walk": {"frames":[6,7,8,9,10,11],"fps":9.0},
+    "run": {"frames":[12,13,14,15,16,17],"fps":13.0},
+    "jump": {"frames":[12,13,14],"fps":8.0},
+    "fall": {"frames":[15,16,17],"fps":8.0},
+    "crouch": {"frames":[6,7],"fps":4.0},
+    "dodge": {"frames":[12,13,14,15],"fps":14.0},
+    "slide": {"frames":[14,15,16],"fps":12.0},
+
+    "punch": {"frames":[18,19,20],"fps":12.0},
+    "kick": {"frames":[19,20,18],"fps":12.0},
+    "combo_1": {"frames":[18,19,20,18],"fps":14.0},
+    "combo_2": {"frames":[18,20,19,20],"fps":15.0},
+    "combo_3": {"frames":[18,19,20,19,18],"fps":16.0},
+
+    "kunai": {"frames":[18,19,20],"fps":15.0},
+    "shuriken": {"frames":[18,19,20],"fps":15.0},
+    "kunai_slash": {"frames":[18,20,19],"fps":15.0},
+
+    "katon_fireball": {"frames":[21,22,23],"fps":9.0},
+    "katon_stream": {"frames":[21,22,23,22],"fps":11.0},
+    "chidori": {"frames":[21,22,23],"fps":13.0},
+    "lightning_current": {"frames":[21,22,23,21],"fps":14.0},
+    "shadow_clone": {"frames":[0,1,2],"fps":8.0},
+    "substitution": {"frames":[12,13,6],"fps":11.0},
+
+    "sharingan": {"frames":[0,1,2],"fps":2.0},
+    "mangekyo": {"frames":[0,1,2],"fps":2.0},
+    "genjutsu": {"frames":[0,3,0,3],"fps":5.0},
+    "susanoo": {"frames":[0,1,2],"fps":4.0},
+
+    "hurt": {"frames":[19,20],"fps":8.0},
+    "down": {"frames":[20],"fps":1.0},
+    "get_up": {"frames":[20,19,18,0],"fps":8.0},
+
+    "advanced_chidori": {"frames":[21,22,23,22],"fps":15.0},
+    "great_fire_explosion": {"frames":[21,22,23,21],"fps":12.0},
+    "amaterasu": {"frames":[21,22,23],"fps":8.0},
+
+    "double_jump": {"frames":[12,13,14,13],"fps":11.0},
+    "air_attack": {"frames":[18,19,20],"fps":14.0},
+    "impact_fall": {"frames":[15,16,17,20],"fps":12.0},
+
+    "sit": {"frames":[6],"fps":1.0},
+    "lean": {"frames":[0],"fps":1.0},
+    "eat": {"frames":[18,0,18],"fps":4.0},
+    "phone": {"frames":[18],"fps":1.0},
+    "hand_sign": {"frames":[21,22,23],"fps":8.0}
+  },
+  "visual_categories": [
+    "casual","classic_ninja","akatsuki","anbu","shirtless",
+    "idle","walk","run","jump","fall","crouch","dodge","slide",
+    "punch","kick","combo_1","combo_2","combo_3",
+    "kunai","shuriken",
+    "katon_fireball","katon_stream","chidori","lightning_current",
+    "shadow_clone","substitution","kunai_slash",
+    "sharingan","mangekyo","genjutsu","susanoo",
+    "hurt","down","get_up",
+    "advanced_chidori","great_fire_explosion","amaterasu",
+    "double_jump","air_attack","impact_fall",
+    "sit","lean","eat","phone","hand_sign"
+  ]
+}
