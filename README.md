@@ -14,7 +14,7 @@ Henrique Uchiha tem 12 anos. Este prólogo original se passa antes dos acontecim
 Durante a perseguição, mantenha distância entre 70 e 230 passos e use FURTIVO. Se for detectado, a perseguição reinicia. Complete 12 segundos seguindo Mizuki, investigue a kunai e volte para a casa à esquerda.
 
 ## Estado
-Arte original em pixel art integrada: quatro personagens com nove quadros cada (frente, costas e lateral), caminhada, vila com casas e telhados, Academia, banca de ramen, canal e ponte, campo de treino, floresta noturna, lanternas, partículas de folhas/vagalumes e efeitos de kunai/Katon. Interface com retrato, barra de chakra e painéis estilizados. Os gráficos são uma interpretação própria simples; a imagem de referência não foi recortada nem usada como atlas. O episódio 1, save, música, combate completo e exportação APK ainda não estão implementados. Importação e execução headless verificadas no Godot 4.3, incluindo teste da sequência completa do prólogo. Desempenho e toque ainda precisam ser conferidos num aparelho Android real. Para Android, instalar os templates de exportação e configurar um preset Android.
+Arte original em pixel art integrada: quatro personagens com nove quadros cada (frente, costas e lateral), caminhada, vila com casas e telhados, Academia, banca de ramen, canal e ponte, campo de treino, floresta noturna, lanternas, partículas de folhas/vagalumes e efeitos de kunai/Katon. Interface com retrato, barra de chakra e painéis estilizados. Os gráficos são uma interpretação própria simples; a imagem de referência não foi recortada nem usada como atlas. O Episódio 1 agora está implementado como continuação jogável de fã: Academia, roubo do Pergaminho dos Selos, busca na floresta, confronto com Mizuki e conclusão com Naruto reconhecido por Iruka. Save, música, combate completo e exportação APK ainda não estão implementados. Importação e execução headless verificadas no Godot 4.3, incluindo teste da sequência completa do prólogo. Desempenho e toque ainda precisam ser conferidos num aparelho Android real. Para Android, instalar os templates de exportação e configurar um preset Android.
 
 
 ## Arte e desempenho
@@ -51,3 +51,8 @@ Teste atualizado passou no Godot 4.3: importação RGBA, atlas de 24 poses, AIR 
 ## Naruto 2D RPG expansion
 
 A branch `naruto-2d-expansion` adds reusable world/progression foundations: Konoha location registry, classic-era cast registry, mission ranks, XP/level/ryo, inventory and jutsu unlocks. The playable prologue now awards progression for kunai training, Katon, stealth pursuit and the Scroll alarm, then unlocks story era 1 for the Episode 1 continuation. See `docs/NARUTO_2D_ROADMAP.md`.
+
+
+## Episódio 1 jogável
+
+Depois do EP -1, o jogo entra automaticamente no EP 1. Henrique presencia a reprovação de Naruto na Academia, percebe a manipulação de Mizuki, segue o alarme do Pergaminho dos Selos até a floresta e ajuda Iruka a ganhar tempo. O momento decisivo permanece com Naruto, que usa a técnica aprendida no pergaminho e encerra o confronto. A adaptação é original do projeto e resume/reinterpreta os acontecimentos sem reproduzir o roteiro oficial palavra por palavra.
