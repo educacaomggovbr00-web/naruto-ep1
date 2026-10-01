@@ -32,6 +32,8 @@ var background = preload("res://scripts/background.gd").new()
 var naruto_world = preload("res://scripts/naruto_world.gd").new()
 var rpg = preload("res://scripts/rpg_systems.gd").new()
 var story_era := 0
+var mizuki_hits := 0
+var episode_1_started := false
 const OBJECTIVES := [
 	"TREINO • Acerte 3 vezes o alvo com kunai (J / botão KUNAI).",
 	"CHAKRA • Use Katon perto do alvo (K / botão KATON).",
@@ -39,7 +41,13 @@ const OBJECTIVES := [
 	"NOITE • Siga Mizuki a 70–230 passos. Segure FURTIVO para não ser visto.",
 	"VOLTA • Investigue a kunai caída (E / AÇÃO).",
 	"CASA • Volte para casa, à esquerda, e descanse (E / AÇÃO).",
-	"PRÓLOGO CONCLUÍDO • A história continua no episódio 1."
+	"TRANSIÇÃO • O alarme do Pergaminho dos Selos inicia o Episódio 1.",
+	"EP 1 • Vá até a Academia e converse com Naruto e Iruka.",
+	"ALARME • O Pergaminho dos Selos foi roubado. Vá à saída leste da vila.",
+	"FLORESTA • Encontre Naruto e descubra o que aconteceu.",
+	"CONFRONTO • Ajude Iruka: acerte Mizuki 3 vezes com kunai.",
+	"DESFECHO • Fale com Naruto e Iruka.",
+	"EP 1 CONCLUÍDO • Naruto dá seu primeiro passo como ninja."
 ]
 
 func _ready() -> void:
@@ -106,8 +114,22 @@ func next_line() -> void:
 	if line_index >= lines.size():
 		lines.clear()
 		dialogue.hide()
+		if stage == 6:
+			begin_episode_1()
+		elif stage == 12:
+			restart.show()
 	else:
 		dialogue.text = lines[line_index] + "\n[Toque para continuar]"
+
+func begin_episode_1() -> void:
+	episode_1_started = true
+	story_era = 1
+	stage = 7
+	player = Vector2(185, 270)
+	naruto_pos = Vector2(620, 265)
+	naruto_action = "idle"
+	restart.hide()
+	say(["NARUTO EP 1 — O COMEÇO DE NARUTO", "Na manhã seguinte, Konoha volta à rotina. A Academia realiza a prova de graduação.", "Henrique ainda pensa em Mizuki e na figura de laranja vista durante o alarme.", "Objetivo: vá até a Academia e descubra o que aconteceu com Naruto."])
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
@@ -128,7 +150,10 @@ func _process(delta: float) -> void:
 	if stage == 2:
 		naruto_pos = Vector2(640 + sin(visual_clock * 0.85) * 34, 260 + sin(visual_clock * 0.42) * 5)
 		naruto_action = "walk" if absf(cos(visual_clock * 0.85)) > 0.18 else "idle"
-	if lines.is_empty() and stage < 6:
+	elif stage == 7:
+		naruto_pos = Vector2(620 + sin(visual_clock * 0.7) * 18, 265)
+		naruto_action = "walk" if absf(cos(visual_clock * 0.7)) > 0.25 else "idle"
+	if lines.is_empty() and stage < 12:
 		movement = Vector2(float(down("right", KEY_D, KEY_RIGHT)) - float(down("left", KEY_A, KEY_LEFT)), float(down("down", KEY_S, KEY_DOWN)) - float(down("up", KEY_W, KEY_UP))).normalized()
 		if movement != Vector2.ZERO:
 			facing = movement
@@ -136,11 +161,17 @@ func _process(delta: float) -> void:
 		sprinting = down("run", KEY_R) and not sneaking
 		var previous_position := player
 		player += movement * (95.0 if sneaking else 240.0 if sprinting else 180.0) * delta
-		if stage == 2 or stage >= 5:
+		if stage == 2 or stage == 5 or stage == 7 or stage == 8:
 			for house_rect in [Rect2(36, 91, 152, 130), Rect2(268, 85, 152, 130), Rect2(460, 91, 152, 130), Rect2(714, 82, 152, 130)]:
 				if house_rect.grow(8).has_point(player):
 					player = previous_position
 		player = player.clamp(Vector2(35, 110), Vector2(925, 375))
+		if stage == 8 and player.distance_to(Vector2(885, 275)) < 55:
+			stage = 9
+			player = Vector2(170, 275)
+			naruto_pos = Vector2(520, 275)
+			mizuki = Vector2(760, 255)
+			say(["Henrique atravessa a trilha e chega a uma clareira.", "Naruto está ali com o Pergaminho dos Selos, exausto depois de treinar uma técnica proibida.", "Henrique: Então foi você... Mas por quê?", "Naruto: Mizuki-sensei disse que, se eu aprendesse uma técnica do pergaminho, eu poderia me formar."])
 		if stage == 3:
 			var distance := player.distance_to(mizuki)
 			if distance < 70 or (distance < 160 and not sneaking and movement != Vector2.ZERO):
@@ -162,13 +193,15 @@ func _process(delta: float) -> void:
 	objective.text = OBJECTIVES[stage]
 	if stage == 3:
 		objective.text += "  %d%%" % int(trail_progress / 12 * 100)
+	elif stage == 10:
+		objective.text += "  %d / 3" % mizuki_hits
 	queue_redraw()
 
 func act(action: String) -> void:
 	if not lines.is_empty():
 		if action == "interact": next_line()
 		return
-	if stage == 6: return
+	if stage == 12: return
 	if action == "kunai" and cooldown <= 0:
 		cooldown = 0.4
 		attack_flash = 0.2
@@ -181,6 +214,12 @@ func act(action: String) -> void:
 				rpg.complete_mission("training_kunai", 30, 20)
 				stage = 1
 				say(["Henrique: Três acertos! Agora vou tentar o Katon."])
+		elif stage == 10 and player.distance_to(mizuki) < 170 and facing.dot((mizuki - player).normalized()) > 0.2:
+			mizuki_hits += 1
+			if mizuki_hits >= 3:
+				stage = 11
+				naruto_pos = Vector2(535, 275)
+				say(["Henrique força Mizuki a recuar e ganha alguns segundos para Iruka e Naruto.", "Mizuki tenta atacar novamente, mas Naruto finalmente entende quem estava tentando usá-lo.", "Naruto usa a técnica que aprendeu no pergaminho e a clareira se enche de clones das sombras.", "A luta termina com Mizuki derrotado. O golpe decisivo foi de Naruto."])
 	elif action == "katon" and cooldown <= 0 and chakra >= 25:
 		chakra -= 25
 		cooldown = 1.0
@@ -207,8 +246,21 @@ func act(action: String) -> void:
 			stage = 6
 			rpg.complete_mission("scroll_alarm", 80, 0)
 			story_era = 1
-			say(["Henrique adormece. No sonho: fogo, o símbolo Uchiha e uma silhueta com olhos vermelhos.", "Sinos de emergência rompem o silêncio da madrugada.", "Ninja no telhado: O Pergaminho dos Selos foi roubado!", "Henrique corre até a janela. Uma figura de roupa laranja desaparece em direção à floresta.", "Henrique: Naruto...?", "FIM DO EP -1 — A Noite Antes do Começo. Prólogo original de fã. O episódio 1 ainda não está implementado."])
-			restart.show()
+			say(["Henrique adormece. No sonho: fogo, o símbolo Uchiha e uma silhueta com olhos vermelhos.", "Sinos de emergência rompem o silêncio da madrugada.", "Um ninja anuncia que o Pergaminho dos Selos desapareceu.", "Henrique corre até a janela. Uma figura de roupa laranja some na direção da floresta.", "Henrique: Naruto...?", "FIM DO EP -1 — a continuação começa agora."])
+		elif stage == 7 and player.distance_to(naruto_pos) < 105:
+			stage = 8
+			player = Vector2(185, 270)
+			say(["Na Academia, Naruto falha novamente na prova de graduação ao não executar corretamente o Bunshin.", "Iruka não pode aprová-lo, embora saiba o quanto Naruto quer ser reconhecido.", "Mais tarde, Mizuki conversa com Naruto longe dos outros alunos.", "Henrique reconhece o mesmo comportamento estranho da noite anterior.", "Pouco depois, o alarme toca: Naruto levou o Pergaminho dos Selos. Henrique corre para a saída leste."])
+		elif stage == 9 and player.distance_to(naruto_pos) < 105:
+			stage = 10
+			mizuki_hits = 0
+			mizuki = Vector2(735, 265)
+			player = Vector2(250, 285)
+			say(["Iruka chega à clareira tentando proteger Naruto.", "Mizuki aparece e revela que enganou Naruto para conseguir acesso ao pergaminho.", "Naruto percebe que foi usado. Iruka se coloca entre ele e o ataque.", "Henrique: Eu sabia que tinha alguma coisa errada. Mizuki, acabou.", "Objetivo: use kunai para abrir espaço. Naruto ainda precisa enfrentar isso por conta própria."])
+		elif stage == 11 and player.distance_to(naruto_pos) < 120:
+			stage = 12
+			rpg.complete_mission("academy_day", 60, 20)
+			say(["Depois da luta, Iruka reconhece o esforço de Naruto e entrega a ele sua própria bandana da Folha.", "Naruto finalmente consegue o símbolo de que tanto precisava: agora pode começar seu caminho como ninja.", "Henrique observa em silêncio, ainda pensando no Sharingan recém-desperto e nas intenções de Mizuki.", "NARUTO EP 1 CONCLUÍDO — adaptação jogável de fã pelo ponto de vista de Henrique Uchiha.", "Próximo: EP 2 — Konohamaru e os primeiros passos de Naruto como ninja."])
 
 func style_button(button: Button, is_dialogue: bool = false) -> void:
 	button.focus_mode = Control.FOCUS_NONE
