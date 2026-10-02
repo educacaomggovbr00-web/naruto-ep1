@@ -22,6 +22,8 @@ var restart: Button
 var progress_button: Button
 var progress_panel: Panel
 var progress_text: RichTextLabel
+var techniques_button: Button
+var techniques_panel: Panel
 var visual_clock := 0.0
 var sprinting := false
 var effect_kind := "kunai"
@@ -31,6 +33,10 @@ var sharingan_awakened := false
 var naruto_pos := Vector2(620, 265)
 var naruto_action := "idle"
 var naruto_battle_flash := 0.0
+var action_state := ""
+var action_timer := 0.0
+var clone_flash := 0.0
+var substitution_flash := 0.0
 var art = preload("res://scripts/visuals.gd").new()
 var background = preload("res://scripts/background.gd").new()
 var naruto_world = preload("res://scripts/naruto_world.gd").new()
@@ -38,6 +44,12 @@ var rpg = preload("res://scripts/rpg_systems.gd").new()
 var story_era := 1
 var mizuki_hits := 0
 var episode_1_started := true
+var episode_2_started := false
+var current_episode := 1
+var konohamaru_pos := Vector2(690, 275)
+var ebisu_pos := Vector2(790, 260)
+var ep2_dodge_done := false
+var ep2_punch_done := false
 const OBJECTIVES := [
 	"TREINO • Acerte 3 vezes o alvo com kunai (J / botão KUNAI).",
 	"CHAKRA • Use Katon perto do alvo (K / botão KATON).",
@@ -51,7 +63,12 @@ const OBJECTIVES := [
 	"FLORESTA • Encontre Naruto e descubra o que aconteceu.",
 	"CONFRONTO • Ajude Iruka: acerte Mizuki 3 vezes com kunai.",
 	"DESFECHO • Fale com Naruto e Iruka.",
-	"EP 1 CONCLUÍDO • Naruto dá seu primeiro passo como ninja."
+	"EP 1 CONCLUÍDO • Naruto dá seu primeiro passo como ninja.",
+	"EP 2 • Encontre Naruto perto do Gabinete do Hokage.",
+	"KONOHAMARU • Fale com o garoto que começou a seguir Naruto.",
+	"TREINO • Mostre uma ESQUIVA e um SOCO perto de Konohamaru.",
+	"EBISU • Fale com Ebisu depois do pequeno treino.",
+	"EP 2 CONCLUÍDO • Konohamaru decide que vai treinar para ser reconhecido."
 ]
 
 func _ready() -> void:
@@ -97,6 +114,40 @@ func _ready() -> void:
 		button.pressed.connect(func(): act(action))
 		style_button(button)
 		layer.add_child(button)
+	techniques_button = Button.new()
+	techniques_button.text = "TÉCNICAS"
+	techniques_button.position = Vector2(8, 88)
+	techniques_button.size = Vector2(112, 42)
+	techniques_button.pressed.connect(toggle_techniques)
+	style_button(techniques_button)
+	layer.add_child(techniques_button)
+
+	techniques_panel = Panel.new()
+	techniques_panel.position = Vector2(8, 136)
+	techniques_panel.size = Vector2(190, 298)
+	techniques_panel.visible = false
+	var tech_style := StyleBoxFlat.new()
+	tech_style.bg_color = Color("10232d")
+	tech_style.border_color = Color("6d8788")
+	tech_style.set_border_width_all(2)
+	tech_style.set_corner_radius_all(6)
+	techniques_panel.add_theme_stylebox_override("panel", tech_style)
+	layer.add_child(techniques_panel)
+	var tech_items := [
+		["SOCO", "punch"], ["SHURIKEN", "shuriken"], ["ESQUIVA", "dodge"],
+		["AGACHAR", "crouch"], ["PULAR", "jump"], ["DESLIZAR", "slide"],
+		["CLONE", "clone"], ["SUBST.", "substitution"]
+	]
+	for i in range(tech_items.size()):
+		var tech := Button.new()
+		tech.text = tech_items[i][0]
+		tech.position = Vector2(10 + (i % 2) * 86, 10 + int(i / 2) * 58)
+		tech.size = Vector2(80, 48)
+		var tech_action: String = tech_items[i][1]
+		tech.pressed.connect(func(): use_technique(tech_action))
+		style_button(tech)
+		techniques_panel.add_child(tech)
+
 	progress_button = Button.new()
 	progress_button.text = "PROGRESSO"
 	progress_button.position = Vector2(475, 460)
@@ -164,6 +215,8 @@ func next_line() -> void:
 		if stage == 6:
 			begin_episode_1()
 		elif stage == 12:
+			begin_episode_2()
+		elif stage == 17:
 			restart.show()
 	else:
 		dialogue.text = lines[line_index] + "\n[Toque para continuar]"
@@ -178,6 +231,19 @@ func begin_episode_1() -> void:
 	restart.hide()
 	say(["NARUTO EP 1 — O COMEÇO DE NARUTO", "Na manhã seguinte, Konoha volta à rotina. A Academia realiza a prova de graduação.", "Henrique ainda pensa em Mizuki e na figura de laranja vista durante o alarme.", "Objetivo: vá até a Academia e descubra o que aconteceu com Naruto."])
 
+func begin_episode_2() -> void:
+	episode_2_started = true
+	current_episode = 2
+	stage = 13
+	player = Vector2(210, 280)
+	naruto_pos = Vector2(610, 270)
+	konohamaru_pos = Vector2(700, 280)
+	ebisu_pos = Vector2(815, 260)
+	ep2_dodge_done = false
+	ep2_punch_done = false
+	restart.hide()
+	say(["NARUTO CLÁSSICO • EP 2 — KONOHAMARU", "Depois de finalmente se formar, Naruto vai cuidar do registro ninja e cruza com Konohamaru, neto do Terceiro Hokage.", "Konohamaru percebe que Naruto não o trata como alguém especial só por causa da família e começa a segui-lo.", "Henrique encontra os dois na praça e resolve ver no que isso vai dar."])
+
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:
@@ -188,6 +254,18 @@ func _unhandled_key_input(event: InputEvent) -> void:
 				if not progress_panel.visible: act("kunai")
 			KEY_K:
 				if not progress_panel.visible: act("katon")
+			KEY_Z:
+				if not progress_panel.visible: act("punch")
+			KEY_X:
+				if not progress_panel.visible: act("shuriken")
+			KEY_Q:
+				if not progress_panel.visible: act("dodge")
+			KEY_C:
+				if not progress_panel.visible: act("crouch")
+			KEY_V:
+				if not progress_panel.visible: act("clone")
+			KEY_B:
+				if not progress_panel.visible: act("substitution")
 
 func down(action: String, key: Key, alternate: Key = KEY_NONE) -> bool:
 	return held.get(action, false) or Input.is_physical_key_pressed(key) or (alternate != KEY_NONE and Input.is_physical_key_pressed(alternate))
@@ -198,6 +276,11 @@ func _process(delta: float) -> void:
 	cooldown = maxf(0.0, cooldown - delta)
 	attack_flash = maxf(0.0, attack_flash - delta)
 	naruto_battle_flash = maxf(0.0, naruto_battle_flash - delta)
+	action_timer = maxf(0.0, action_timer - delta)
+	clone_flash = maxf(0.0, clone_flash - delta)
+	substitution_flash = maxf(0.0, substitution_flash - delta)
+	if action_timer <= 0.0:
+		action_state = ""
 	chakra = minf(100.0, chakra + delta * 5.0)
 	if stage == 2:
 		naruto_pos = Vector2(640 + sin(visual_clock * 0.85) * 34, 260 + sin(visual_clock * 0.42) * 5)
@@ -211,7 +294,7 @@ func _process(delta: float) -> void:
 		naruto_action = "run" if lines.is_empty() else "idle"
 	elif stage >= 11:
 		naruto_action = "idle"
-	if lines.is_empty() and stage < 12 and not progress_panel.visible:
+	if lines.is_empty() and stage < 17 and not progress_panel.visible and action_timer <= 0.0:
 		movement = Vector2(float(down("right", KEY_D, KEY_RIGHT)) - float(down("left", KEY_A, KEY_LEFT)), float(down("down", KEY_S, KEY_DOWN)) - float(down("up", KEY_W, KEY_UP))).normalized()
 		if movement != Vector2.ZERO:
 			facing = movement
@@ -219,7 +302,7 @@ func _process(delta: float) -> void:
 		sprinting = down("run", KEY_R) and not sneaking
 		var previous_position := player
 		player += movement * (95.0 if sneaking else 240.0 if sprinting else 180.0) * delta
-		if stage == 2 or stage == 5 or stage == 7 or stage == 8:
+		if stage == 2 or stage == 5 or stage == 7 or stage == 8 or (stage >= 13 and stage <= 16):
 			for house_rect in [Rect2(36, 91, 152, 130), Rect2(268, 85, 152, 130), Rect2(460, 91, 152, 130), Rect2(714, 82, 152, 130)]:
 				if house_rect.grow(8).has_point(player):
 					player = previous_position
@@ -261,7 +344,56 @@ func act(action: String) -> void:
 	if not lines.is_empty():
 		if action == "interact": next_line()
 		return
-	if stage == 12: return
+	if stage == 17: return
+	if action == "punch" and cooldown <= 0:
+		cooldown = 0.35
+		start_action("punch_combo", 0.48)
+		if stage == 15 and player.distance_to(konohamaru_pos) < 150:
+			ep2_punch_done = true
+			check_ep2_training()
+		return
+	if action == "shuriken" and cooldown <= 0 and rpg.consume_item("shuriken"):
+		cooldown = 0.45
+		attack_flash = 0.28
+		effect_kind = "shuriken"
+		effect_origin = player
+		effect_direction = facing
+		start_action("shuriken_throw", 0.45)
+		return
+	if action == "dodge" and cooldown <= 0:
+		cooldown = 0.45
+		start_action("dodge_roll", 0.45)
+		player = (player + facing * 58.0).clamp(Vector2(35, 110), Vector2(925, 375))
+		if stage == 15 and player.distance_to(konohamaru_pos) < 180:
+			ep2_dodge_done = true
+			check_ep2_training()
+		return
+	if action == "crouch" and cooldown <= 0:
+		cooldown = 0.35
+		start_action("crouch", 0.65)
+		return
+	if action == "jump" and cooldown <= 0:
+		cooldown = 0.45
+		start_action("jump", 0.60)
+		return
+	if action == "slide" and cooldown <= 0:
+		cooldown = 0.50
+		start_action("slide", 0.52)
+		player = (player + facing * 72.0).clamp(Vector2(35, 110), Vector2(925, 375))
+		return
+	if action == "clone" and cooldown <= 0 and chakra >= 10:
+		chakra -= 10
+		cooldown = 0.8
+		clone_flash = 0.8
+		start_action("shadow_clone", 0.75)
+		return
+	if action == "substitution" and cooldown <= 0 and chakra >= 12:
+		chakra -= 12
+		cooldown = 0.8
+		substitution_flash = 0.8
+		start_action("substitution", 0.70)
+		player = (player - facing * 45.0).clamp(Vector2(35, 110), Vector2(925, 375))
+		return
 	if action == "kunai" and cooldown <= 0:
 		cooldown = 0.4
 		attack_flash = 0.2
@@ -322,8 +454,42 @@ func act(action: String) -> void:
 			stage = 12
 			rpg.complete_mission("academy_day", 60, 20)
 			say(["Depois da luta, Iruka reconhece o esforço de Naruto e entrega a ele sua própria bandana da Folha.", "Naruto finalmente consegue o símbolo de que tanto precisava: agora pode começar seu caminho como ninja.", "Henrique observa em silêncio, ainda pensando no Sharingan recém-desperto e nas intenções de Mizuki.", "NARUTO EP 1 CONCLUÍDO — adaptação jogável de fã pelo ponto de vista de Henrique Uchiha.", "Próximo: EP 2 — Konohamaru e os primeiros passos de Naruto como ninja."])
+		elif stage == 13 and player.distance_to(naruto_pos) < 120:
+			stage = 14
+			say(["Naruto termina seu registro e, no caminho de volta, tromba com Konohamaru.", "Konohamaru: Você não vai ficar me tratando diferente só porque eu sou neto do Hokage?", "Naruto: Por que eu faria isso?", "Konohamaru fica impressionado e começa a seguir Naruto pela vila.", "Henrique: Pronto. Agora ele arrumou um mini-Naruto."])
+		elif stage == 14 and player.distance_to(konohamaru_pos) < 115:
+			stage = 15
+			say(["Konohamaru quer ser reconhecido pela vila e acha que virar Hokage rapidamente resolveria tudo.", "Naruto responde que título nenhum substitui treino e esforço.", "Konohamaru desafia os dois a mostrarem alguma coisa de verdade.", "Objetivo: perto de Konohamaru, use ESQUIVA e depois SOCO."])
+		elif stage == 16 and player.distance_to(ebisu_pos) < 125:
+			stage = 17
+			rpg.complete_mission("konohamaru_first_meeting", 70, 30)
+			say(["Ebisu chega procurando Konohamaru e encontra Naruto, Henrique e o garoto no meio do treino.", "Depois da discussão, Konohamaru percebe que ser reconhecido não é algo que se consegue apenas usando o nome do avô.", "Naruto segue seu caminho com uma nova sombra pequena correndo atrás dele.", "Henrique: Essa vila só fica mais estranha a cada dia.", "NARUTO EP 2 CONCLUÍDO — próximo passo: formação dos times e a apresentação do Time 7."])
+
+func start_action(name: String, duration: float) -> void:
+	if not art.character_art.henrique_actions.has(name):
+		return
+	action_state = name
+	action_timer = duration
+	movement = Vector2.ZERO
+
+func check_ep2_training() -> void:
+	if stage == 15 and ep2_dodge_done and ep2_punch_done:
+		stage = 16
+		ebisu_pos = Vector2(800, 265)
+		say(["Konohamaru tenta copiar os movimentos, tropeça e levanta rápido como se nada tivesse acontecido.", "Naruto ri, mas admite que o garoto tem coragem.", "Uma voz irritada interrompe o treino: Ebisu finalmente encontrou Konohamaru.", "Objetivo: fale com Ebisu."])
+
+func toggle_techniques() -> void:
+	if progress_panel.visible:
+		progress_panel.hide()
+	techniques_panel.visible = not techniques_panel.visible
+
+func use_technique(action: String) -> void:
+	techniques_panel.hide()
+	act(action)
 
 func toggle_progression() -> void:
+	if techniques_panel.visible:
+		techniques_panel.hide()
 	progress_panel.visible = not progress_panel.visible
 	if progress_panel.visible:
 		held.clear()
@@ -332,9 +498,14 @@ func toggle_progression() -> void:
 
 func refresh_progression() -> void:
 	var chapter := "NARUTO CLÁSSICO • EP 1"
-	if stage >= 12:
-		chapter = "NARUTO CLÁSSICO • EP 1 CONCLUÍDO"
 	var story_percent := int(clampf(float(stage - 7) / 5.0, 0.0, 1.0) * 100.0)
+	if stage == 12:
+		chapter = "NARUTO CLÁSSICO • EP 1 CONCLUÍDO"
+	elif stage >= 13:
+		chapter = "NARUTO CLÁSSICO • EP 2 — KONOHAMARU"
+		story_percent = int(clampf(float(stage - 13) / 4.0, 0.0, 1.0) * 100.0)
+	if stage >= 17:
+		chapter = "NARUTO CLÁSSICO • EP 2 CONCLUÍDO"
 	var sharingan_text := "Sharingan 1 Tomoe" if sharingan_awakened else "Ainda não despertado nesta linha do tempo"
 	var jutsu_text := "Kunai • Shuriken • Katon: Bola de Fogo"
 	if sharingan_awakened:
