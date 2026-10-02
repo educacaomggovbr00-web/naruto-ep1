@@ -96,21 +96,23 @@ func render(host: Node2D) -> void:
 	character_art.draw_henrique(host)
 
 	if host.clone_flash > 0.0:
-		var alpha := clampf(host.clone_flash, 0.0, 1.0)
+		var alpha: float = clampf(float(host.clone_flash), 0.0, 1.0)
+		var player_pos: Vector2 = host.player
 		for side in [-1, 1]:
-			var clone_at := host.player + Vector2(42 * side, 0)
+			var clone_at: Vector2 = player_pos + Vector2(float(42 * int(side)), 0.0)
 			host.draw_circle(clone_at + Vector2(0, -28), 15, Color(0.75, 0.82, 0.86, 0.16 * alpha))
 			host.draw_rect(Rect2(clone_at + Vector2(-12, -16), Vector2(24, 38)), Color(0.70, 0.78, 0.84, 0.13 * alpha))
 		for i in range(8):
-			var smoke := host.player + Vector2((i - 4) * 12, -8 + sin(i * 1.4 + host.visual_clock * 7.0) * 12)
+			var smoke: Vector2 = player_pos + Vector2(float((i - 4) * 12), -8.0 + sin(float(i) * 1.4 + float(host.visual_clock) * 7.0) * 12.0)
 			host.draw_circle(smoke, 8 + (i % 3) * 3, Color(0.82, 0.86, 0.88, 0.22 * alpha))
 	if host.substitution_flash > 0.0:
-		var alpha := clampf(host.substitution_flash, 0.0, 1.0)
+		var alpha: float = clampf(float(host.substitution_flash), 0.0, 1.0)
+		var player_pos: Vector2 = host.player
 		for i in range(7):
-			var smoke := host.player + Vector2(cos(i * 1.7) * 30, sin(i * 2.1) * 20 - 15)
+			var smoke: Vector2 = player_pos + Vector2(cos(float(i) * 1.7) * 30.0, sin(float(i) * 2.1) * 20.0 - 15.0)
 			host.draw_circle(smoke, 9 + (i % 2) * 5, Color(0.86, 0.88, 0.90, 0.25 * alpha))
-		host.draw_rect(Rect2(host.player + Vector2(-10, -24), Vector2(20, 44)), Color(0.42, 0.27, 0.16, 0.65 * alpha))
-		host.draw_line(host.player + Vector2(-8, -12), host.player + Vector2(8, -8), Color(0.66, 0.46, 0.28, 0.8 * alpha), 3)
+		host.draw_rect(Rect2(player_pos + Vector2(-10, -24), Vector2(20, 44)), Color(0.42, 0.27, 0.16, 0.65 * alpha))
+		host.draw_line(player_pos + Vector2(-8, -12), player_pos + Vector2(8, -8), Color(0.66, 0.46, 0.28, 0.8 * alpha), 3)
 
 	if host.naruto_battle_flash > 0.0:
 		var action := "run" if host.naruto_battle_flash > 0.8 else "idle"
