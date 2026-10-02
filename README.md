@@ -117,3 +117,14 @@ A prancha `assets/characters/file_000000003c88820e930f366203f13d4e.png` deixou d
 `assets/characters/henrique-board-frames.json` mapeia 86 recortes da própria prancha. Para não exibir os painéis escuros do arquivo original, `character_art.gd` extrai cada pose sob demanda, remove o fundo por flood-fill e mantém a textura resultante em cache. Assim o jogo usa os sprites daquele PNG sem precisar trocar para o antigo `henrique-detailed.png`.
 
 As animações mapeadas incluem idle, caminhada, corrida, pulo, queda, agachar, esquiva/rolamento, deslizar, combo de socos, kunai, shuriken, Katon, clone das sombras, substituição, levar dano, cair, levantar e morte básica. Técnicas futuras continuam cadastradas como aliases temporários até terem quadros próprios.
+
+
+## Konoha inteira — 30 áreas
+
+Konoha agora funciona como um overworld conectado de RPG portátil antigo. O botão **MAPA** abre uma grade de 30 áreas, e o jogador também pode atravessar as bordas da tela para ir para áreas vizinhas.
+
+Entre os pontos implementados estão Academia, Monumento e Residência do Hokage, Hospital, Estação Jōnin, Arquivos, Atribuição de Missões, Distrito Comercial, Cemitério, Pedra Memorial, Biblioteca, Correio, Ichiraku, Distrito Uchiha, Polícia Militar, Santuário Naka, Rio Naka, loja de dango, Campos de Treino 3 e 44, Aviário, Divisão de Inteligência, Fontes Termais, Orfanato e Portão de Konoha, além de bairros residenciais usados para conectar o mapa.
+
+A posição exata das ruas é uma adaptação de gameplay: as fontes de Naruto fornecem landmarks e relações importantes, mas não uma única planta canônica completa, rua por rua, pronta para ser convertida em tilemap. A pesquisa e a grade usada pelo jogo estão documentadas em `docs/KONOHA_WORLD.md`.
+
+Cada tipo de local recebe elementos visuais próprios e os NPCs de história só aparecem no local correto. Durante a perseguição do Pergaminho dos Selos, o fast travel é bloqueado na parte da floresta para preservar a sequência.
