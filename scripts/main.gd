@@ -42,7 +42,6 @@ var clone_flash := 0.0
 var substitution_flash := 0.0
 var art = preload("res://scripts/visuals.gd").new()
 var background = preload("res://scripts/background.gd").new()
-var academy_tilemap = preload("res://scripts/academy_tilemap.gd").new()
 var naruto_world = preload("res://scripts/naruto_world.gd").new()
 var rpg = preload("res://scripts/rpg_systems.gd").new()
 var external_sprites
@@ -112,12 +111,9 @@ func _ready() -> void:
 	external_sprites = preload("res://scripts/external_sprite_loader.gd").new()
 	add_child(external_sprites)
 	add_child(background)
-	background.z_index = -2
+	background.z_index = -1
 	background.set_area(stage)
 	background.set_location(naruto_world.location(current_location_id))
-	add_child(academy_tilemap)
-	academy_tilemap.z_index = -1
-	academy_tilemap.set_active(current_location_id == "academy")
 	var layer := CanvasLayer.new()
 	add_child(layer)
 	hud = Label.new()
@@ -445,7 +441,6 @@ func _process(delta: float) -> void:
 	visual_clock += delta
 	background.set_area(stage)
 	background.set_location(naruto_world.location(current_location_id))
-	academy_tilemap.set_active(current_location_id == "academy")
 	cooldown = maxf(0.0, cooldown - delta)
 	attack_flash = maxf(0.0, attack_flash - delta)
 	naruto_battle_flash = maxf(0.0, naruto_battle_flash - delta)
@@ -474,11 +469,7 @@ func _process(delta: float) -> void:
 		var sneaking := down("sneak", KEY_SHIFT)
 		sprinting = down("run", KEY_R) and not sneaking
 		var previous_position := player
-		var next_position: Vector2 = player + movement * (95.0 if sneaking else 240.0 if sprinting else 180.0) * delta
-		if academy_tilemap.is_active() and academy_tilemap.blocks_player(next_position):
-			player = previous_position
-		else:
-			player = next_position
+		player += movement * (95.0 if sneaking else 240.0 if sprinting else 180.0) * delta
 		if can_roam_konoha():
 			if player.x < 26.0 and movement.x < 0.0:
 				change_to_neighbor("west", Vector2(910, player.y))
@@ -488,7 +479,7 @@ func _process(delta: float) -> void:
 				change_to_neighbor("north", Vector2(player.x, 360))
 			elif player.y > 382.0 and movement.y > 0.0:
 				change_to_neighbor("south", Vector2(player.x, 120))
-		if not academy_tilemap.is_active() and (stage == 2 or stage == 5 or stage == 7 or stage == 8 or (stage >= 13 and stage <= 16) or (stage >= 18 and stage <= 23) or (stage >= 29 and stage <= 31)):
+		if stage == 2 or stage == 5 or stage == 7 or stage == 8 or (stage >= 13 and stage <= 16) or (stage >= 18 and stage <= 23) or (stage >= 29 and stage <= 31):
 			for house_rect in [Rect2(36, 91, 152, 130), Rect2(268, 85, 152, 130), Rect2(460, 91, 152, 130), Rect2(714, 82, 152, 130)]:
 				if house_rect.grow(8).has_point(player):
 					player = previous_position
