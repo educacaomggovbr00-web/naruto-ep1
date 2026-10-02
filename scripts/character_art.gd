@@ -29,6 +29,8 @@ func frame_for_action(action_name: String, clock: float) -> int:
 	return int(frames[int(clock * fps) % frames.size()])
 
 func current_henrique_action(host: Node2D) -> String:
+	if host.action_state != "":
+		return host.action_state
 	if host.attack_flash > 0:
 		return "katon_fireball" if host.effect_kind == "katon" else "kunai"
 	if host.movement != Vector2.ZERO and host.lines.is_empty():
