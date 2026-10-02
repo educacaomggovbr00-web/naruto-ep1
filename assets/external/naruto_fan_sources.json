@@ -1,0 +1,15 @@
+{
+  "pack": "Anime Coder - Naruto",
+  "repository": "https://github.com/vikas0304/vscode-anime",
+  "license": "MIT",
+  "author": "Vikas Pal",
+  "notes": "README says the sprite art was AI-generated for the initial release. Used as optional fan-made 2D Naruto animation art with offline fallback.",
+  "files": {
+    "idle_1": "https://raw.githubusercontent.com/vikas0304/vscode-anime/main/media/characters/naruto/idle_1.png",
+    "idle_2": "https://raw.githubusercontent.com/vikas0304/vscode-anime/main/media/characters/naruto/idle_2.png",
+    "walk_1": "https://raw.githubusercontent.com/vikas0304/vscode-anime/main/media/characters/naruto/walk_1.png",
+    "walk_2": "https://raw.githubusercontent.com/vikas0304/vscode-anime/main/media/characters/naruto/walk_2.png",
+    "walk_3": "https://raw.githubusercontent.com/vikas0304/vscode-anime/main/media/characters/naruto/walk_3.png",
+    "walk_4": "https://raw.githubusercontent.com/vikas0304/vscode-anime/main/media/characters/naruto/walk_4.png"
+  }
+}
