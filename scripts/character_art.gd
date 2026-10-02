@@ -64,7 +64,7 @@ func _henrique_frame_texture(frame_id: int) -> Texture2D:
 	var threshold := float(henrique_manifest.get("background_flood_step_threshold", 7)) / 255.0
 	var threshold_sq := threshold * threshold
 	var head := 0
-	var dirs := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
+	var dirs: Array[Vector2i] = [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
 	while head < queue.size():
 		var p: Vector2i = queue[head]
 		head += 1
