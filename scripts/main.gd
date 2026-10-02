@@ -424,6 +424,12 @@ func _process(delta: float) -> void:
 					stage = 4
 					target = mizuki
 					say(["Henrique: Ele sumiu entre as árvores...", "Há uma kunai no chão. Será que ele deixou cair?"])
+	if lines.is_empty() and stage == 8 and current_location_id == "village_gate" and player.distance_to(Vector2(885, 275)) < 55:
+		stage = 9
+		player = Vector2(170, 275)
+		naruto_pos = Vector2(520, 275)
+		mizuki = Vector2(760, 255)
+		say(["Henrique atravessa o Portão de Konoha e chega à trilha da floresta.", "Naruto está ali com o Pergaminho dos Selos, exausto depois de treinar uma técnica proibida.", "Henrique: Então foi você... Mas por quê?", "Naruto: Mizuki-sensei disse que, se eu aprendesse uma técnica do pergaminho, eu poderia me formar."])
 	var eye_status := "SHARINGAN 1T" if sharingan_awakened else "OLHOS NORMAIS"
 	hud.text = "HENRIQUE • NV %d • %d RYO     | CHAKRA %d | %s" % [rpg.level, rpg.ryo, int(chakra), eye_status]
 	objective.text = OBJECTIVES[stage] + "   •   " + naruto_world.location_name(current_location_id)
@@ -634,6 +640,8 @@ func change_to_neighbor(direction: String, spawn: Vector2) -> void:
 	background.set_location(naruto_world.location(current_location_id))
 
 func toggle_konoha_map() -> void:
+	if not lines.is_empty():
+		return
 	if progress_panel.visible:
 		progress_panel.hide()
 	if techniques_panel.visible:
