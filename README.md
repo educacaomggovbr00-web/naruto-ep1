@@ -1,6 +1,6 @@
-# Naruto Clássico EP 1 — O Começo
+# Naruto Clássico — O Começo
 
-Fangame 2D em Godot 4.x focado no início de Naruto Clássico. Henrique Uchiha tem 12 anos e o jogo agora abre diretamente no Episódio 1.
+Fangame 2D em Godot 4.x focado no início de Naruto Clássico. Henrique Uchiha tem 12 anos. O jogo abre no Episódio 1 e agora continua jogavelmente pelo Episódio 2.
 
 ## Direção do jogo
 
@@ -75,3 +75,25 @@ godot --headless --path . --script res://tests/prologue_smoke.gd
 ```
 
 O renderizador continua em Compatibility e a interface permanece 960×540 para manter o projeto leve no Android.
+
+
+## Episódio 2 — Konohamaru
+
+Depois da conclusão do confronto com Mizuki, o jogo passa automaticamente para o Episódio 2. Naruto já se formou e cruza com Konohamaru, neto do Terceiro Hokage. A adaptação mantém o foco em reconhecimento, esforço e no começo da relação entre Naruto e Konohamaru, sem reproduzir o roteiro oficial palavra por palavra.
+
+O Episódio 2 adiciona Konohamaru e Ebisu ao overworld, um pequeno treino interativo e recompensa própria de progressão. O próximo gancho narrativo aponta para a formação dos times e o futuro Time 7.
+
+## Menu TÉCNICAS e animações do Henrique
+
+Além de KUNAI, KATON e AÇÃO, existe um botão TÉCNICAS para celular. Ele expõe ações básicas ligadas ao catálogo do Henrique:
+
+- soco / combo básico
+- shuriken
+- esquiva/rolamento
+- agachar
+- pular
+- deslizar
+- clone das sombras
+- substituição
+
+O manifesto também registra estados de dano, queda, levantar e morte básica, além das animações avançadas já guardadas para fases futuras. O atlas transparente atual tem 24 poses e reutiliza algumas delas para representar ações adicionais até que cada pose da folha visual enviada seja exportada como frame transparente individual.
