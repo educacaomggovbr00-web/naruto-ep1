@@ -8,4 +8,5 @@ window/size/viewport_height=540
 window/stretch/mode="canvas_items"
 [rendering]
 renderer/rendering_method="gl_compatibility"
-textures/default_filters/use_nearest_filter=true\ntextures/default_filters/use_nearest_mipmap_filter=false
+textures/default_filters/use_nearest_filter=true
+textures/default_filters/use_nearest_mipmap_filter=false
