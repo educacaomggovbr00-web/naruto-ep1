@@ -1,6 +1,20 @@
 extends RefCounted
 
+var user_assets = preload("res://scripts/user_asset_pack.gd").new()
+
 func draw(host: Node2D, stage_id: String) -> void:
+	var exact_key: String = ""
+	match stage_id:
+		"plaza": exact_key = "village"
+		"forest": exact_key = "forest"
+		"bridge": exact_key = "bridge"
+		"training_ground": exact_key = "training"
+	if not exact_key.is_empty():
+		var exact: Texture2D = user_assets.stage_texture(exact_key)
+		if exact != null:
+			host.draw_rect(Rect2(0, 78, 960, 367), Color("17252b"))
+			host.draw_texture_rect(exact, Rect2(0, 78, 960, 367), false)
+			return
 	match stage_id:
 		"plaza":
 			_plaza(host)
