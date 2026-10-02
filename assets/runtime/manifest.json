@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "policy": "mobile-safe-direct-assets",
+  "runtime_root": "res://assets/runtime",
+  "reference_root": "res://assets/references",
+  "network_loading": false,
+  "compressed_runtime_pack": false,
+  "nearest_filtering": true,
+  "folders": [
+    "overworld",
+    "battle",
+    "naruto_actions",
+    "henrique_actions",
+    "characters",
+    "stages",
+    "world"
+  ],
+  "fallback": "bundled-svg-mugen"
+}
