@@ -397,7 +397,7 @@ func act(action: String) -> void:
 			rpg.register_success("punch")
 			check_ep2_training()
 		return
-	if action == "shuriken" and cooldown <= 0 and rpg.consume_item("shuriken"):
+	if action == "shuriken" and cooldown <= 0 and (stage == 20 or rpg.consume_item("shuriken")):
 		cooldown = 0.45
 		attack_flash = 0.28
 		effect_kind = "shuriken"
