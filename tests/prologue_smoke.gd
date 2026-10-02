@@ -21,6 +21,10 @@ func run_checks() -> void:
 	assert(game.progress_panel.visible, "Progression menu must open")
 	game.toggle_progression()
 	assert(not game.progress_panel.visible, "Progression menu must close")
+	game.toggle_techniques()
+	assert(game.techniques_panel.visible, "Technique menu must open")
+	game.toggle_techniques()
+	assert(not game.techniques_panel.visible, "Technique menu must close")
 
 	close_dialogue(game)
 	game.player = game.naruto_pos
@@ -52,22 +56,74 @@ func run_checks() -> void:
 	assert(game.stage == 12, "Talking after the fight must complete Episode 1")
 	assert(game.rpg.completed_missions.has("academy_day"), "Episode 1 completion must reward progression")
 	close_dialogue(game)
-	assert(game.restart.visible, "Episode 1 ending must expose replay")
+	assert(game.stage == 13, "Closing Episode 1 must begin Episode 2")
+	assert(game.episode_2_started, "Episode 2 flag must be enabled")
 
-	for area in range(7, 13):
-		game.stage = area
-		game.background.set_area(area)
-		await process_frame
+	# Episode 2: Naruto meets Konohamaru, then the player demonstrates movement/combat basics.
+	close_dialogue(game)
+	game.player = game.naruto_pos
+	game.act("interact")
+	assert(game.stage == 14, "Meeting Naruto must introduce Konohamaru")
+	close_dialogue(game)
+	game.player = game.konohamaru_pos
+	game.act("interact")
+	assert(game.stage == 15, "Talking to Konohamaru must start the small training beat")
+	close_dialogue(game)
 
-	assert(game.art.character_art.henrique_frames.size() == 24, "All Henrique poses must stay mapped")
-	assert(game.art.character_art.henrique_actions.has("double_jump"), "Henrique full animation catalog must stay available")
-	assert(game.art.character_art.henrique_actions.has("amaterasu"), "Future animation references remain registered but locked")
+	game.player = game.konohamaru_pos - Vector2(70, 0)
+	game.facing = Vector2.RIGHT
+	game.cooldown = 0.0
+	game.act("dodge")
+	assert(game.ep2_dodge_done, "Episode 2 training must register dodge")
+	game.action_timer = 0.0
+	game.action_state = ""
+	game.cooldown = 0.0
+	game.player = game.konohamaru_pos - Vector2(70, 0)
+	game.act("punch")
+	assert(game.ep2_punch_done, "Episode 2 training must register punch")
+	assert(game.stage == 16, "Completing both training actions must bring Ebisu")
+	close_dialogue(game)
+
+	game.player = game.ebisu_pos
+	game.act("interact")
+	assert(game.stage == 17, "Talking to Ebisu must conclude Episode 2")
+	assert(game.rpg.completed_missions.has("konohamaru_first_meeting"), "Episode 2 completion must reward progression")
+	close_dialogue(game)
+	assert(game.restart.visible, "Episode 2 ending must expose replay")
+
+	# Every requested basic/classic action must resolve through the animation manifest.
+	var required_actions := [
+		"idle","walk","run","jump","fall","crouch","dodge_roll","slide",
+		"punch_combo","kunai_attack","shuriken_throw","katon_fireball",
+		"shadow_clone","substitution","hurt","down","get_up","death"
+	]
+	for action in required_actions:
+		assert(game.art.character_art.henrique_actions.has(action), "Missing Henrique action: " + action)
+		var frame_id: int = game.art.character_art.frame_for_action(action, 0.25)
+		assert(frame_id >= 0 and frame_id < game.art.character_art.henrique_frames.size(), "Animation frame out of range: " + action)
+
+	assert(game.art.character_art.henrique_frames.size() == 24, "Detailed Henrique gameplay atlas must stay mapped")
 	assert(game.art.character_art.mugen_actions["idle"].size() == 4, "Imported fan-MUGEN idle cycle must load")
 	assert(game.art.NARUTO.get_width() == 216, "Top-down Naruto overworld atlas must load")
 	assert(game.art.SASUKE.get_width() == 216, "Sasuke overworld atlas must load")
 	assert(game.art.SAKURA.get_width() == 216, "Sakura overworld atlas must load")
+	assert(game.art.KONOHAMARU.get_width() == 216, "Konohamaru overworld atlas must load")
+	assert(game.art.EBISU.get_width() == 216, "Ebisu overworld atlas must load")
 
-	print("PASS: Naruto Classic EP1 start, coherent overworld cast, progression and MUGEN battle presentation")
+	# Exercise action effects without requiring combat targets.
+	game.stage = 15
+	game.lines.clear()
+	game.chakra = 100
+	game.cooldown = 0.0
+	game.act("clone")
+	assert(game.action_state == "shadow_clone" and game.clone_flash > 0.0, "Shadow clone animation/effect must trigger")
+	game.action_timer = 0.0
+	game.action_state = ""
+	game.cooldown = 0.0
+	game.act("substitution")
+	assert(game.action_state == "substitution" and game.substitution_flash > 0.0, "Substitution animation/effect must trigger")
+
+	print("PASS: Episodes 1-2, progression, top-down cast, MUGEN battle art and Henrique basic animation catalog")
 	game.queue_free()
 	await process_frame
 	quit()
