@@ -1,65 +1,77 @@
-# Naruto EP -1 — A Noite Antes do Começo
+# Naruto Clássico EP 1 — O Começo
 
-Protótipo jogável de fã em Godot 4.x. Abra `project.godot` e execute com F6/F5. Sem plugins ou assets externos. Renderizador Compatibility, interface 960×540 e controles de toque para telas em paisagem.
+Fangame 2D em Godot 4.x focado no início de Naruto Clássico. Henrique Uchiha tem 12 anos e o jogo agora abre diretamente no Episódio 1.
 
-Henrique Uchiha tem 12 anos. Este prólogo original se passa antes dos acontecimentos do episódio 1: treino de kunai e Katon, encontro com Naruto e Iruka, perseguição furtiva de Mizuki, investigação e alarme do Pergaminho dos Selos. A narrativa é uma criação de fã, não um episódio oficial.
+## Direção do jogo
+
+A exploração usa visão de cima, mapa compacto e leitura de RPG portátil antigo. O combate e as cutscenes podem usar apresentação lateral mais detalhada, no estilo dos fangames 2D/JUS/NZC/MUGEN, sem misturar esse corpo lateral com o overworld.
+
+Naruto, Iruka, Mizuki, Sasuke e Sakura aparecem em escala coerente no mapa. O Naruto lateral importado do pack MUGEN deixou de ser o corpo de exploração; ele aparece apenas como apresentação curta de batalha no momento decisivo do confronto com Mizuki.
 
 ## Controles
-- WASD/setas: andar; Shift: andar furtivamente.
-- J: kunai (olhe para o alvo a menos de 150 passos).
-- K: Katon (consome 25 de chakra, regenerado automaticamente).
-- E/Espaço: conversar, investigar e avançar diálogos.
-- Botões na tela oferecem as mesmas ações. Toque no diálogo para avançar.
 
-Durante a perseguição, mantenha distância entre 70 e 230 passos e use FURTIVO. Se for detectado, a perseguição reinicia. Complete 12 segundos seguindo Mizuki, investigue a kunai e volte para a casa à esquerda.
+- WASD/setas: andar.
+- R / botão CORRER: correr.
+- Shift / FURTIVO: andar furtivamente.
+- J / KUNAI: lançar kunai.
+- K / KATON: Katon básico.
+- E/Espaço / AÇÃO: conversar e interagir.
+- P / PROGRESSO: abrir o menu de progressão.
 
-## Estado
-Arte original em pixel art integrada: quatro personagens com nove quadros cada (frente, costas e lateral), caminhada, vila com casas e telhados, Academia, banca de ramen, canal e ponte, campo de treino, floresta noturna, lanternas, partículas de folhas/vagalumes e efeitos de kunai/Katon. Interface com retrato, barra de chakra e painéis estilizados. Os gráficos são uma interpretação própria simples; a imagem de referência não foi recortada nem usada como atlas. O Episódio 1 agora está implementado como continuação jogável de fã: Academia, roubo do Pergaminho dos Selos, busca na floresta, confronto com Mizuki e conclusão com Naruto reconhecido por Iruka. Save, música, combate completo e exportação APK ainda não estão implementados. Importação e execução headless verificadas no Godot 4.3, incluindo teste da sequência completa do prólogo. Desempenho e toque ainda precisam ser conferidos num aparelho Android real. Para Android, instalar os templates de exportação e configurar um preset Android.
+## Progressão
 
+O menu mostra nível, XP, ryo, chakra, inventário, missões, avanço da história e técnicas atuais.
 
-## Arte e desempenho
+Começo do Episódio 1:
+- Kunai
+- Shuriken
+- Katon básico
+- movimentos e ações básicas
 
-`assets/art/` contém SVGs feitos com retângulos em uma grade de pixels. O Godot importa essas texturas uma vez; o filtro nearest preserva as bordas. O cenário usa comandos CanvasItem retidos e é redesenhado apenas quando a área muda. Efeitos usam quantidades limitadas de partículas desenhadas e nenhum pós-processamento pesado.
+Mantidos para fases futuras, mas bloqueados agora:
+- Chidori
+- Mangekyo
+- Amaterasu
+- Susanoo
+- técnicas avançadas e transformações
 
-Recriar a arte: `python tools/build_art.py` (Python 3, sem dependências).
+## Animações do Henrique
 
-Verificação: `godot --headless --path . --editor --quit`, depois `godot --headless --path . --script res://tests/prologue_smoke.gd`.
+`assets/characters/henrique-actions.json` mantém o catálogo enviado pelo usuário: idle, caminhada, corrida, pulo, queda, agachar, esquiva, deslizar, soco, chute, combos, kunai, shuriken, Katon, Chidori, corrente elétrica, clones, substituição, Sharingan, Mangekyo, genjutsu, Susanoo, dano, levantar, Amaterasu, ataques aéreos e extras.
 
-## Referências pesquisadas
+O jogo só libera ações compatíveis com a fase atual da história.
 
-- [Pixel Shippuden](https://www.narutostorm.com/games/english): referência de RPG pixel art com exploração da Vila da Folha.
-- [The Fight of Konoha](https://timyfreak.itch.io/the-fight-of-konoha): referência de apresentação de Naruto/Sasuke em pixel art.
-- [Simple NES-like Village Tiles, surt / OpenGameArt](https://opengameart.org/content/simple-nes-like-village-tiles): pesquisa de tilesets retro.
+## Sprites 2D
 
-Esses links foram referências para a primeira versão visual. A atualização detalhada inclui arte gerada do Henrique baseada na imagem enviada pelo usuário e sprites do Naruto convertidos do pack MUGEN Real Naruto. Consulte `assets/mugen/CREDITS.md` para a origem e créditos do pack. Naruto e personagens associados pertencem aos respectivos titulares. Projeto independente de fã.
+- `assets/art/naruto.svg`: overworld do Naruto clássico.
+- `assets/art/iruka.svg`: overworld do Iruka.
+- `assets/art/mizuki.svg`: overworld do Mizuki.
+- `assets/art/sasuke.svg`: overworld original do Sasuke adicionado para a Academia.
+- `assets/art/sakura.svg`: overworld original da Sakura adicionado para a Academia.
+- `assets/mugen/naruto/`: quadros de um Naruto Kid fan-MUGEN já existentes no projeto, usados apenas em apresentação de combate/cutscene.
+- `assets/characters/henrique-detailed.png`: atlas detalhado do Henrique.
 
-### Continuação visual
+Créditos e procedência do material MUGEN estão em `assets/mugen/CREDITS.md`.
 
-A praça de Konoha agora ganhou placas da Folha, quadro de missões e marcadores visuais do distrito Uchiha. Naruto deixou de ficar totalmente parado: usa os ciclos MUGEN já importados para alternar idle/caminhada enquanto patrulha a praça. O HUD também passa a mostrar o Sharingan de 1 tomoe depois do primeiro Katon bem-sucedido, sem adicionar pós-processamento pesado.
+## Mundo
 
+A praça de Konoha recebeu mais elementos de RPG top-down: caminhos quebrados, bancos, caixas, placa de direção, áreas de grama, Academia, ramen, quadro de missões, ponte/canal e marcadores de distrito.
 
-## Sprites detalhados e MUGEN
+## História
 
-- `assets/characters/henrique-detailed.png`: atlas RGBA com 24 poses do Henrique, criado com a ferramenta integrada de geração de imagens a partir da referência enviada. `henrique-frames.json` mapeia os recortes reais da textura, mantendo o PNG original intacto.
-- `assets/mugen/naruto/`: 14 sprites originais decodificados do SFF do pack Real Naruto, com quatro animações e os tempos/eixos do AIR preservados. A espera do Naruto usa esses quadros na praça; caminhada, corrida e agachamento ficam disponíveis no manifesto, sem novas cenas para o NPC.
-- CORRER na tela ou R: sprint do Henrique. FURTIVO/Shift continua tendo prioridade na perseguição.
-- Henrique usa poses próprias de idle, caminhada, corrida, kunai e Katon. Não é um personagem baixado do MUGEN. O jogo permanece em visão de cima; os movimentos laterais usam o atlas detalhado e o idle de costas aparece ao olhar para cima. Ciclos de caminhada vertical exclusivos ainda não estão disponíveis.
+A abertura começa no dia da prova de graduação. Naruto falha na Academia; Mizuki o manipula; o Pergaminho dos Selos é roubado; Henrique segue os acontecimentos até a floresta e ajuda Iruka a ganhar tempo. O momento decisivo continua sendo de Naruto.
 
-Teste atualizado passou no Godot 4.3: importação RGBA, atlas de 24 poses, AIR idle de quatro quadros, seleção de sprint/Katon e sequência completa do prólogo. Não há exportação APK nesta mudança.
+Esta é uma adaptação jogável de fã e não reproduz o roteiro oficial palavra por palavra.
 
+## Pesquisa e direção visual
 
-## Naruto 2D RPG expansion
+A direção de arte foi refinada olhando referências de fangames Naruto 2D/JUS/NZC/MUGEN e mantendo a escala dos personagens coerente, além do material oficial do Episódio 1. Consulte `docs/CLASSIC_EP1_STYLE.md`.
 
-A branch `naruto-2d-expansion` adds reusable world/progression foundations: Konoha location registry, classic-era cast registry, mission ranks, XP/level/ryo, inventory and jutsu unlocks. The playable prologue now awards progression for kunai training, Katon, stealth pursuit and the Scroll alarm, then unlocks story era 1 for the Episode 1 continuation. See `docs/NARUTO_2D_ROADMAP.md`.
+## Teste
 
+```
+godot --headless --path . --editor --quit
+godot --headless --path . --script res://tests/prologue_smoke.gd
+```
 
-## Episódio 1 jogável
-
-Depois do EP -1, o jogo entra automaticamente no EP 1. Henrique presencia a reprovação de Naruto na Academia, percebe a manipulação de Mizuki, segue o alarme do Pergaminho dos Selos até a floresta e ajuda Iruka a ganhar tempo. O momento decisivo permanece com Naruto, que usa a técnica aprendida no pergaminho e encerra o confronto. A adaptação é original do projeto e resume/reinterpreta os acontecimentos sem reproduzir o roteiro oficial palavra por palavra.
-
-
-## Menu de progressão — começo de Naruto Clássico
-
-O HUD agora inclui o botão `PROGRESSO` (tecla `P`). O painel mostra idade, rank, nível, XP, ryo, chakra, avanço da história, missões, inventário e arsenal liberado. Como o jogo ainda está no começo do Episódio 1 de Naruto Clássico, técnicas muito avançadas permanecem explicitamente bloqueadas para fases futuras.
-
-Os ciclos MUGEN já importados do Naruto Kid também ganharam mais uso contextual: idle/caminhada na vila, agachamento na clareira do pergaminho e corrida durante o confronto. Nenhum segundo pack sem licença aberta foi adicionado nesta etapa.
+O renderizador continua em Compatibility e a interface permanece 960×540 para manter o projeto leve no Android.
