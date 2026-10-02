@@ -25,6 +25,10 @@ func run_checks() -> void:
 	assert(game.techniques_panel.visible, "Technique menu must open")
 	game.toggle_techniques()
 	assert(not game.techniques_panel.visible, "Technique menu must close")
+	game.toggle_konoha_map()
+	assert(game.map_panel.visible, "Konoha map must open")
+	game.toggle_konoha_map()
+	assert(not game.map_panel.visible, "Konoha map must close")
 
 	close_dialogue(game)
 	game.player = game.naruto_pos
@@ -32,9 +36,14 @@ func run_checks() -> void:
 	assert(game.stage == 8, "Academy scene must trigger the scroll alarm")
 	close_dialogue(game)
 
+	assert(game.naruto_world.all_konoha_locations().size() == 30, "Konoha overworld must expose all 30 connected areas")
+	assert(game.naruto_world.neighbor("academy", "south") == "central_plaza", "Academy must connect south into central Konoha")
+	game.travel_to_location("hospital")
+	assert(game.current_location_id == "hospital", "Konoha map must travel to Hospital")
+	game.travel_to_location("village_gate")
 	game.player = Vector2(885, 275)
 	game._process(0.1)
-	assert(game.stage == 9, "Village exit must lead to Naruto in the forest")
+	assert(game.stage == 9, "Village Gate must lead to Naruto in the forest during the scroll incident")
 	close_dialogue(game)
 
 	game.player = game.naruto_pos
@@ -153,6 +162,7 @@ func run_checks() -> void:
 	assert(game.art.SAKURA.get_width() == 216, "Sakura overworld atlas must load")
 	assert(game.art.KONOHAMARU.get_width() == 216, "Konohamaru overworld atlas must load")
 	assert(game.art.EBISU.get_width() == 216, "Ebisu overworld atlas must load")
+	assert(game.art.KAKASHI.get_width() == 216, "Kakashi overworld atlas must load")
 
 	# Exercise action effects without requiring combat targets.
 	game.stage = 15
@@ -167,7 +177,7 @@ func run_checks() -> void:
 	game.act("substitution")
 	assert(game.action_state == "substitution" and game.substitution_flash > 0.0, "Substitution animation/effect must trigger")
 
-	print("PASS: Episodes 1-3, real gameplay progression, dynamic personality, Team 7 cast and Henrique animation catalog")
+	print("PASS: Episodes 1-3, 30-zone Konoha overworld, real progression, Team 7 cast and Henrique animation catalog")
 	game.queue_free()
 	await process_frame
 	quit()
