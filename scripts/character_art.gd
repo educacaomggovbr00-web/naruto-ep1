@@ -1,12 +1,12 @@
 extends RefCounted
 
-# Mobile-safe rendering from the final user-provided sprite atlas.
+# Mobile-safe rendering from separate user-provided PNG sprite strips.
 # Large source boards under assets/references are never decoded during gameplay.
 var user_assets = preload("res://scripts/user_asset_pack.gd").new()
 
 const HENRIQUE_FALLBACK: Texture2D = preload("res://assets/art/henrique.svg")
 
-# Keep the old mapping only as story/action metadata; visuals now come from the runtime atlas.
+# Keep the old mapping only as story/action metadata; visuals come from PNGs under assets/runtime/.
 var henrique_manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/characters/henrique-board-frames.json"))
 var henrique_frames: Array = henrique_manifest["frames"]
 var henrique_actions: Dictionary = henrique_manifest["actions"]
