@@ -9,4 +9,7 @@ Arquivo de consumo: `henrique-detailed.png`. O Godot usa os recortes do manifest
 
 ## Folha visual adicional
 
-O arquivo `file_000000003c88820e930f366203f13d4e.png` foi enviado pelo proprietário do projeto em 2026-10-01 como folha visual adicional do Henrique Uchiha aos 12 anos. Ele serve como referência para proporções, expressões, trajes e movimentos básicos. O gameplay continua usando `henrique-detailed.png` + `henrique-frames.json` porque esse atlas possui recortes explicitamente mapeados e adequados para animação em tempo real.
+O arquivo `file_000000003c88820e930f366203f13d4e.png` foi enviado pelo proprietário do projeto em 2026-10-01 como folha visual adicional do Henrique Uchiha aos 12 anos. Ele agora é a **fonte ativa das animações do Henrique no gameplay**. `assets/characters/henrique-board-frames.json` contém 86 recortes mapeados diretamente nesse PNG, incluindo idle, andar, correr, pular, cair, agachar, esquiva, deslizar, socos, kunai, shuriken, Katon, clone, substituição, dano, queda, levantar e morte. `character_art.gd` remove o fundo escuro de cada recorte em tempo de execução por flood-fill e guarda cada frame em cache. O texto “IDADE: 16” existente na prancha não altera o cânone do jogo: Henrique continua com 12 anos; apenas os sprites são consumidos.
+
+
+O blob Git exato da prancha usada pelo runtime é `265335ebcdd1d4a16052f968c4c2fb7a21e86b49`, garantindo que o mapeamento aponta para o mesmo PNG colocado pelo usuário na `main`.
