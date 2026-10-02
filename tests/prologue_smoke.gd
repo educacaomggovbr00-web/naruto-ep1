@@ -234,6 +234,7 @@ func run_checks() -> void:
 
 	assert(game.art.character_art.henrique_frames.size() == 86, "Exact Henrique board must expose all 86 runtime frames")
 	assert(game.art.character_art.henrique_manifest["source_git_blob"] == "265335ebcdd1d4a16052f968c4c2fb7a21e86b49", "Henrique runtime must use the exact uploaded PNG")
+	assert(game.art.character_art.user_assets.has_asset("overworld/henrique.png"), "Latest user Henrique overworld crop must be packed")
 	assert(game.art.character_art.user_assets.has_asset("overworld/naruto.png"), "User Naruto overworld crop must be packed")
 	assert(game.art.character_art.user_assets.has_asset("overworld/sasuke.png"), "User Sasuke overworld crop must be packed")
 	assert(game.art.character_art.user_assets.has_asset("overworld/sakura.png"), "User Sakura overworld crop must be packed")
@@ -242,8 +243,13 @@ func run_checks() -> void:
 	assert(game.art.character_art.user_assets.has_asset("naruto_actions/shadow_clone.png"), "Exact Naruto clone animation crop must be packed")
 	assert(game.art.character_art.user_assets.has_asset("world/konoha_map.png"), "User Konoha board crop must be packed")
 	assert(game.art.character_art.user_assets.has_asset("world/items_ui.png"), "User items/UI crop must be packed")
+	assert(game.art.character_art.user_assets.has_asset("stages/bridge.png"), "Exact bridge battle stage must be packed")
+	assert(game.art.character_art.user_assets.has_asset("stages/training.png"), "Exact training battle stage must be packed")
 	assert(game.art.character_art.user_assets.has_asset("stages/forest.png"), "User battle forest crop must be packed")
+	assert(game.art.character_art.user_assets.overworld("henrique") != null, "Packed Henrique overworld texture must decode")
 	assert(game.art.character_art.user_assets.overworld("naruto") != null, "Packed Naruto overworld texture must decode")
+	assert(game.art.character_art.user_assets.world("items_ui") != null, "Packed exact items/UI texture must decode")
+	assert(game.art.character_art.user_assets.stage_texture("training") != null, "Packed exact training stage must decode")
 	assert(game.art.character_art.user_assets.naruto_action("idle") != null, "Packed Naruto idle texture must decode")
 	assert(game.art.character_art.mugen_actions["idle"].size() == 4, "Imported fan-MUGEN idle cycle must load")
 	assert(game.art.NARUTO.get_width() == 216, "Top-down Naruto overworld atlas must load")
@@ -268,7 +274,7 @@ func run_checks() -> void:
 	game.act("substitution")
 	assert(game.action_state == "substitution" and game.substitution_flash > 0.0, "Substitution animation/effect must trigger")
 
-	print("PASS: Episodes 1-6, exact user-image asset pack, Naruto animation sheet, 30-zone Konoha and Team 7")
+	print("PASS: Episodes 1-6, exact user overworld/Henrique/items/stages, Naruto animation sheet, Konoha and Team 7")
 	game.queue_free()
 	await process_frame
 	quit()
