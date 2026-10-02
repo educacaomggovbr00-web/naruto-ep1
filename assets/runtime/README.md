@@ -7,9 +7,16 @@ Expected layout:
 - overworld/<character>.png
 - battle/<character>.png
 - naruto_actions/<action>.png
+- henrique_actions/<action>.png
 - characters/<character>.png
 - stages/<stage>.png
 - world/<asset>.png
 
-Large source boards belong in `assets/references/` and are intentionally ignored by Godot.
-The game must fall back to bundled lightweight SVG/MUGEN assets when a runtime PNG is absent.
+Rules:
+- large source boards stay in `assets/references/` and are ignored by Godot;
+- no HTTP downloads during gameplay;
+- no gzip/base64/JSON pixel reconstruction during gameplay;
+- pixel art uses nearest filtering;
+- when a runtime PNG is absent, the game falls back to the bundled lightweight SVG/MUGEN assets.
+
+This directory is the only destination for final cropped runtime PNGs.
