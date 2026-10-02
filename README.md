@@ -145,3 +145,12 @@ Naruto, Sasuke, Sakura e Kakashi permanecem visíveis durante toda a saída da v
 Ao atravessar o portão, o mapa de fast travel é bloqueado e o cenário muda para a estrada fora de Konoha. A missão só é registrada quando o jogador realmente percorre o trecho de saída.
 
 A ordem narrativa foi ajustada para seguir a cronologia do anime: o teste de sobrevivência ocupa os episódios 4-5; a missão de Tazuna e a viagem ao País das Ondas começam no episódio 6.
+
+
+## Pacote gráfico da prancha
+
+A referência visual enviada pelo usuário agora está representada no projeto como um pacote gráfico completo e leve. Foram adicionados Teuchi, Ayame, ANBU e variantes de moradores ao overworld; strips 2D de batalha para Henrique, Naruto, Sasuke, Sakura e Kakashi; biblioteca de VFX de fogo/raio/água/fumaça/impacto/aura; tileset de Konoha; ícones de itens/UI; e nove cenários de batalha.
+
+Os NPCs novos já aparecem em locais coerentes de Konoha, e os VFX básicos já participam de Katon, clone, substituição, impactos e Sharingan. O inventário também passou a registrar pergaminhos, ryō, ramen, dango, água e remédio.
+
+Detalhes em `docs/GRAPHICS_PACK.md`.
