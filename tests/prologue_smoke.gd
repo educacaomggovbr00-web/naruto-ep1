@@ -8,6 +8,22 @@ func close_dialogue(game: Node) -> void:
 		game.next_line()
 
 func run_checks() -> void:
+	var graphics_catalog = preload("res://scripts/graphics_catalog.gd").new()
+	var battle_stages = preload("res://scripts/battle_stages.gd").new()
+	var vfx = preload("res://scripts/vfx.gd").new()
+	assert(graphics_catalog.CHARACTER_PACK.size() >= 17, "Graphics catalog must include player, classic cast, ANBU and NPC variants")
+	assert(graphics_catalog.HENRIQUE_ANIMATIONS.size() == 18, "Henrique graphics pack must keep all 18 core animations")
+	assert(graphics_catalog.JUTSU_EFFECTS.size() == 16, "Jutsu graphics pack must include all reference-sheet effect families")
+	assert(graphics_catalog.ITEMS.size() == 10, "Item/UI graphics pack must include all icon families")
+	assert(graphics_catalog.BATTLE_STAGES.size() == 9, "Battle graphics pack must include all nine stage types")
+	assert(ResourceLoader.exists("res://assets/ui/items.svg"), "Item icon sheet must exist")
+	assert(ResourceLoader.exists("res://assets/tiles/konoha_tiles.svg"), "Konoha tileset must exist")
+	assert(ResourceLoader.exists("res://assets/stages/battle_stages.svg"), "Battle-stage thumbnail sheet must exist")
+	assert(ResourceLoader.exists("res://assets/battle/naruto.svg"), "Naruto battle strip must exist")
+	assert(ResourceLoader.exists("res://assets/battle/sasuke.svg"), "Sasuke battle strip must exist")
+	assert(ResourceLoader.exists("res://assets/battle/sakura.svg"), "Sakura battle strip must exist")
+	assert(ResourceLoader.exists("res://assets/battle/kakashi.svg"), "Kakashi battle strip must exist")
+	assert(ResourceLoader.exists("res://assets/battle/henrique.svg"), "Henrique battle strip must exist")
 	var game = load("res://scenes/main.tscn").instantiate()
 	root.add_child(game)
 	await process_frame
@@ -241,7 +257,7 @@ func run_checks() -> void:
 	game.act("substitution")
 	assert(game.action_state == "substitution" and game.substitution_flash > 0.0, "Substitution animation/effect must trigger")
 
-	print("PASS: Episodes 1-6, survival test, Team 7 departure, 30-zone Konoha and real Henrique progression")
+	print("PASS: Episodes 1-6, complete graphics reference pack, 30-zone Konoha, Team 7 and real Henrique progression")
 	game.queue_free()
 	await process_frame
 	quit()
