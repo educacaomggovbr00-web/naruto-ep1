@@ -7,6 +7,8 @@ const SAKURA = preload("res://assets/art/sakura.svg")
 const KONOHAMARU = preload("res://assets/art/konohamaru.svg")
 const EBISU = preload("res://assets/art/ebisu.svg")
 const KAKASHI = preload("res://assets/art/kakashi.svg")
+const HIRUZEN = preload("res://assets/art/hiruzen.svg")
+const TAZUNA = preload("res://assets/art/tazuna.svg")
 const IRUKA = preload("res://assets/art/iruka.svg")
 const MIZUKI = preload("res://assets/art/mizuki.svg")
 const TARGET = preload("res://assets/art/target.svg")
@@ -124,6 +126,49 @@ func render(host: Node2D) -> void:
 		actor(host, host.sasuke_pos, SASUKE, Vector2.RIGHT, true, host.visual_clock, "Sasuke", false)
 		actor(host, host.sakura_pos, SAKURA, Vector2.RIGHT, true, host.visual_clock, "Sakura", false)
 		actor(host, host.kakashi_pos, KAKASHI, Vector2.RIGHT, true, host.visual_clock, "Kakashi", false)
+	elif host.stage >= 24 and host.stage <= 28 and host.current_location_id == "training_ground_3":
+		var naruto_move := host.stage == 25
+		var sasuke_move := host.stage == 26
+		var sakura_move := host.stage == 27
+		actor(host, host.naruto_pos + Vector2(sin(host.visual_clock * 1.8) * 24 if naruto_move else 0, 0), NARUTO, Vector2.RIGHT, naruto_move, host.visual_clock, "Naruto", false)
+		actor(host, host.sasuke_pos + Vector2(cos(host.visual_clock * 1.4) * 18 if sasuke_move else 0, 0), SASUKE, Vector2.LEFT, sasuke_move, host.visual_clock, "Sasuke", false)
+		actor(host, host.sakura_pos + Vector2(0, sin(host.visual_clock * 1.6) * 12 if sakura_move else 0), SAKURA, Vector2.UP, sakura_move, host.visual_clock, "Sakura", false)
+		actor(host, host.kakashi_pos, KAKASHI, Vector2.LEFT, false, host.visual_clock, "Kakashi", false)
+		if host.stage >= 26:
+			host.draw_texture_rect(TARGET, Rect2(host.target - Vector2(28, 37), Vector2(56, 64)), false)
+			host.draw_string(ThemeDB.fallback_font, host.target + Vector2(-22, 46), "SINOS", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("f6d98d"))
+		if host.stage == 24 or host.stage == 28:
+			marker(host, host.kakashi_pos, host.visual_clock)
+	elif host.stage == 29 and host.current_location_id == "hokage_residence":
+		actor(host, host.hiruzen_pos, HIRUZEN, Vector2.DOWN, false, host.visual_clock, "Hiruzen", false)
+		actor(host, host.tazuna_pos, TAZUNA, Vector2.LEFT, false, host.visual_clock, "Tazuna", false)
+		actor(host, host.kakashi_pos, KAKASHI, Vector2.LEFT, false, host.visual_clock, "Kakashi", false)
+		actor(host, host.naruto_pos, NARUTO, Vector2.UP, false, host.visual_clock, "Naruto", false)
+		actor(host, host.sasuke_pos, SASUKE, Vector2.UP, false, host.visual_clock, "Sasuke", false)
+		actor(host, host.sakura_pos, SAKURA, Vector2.UP, false, host.visual_clock, "Sakura", false)
+		marker(host, host.hiruzen_pos, host.visual_clock)
+	elif host.stage == 30 and host.current_location_id == "hokage_residence":
+		actor(host, host.hiruzen_pos, HIRUZEN, Vector2.DOWN, false, host.visual_clock, "Hiruzen", false)
+		actor(host, host.tazuna_pos, TAZUNA, Vector2.LEFT, false, host.visual_clock, "Tazuna", false)
+		actor(host, host.kakashi_pos, KAKASHI, Vector2.LEFT, false, host.visual_clock, "Kakashi", false)
+		actor(host, host.naruto_pos, NARUTO, Vector2.UP, false, host.visual_clock, "Naruto", false)
+		actor(host, host.sasuke_pos, SASUKE, Vector2.UP, false, host.visual_clock, "Sasuke", false)
+		actor(host, host.sakura_pos, SAKURA, Vector2.UP, false, host.visual_clock, "Sakura", false)
+		marker(host, host.tazuna_pos, host.visual_clock)
+	elif host.stage == 31 and host.current_location_id == "village_gate":
+		actor(host, host.naruto_pos, NARUTO, Vector2.RIGHT, true, host.visual_clock, "Naruto", false)
+		actor(host, host.sasuke_pos, SASUKE, Vector2.RIGHT, false, host.visual_clock, "Sasuke", false)
+		actor(host, host.sakura_pos, SAKURA, Vector2.RIGHT, true, host.visual_clock, "Sakura", false)
+		actor(host, host.kakashi_pos, KAKASHI, Vector2.RIGHT, false, host.visual_clock, "Kakashi", false)
+		actor(host, host.tazuna_pos, TAZUNA, Vector2.LEFT, false, host.visual_clock, "Tazuna", false)
+		marker(host, host.kakashi_pos, host.visual_clock)
+	elif host.stage == 32 or host.stage == 33:
+		var march := Vector2(sin(host.visual_clock * 1.1) * 22, 0)
+		actor(host, host.naruto_pos + march, NARUTO, Vector2.RIGHT, true, host.visual_clock, "Naruto", false)
+		actor(host, host.sasuke_pos + march * 0.8, SASUKE, Vector2.RIGHT, true, host.visual_clock, "Sasuke", false)
+		actor(host, host.sakura_pos + march * 0.6, SAKURA, Vector2.RIGHT, true, host.visual_clock, "Sakura", false)
+		actor(host, host.kakashi_pos + march * 0.4, KAKASHI, Vector2.RIGHT, true, host.visual_clock, "Kakashi", false)
+		actor(host, host.tazuna_pos + march * 0.2, TAZUNA, Vector2.RIGHT, true, host.visual_clock, "Tazuna", false)
 
 	character_art.draw_henrique(host)
 
@@ -191,7 +236,9 @@ func render(host: Node2D) -> void:
 	host.draw_rect(Rect2(610, 16, 166, 10), Color("314952"))
 	host.draw_rect(Rect2(612, 18, 162 * host.chakra / 100.0, 6), Color("66b8bd"))
 	var place := host.naruto_world.location_name(host.current_location_id)
-	if host.stage == 3 or host.stage == 4:
+	if host.stage >= 32:
+		place = "ESTRADA • FORA DE KONOHA"
+	elif host.stage == 3 or host.stage == 4:
 		place = "FLORESTA • NOITE"
 	elif host.stage >= 9 and host.stage <= 12:
 		place = "FLORESTA • PERGAMINHO"
