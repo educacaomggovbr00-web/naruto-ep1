@@ -4,6 +4,8 @@ var character_art = preload("res://scripts/character_art.gd").new()
 const NARUTO = preload("res://assets/art/naruto.svg")
 const SASUKE = preload("res://assets/art/sasuke.svg")
 const SAKURA = preload("res://assets/art/sakura.svg")
+const KONOHAMARU = preload("res://assets/art/konohamaru.svg")
+const EBISU = preload("res://assets/art/ebisu.svg")
 const IRUKA = preload("res://assets/art/iruka.svg")
 const MIZUKI = preload("res://assets/art/mizuki.svg")
 const TARGET = preload("res://assets/art/target.svg")
@@ -29,7 +31,7 @@ func marker(host: Node2D, at: Vector2, clock: float) -> void:
 	host.draw_colored_polygon(PackedVector2Array([Vector2(at.x - 6, y), Vector2(at.x + 6, y), Vector2(at.x, y + 7)]), Color("f4d085"))
 
 func render(host: Node2D) -> void:
-	var night: bool = host.stage == 3 or host.stage == 4 or host.stage == 5 or host.stage == 6 or host.stage >= 8
+	var night: bool = host.stage == 3 or host.stage == 4 or host.stage == 5 or host.stage == 6 or (host.stage >= 8 and host.stage <= 12)
 	if host.stage <= 1:
 		host.draw_texture_rect(TARGET, Rect2(host.target - Vector2(28, 37), Vector2(56, 64)), false)
 		marker(host, host.target, host.visual_clock)
@@ -69,8 +71,46 @@ func render(host: Node2D) -> void:
 
 	if host.stage == 5:
 		marker(host, Vector2(110, 240), host.visual_clock)
+	elif host.stage == 13:
+		actor(host, host.naruto_pos, NARUTO, Vector2.LEFT, false, host.visual_clock, "Naruto", false)
+		actor(host, host.konohamaru_pos, KONOHAMARU, Vector2.RIGHT, true, host.visual_clock, "Konohamaru", false)
+		marker(host, host.naruto_pos, host.visual_clock)
+	elif host.stage == 14:
+		actor(host, host.naruto_pos, NARUTO, Vector2.RIGHT, false, host.visual_clock, "Naruto", false)
+		actor(host, host.konohamaru_pos, KONOHAMARU, Vector2.LEFT, true, host.visual_clock, "Konohamaru", false)
+		marker(host, host.konohamaru_pos, host.visual_clock)
+	elif host.stage == 15:
+		actor(host, host.naruto_pos, NARUTO, Vector2.DOWN, false, host.visual_clock, "Naruto", false)
+		actor(host, host.konohamaru_pos, KONOHAMARU, Vector2.LEFT, false, host.visual_clock, "Konohamaru", false)
+		marker(host, host.konohamaru_pos, host.visual_clock)
+	elif host.stage == 16:
+		actor(host, host.naruto_pos, NARUTO, Vector2.RIGHT, false, host.visual_clock, "Naruto", false)
+		actor(host, host.konohamaru_pos, KONOHAMARU, Vector2.RIGHT, false, host.visual_clock, "Konohamaru", false)
+		actor(host, host.ebisu_pos, EBISU, Vector2.LEFT, false, host.visual_clock, "Ebisu", false)
+		marker(host, host.ebisu_pos, host.visual_clock)
+	elif host.stage == 17:
+		actor(host, host.naruto_pos, NARUTO, Vector2.RIGHT, true, host.visual_clock, "Naruto", false)
+		actor(host, host.konohamaru_pos, KONOHAMARU, Vector2.RIGHT, true, host.visual_clock, "Konohamaru", false)
+		actor(host, host.ebisu_pos, EBISU, Vector2.LEFT, false, host.visual_clock, "Ebisu", false)
 
 	character_art.draw_henrique(host)
+
+	if host.clone_flash > 0.0:
+		var alpha := clampf(host.clone_flash, 0.0, 1.0)
+		for side in [-1, 1]:
+			var clone_at := host.player + Vector2(42 * side, 0)
+			host.draw_circle(clone_at + Vector2(0, -28), 15, Color(0.75, 0.82, 0.86, 0.16 * alpha))
+			host.draw_rect(Rect2(clone_at + Vector2(-12, -16), Vector2(24, 38)), Color(0.70, 0.78, 0.84, 0.13 * alpha))
+		for i in range(8):
+			var smoke := host.player + Vector2((i - 4) * 12, -8 + sin(i * 1.4 + host.visual_clock * 7.0) * 12)
+			host.draw_circle(smoke, 8 + (i % 3) * 3, Color(0.82, 0.86, 0.88, 0.22 * alpha))
+	if host.substitution_flash > 0.0:
+		var alpha := clampf(host.substitution_flash, 0.0, 1.0)
+		for i in range(7):
+			var smoke := host.player + Vector2(cos(i * 1.7) * 30, sin(i * 2.1) * 20 - 15)
+			host.draw_circle(smoke, 9 + (i % 2) * 5, Color(0.86, 0.88, 0.90, 0.25 * alpha))
+		host.draw_rect(Rect2(host.player + Vector2(-10, -24), Vector2(20, 44)), Color(0.42, 0.27, 0.16, 0.65 * alpha))
+		host.draw_line(host.player + Vector2(-8, -12), host.player + Vector2(8, -8), Color(0.66, 0.46, 0.28, 0.8 * alpha), 3)
 
 	if host.naruto_battle_flash > 0.0:
 		var action := "run" if host.naruto_battle_flash > 0.8 else "idle"
@@ -88,6 +128,12 @@ func render(host: Node2D) -> void:
 				var shift := Vector2(cos(i * 1.7) * 12, sin(i * 2.8) * 10)
 				host.draw_rect(Rect2(at + shift - Vector2(4, 4), Vector2(8, 8)), Color("ffcf69"))
 			host.draw_rect(Rect2(at - Vector2(5, 5), Vector2(10, 10)), Color("fff1b0"))
+		elif host.effect_kind == "shuriken":
+			host.draw_set_transform(at, host.visual_clock * 14.0)
+			var star := PackedVector2Array([Vector2(0,-14),Vector2(4,-4),Vector2(14,0),Vector2(4,4),Vector2(0,14),Vector2(-4,4),Vector2(-14,0),Vector2(-4,-4)])
+			host.draw_colored_polygon(star, Color("b7c5cf"))
+			host.draw_circle(Vector2.ZERO, 4, Color("38434b"))
+			host.draw_set_transform(Vector2.ZERO)
 		else:
 			host.draw_set_transform(at, host.effect_direction.angle())
 			host.draw_texture_rect(KUNAI, Rect2(-16, -8, 32, 16), false)
@@ -121,7 +167,11 @@ func render(host: Node2D) -> void:
 		place = "ACADEMIA • EP 1"
 	elif host.stage == 8:
 		place = "KONOHA • ALARME"
-	elif host.stage >= 9:
+	elif host.stage >= 9 and host.stage <= 12:
 		place = "FLORESTA • PERGAMINHO"
+	elif host.stage == 13:
+		place = "GABINETE • EP 2"
+	elif host.stage >= 14:
+		place = "KONOHA • EP 2"
 	host.draw_string(ThemeDB.fallback_font, Vector2(790, 26), place, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("d6c89f"))
 	host.draw_rect(Rect2(0, 445, 960, 95), Color(0.045, 0.10, 0.15, 0.70))
