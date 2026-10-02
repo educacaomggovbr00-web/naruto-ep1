@@ -23,6 +23,8 @@ const CLASSIC_CAST := [
 	{"name":"Sakura Haruno","role":"Aluna / futuro Time 7","era":1},
 	{"name":"Kakashi Hatake","role":"Jounin / futuro líder do Time 7","era":1},
 	{"name":"Hiruzen Sarutobi","role":"Terceiro Hokage","era":1},
+	{"name":"Konohamaru Sarutobi","role":"Neto do Terceiro Hokage / aluno","era":1},
+	{"name":"Ebisu","role":"Tutor de Konohamaru","era":1},
 	{"name":"Shikamaru Nara","role":"Aluno ninja","era":1},
 	{"name":"Hinata Hyuga","role":"Aluna ninja","era":1},
 	{"name":"Kiba Inuzuka","role":"Aluno ninja","era":1},
