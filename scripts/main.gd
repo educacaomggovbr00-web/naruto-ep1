@@ -62,6 +62,13 @@ var ep3_shuriken_hits := 0
 var ep3_substitution_done := false
 var ep3_sasuke_resolved := false
 var current_location_id := "academy"
+var episode_4_started := false
+var episode_6_started := false
+var ep4_dodge_done := false
+var ep4_substitution_done := false
+var ep4_bell_hits := 0
+var hiruzen_pos := Vector2(350, 250)
+var tazuna_pos := Vector2(705, 270)
 const OBJECTIVES := [
 	"TREINO • Acerte 3 vezes o alvo com kunai (J / botão KUNAI).",
 	"CHAKRA • Use Katon perto do alvo (K / botão KATON).",
@@ -86,7 +93,17 @@ const OBJECTIVES := [
 	"AVALIAÇÃO • Acerte 3 shuriken no alvo. Só acerto conta como progresso.",
 	"KAWARIMI • Execute Substituição perto do alvo para concluir sua avaliação.",
 	"KAKASHI • Fale com o jōnin que chegou para buscar o Time 7.",
-	"EP 3 CONCLUÍDO • Henrique conquista seu avanço por ações comprovadas."
+	"EP 3 CONCLUÍDO • Henrique conquista seu avanço por ações comprovadas.",
+	"EP 4 • Vá ao Campo de Treinamento 3 e fale com Kakashi.",
+	"SOBREVIVÊNCIA • Execute uma ESQUIVA perto de Kakashi.",
+	"KAWARIMI • Use Substituição perto do alvo dos sinos.",
+	"SINOS • Acerte o alvo dos sinos 2 vezes com shuriken.",
+	"RESULTADO • Fale com Kakashi e veja a conclusão do teste do Time 7.",
+	"EP 6 • Vá à Residência do Hokage para a primeira missão C.",
+	"TAZUNA • Fale com o cliente da missão.",
+	"PORTÃO • Encontre Kakashi, Naruto, Sasuke, Sakura e Tazuna.",
+	"FORA DE KONOHA • Siga o grupo pela estrada.",
+	"PARTIDA CONCLUÍDA • O Time 7 segue rumo ao País das Ondas."
 ]
 
 func _ready() -> void:
@@ -278,6 +295,10 @@ func next_line() -> void:
 		elif stage == 17:
 			begin_episode_3()
 		elif stage == 23:
+			begin_episode_4()
+		elif stage == 28:
+			begin_episode_6()
+		elif stage == 33:
 			restart.show()
 	else:
 		dialogue.text = lines[line_index] + "\n[Toque para continuar]"
@@ -326,6 +347,40 @@ func begin_episode_3() -> void:
 	ep3_sasuke_resolved = false
 	restart.hide()
 	say(["NARUTO CLÁSSICO • EP 3 — SASUKE E SAKURA", "Os recém-formados voltam à Academia para descobrir suas equipes. Naruto acaba no Time 7 ao lado de Sakura e Sasuke.", "Henrique não recebe promoção de graça: Iruka mantém sua avaliação aberta. Se ele quiser avançar, vai precisar provar precisão e controle na prática.", "Henrique: Melhor assim. Um título que vem sem teste não vale muita coisa."])
+
+func begin_episode_4() -> void:
+	episode_4_started = true
+	current_episode = 4
+	stage = 24
+	current_location_id = "training_ground_3"
+	background.set_location(naruto_world.location(current_location_id))
+	player = Vector2(170, 300)
+	kakashi_pos = Vector2(690, 245)
+	naruto_pos = Vector2(330, 300)
+	sasuke_pos = Vector2(445, 260)
+	sakura_pos = Vector2(545, 310)
+	target = Vector2(760, 300)
+	ep4_dodge_done = false
+	ep4_substitution_done = false
+	ep4_bell_hits = 0
+	restart.hide()
+	say(["NARUTO CLÁSSICO • EP 4-5 — TESTE DE SOBREVIVÊNCIA", "Kakashi leva Naruto, Sasuke e Sakura ao Campo de Treinamento 3 para o teste dos sinos.", "Henrique não entra no Time 7, mas Kakashi usa a oportunidade para medir a reação dele ao lado de genins da mesma idade.", "Henrique: Então eu observo o teste deles e provo o que eu sei fazer. Sem presente."])
+
+func begin_episode_6() -> void:
+	episode_6_started = true
+	current_episode = 6
+	stage = 29
+	current_location_id = "hokage_residence"
+	background.set_location(naruto_world.location(current_location_id))
+	player = Vector2(190, 290)
+	hiruzen_pos = Vector2(355, 250)
+	tazuna_pos = Vector2(705, 270)
+	kakashi_pos = Vector2(610, 245)
+	naruto_pos = Vector2(470, 305)
+	sasuke_pos = Vector2(535, 270)
+	sakura_pos = Vector2(590, 315)
+	restart.hide()
+	say(["NARUTO CLÁSSICO • EP 6 — PRIMEIRA MISSÃO C", "Depois de tarefas simples dentro da vila, Naruto exige algo maior. O Terceiro Hokage apresenta uma missão de escolta.", "O cliente é Tazuna, um construtor de pontes que precisa voltar ao País das Ondas.", "Henrique é enviado como apoio extra nesta adaptação do jogo; o Time 7 continua sendo Naruto, Sasuke, Sakura e Kakashi."])
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
@@ -378,7 +433,7 @@ func _process(delta: float) -> void:
 		naruto_action = "run" if lines.is_empty() else "idle"
 	elif stage >= 11:
 		naruto_action = "idle"
-	if lines.is_empty() and stage < 23 and not progress_panel.visible and not map_panel.visible and action_timer <= 0.0:
+	if lines.is_empty() and stage < 33 and not progress_panel.visible and not map_panel.visible and action_timer <= 0.0:
 		movement = Vector2(float(down("right", KEY_D, KEY_RIGHT)) - float(down("left", KEY_A, KEY_LEFT)), float(down("down", KEY_S, KEY_DOWN)) - float(down("up", KEY_W, KEY_UP))).normalized()
 		if movement != Vector2.ZERO:
 			facing = movement
@@ -395,7 +450,7 @@ func _process(delta: float) -> void:
 				change_to_neighbor("north", Vector2(player.x, 360))
 			elif player.y > 382.0 and movement.y > 0.0:
 				change_to_neighbor("south", Vector2(player.x, 120))
-		if stage == 2 or stage == 5 or stage == 7 or stage == 8 or (stage >= 13 and stage <= 16) or (stage >= 18 and stage <= 23):
+		if stage == 2 or stage == 5 or stage == 7 or stage == 8 or (stage >= 13 and stage <= 16) or (stage >= 18 and stage <= 23) or (stage >= 29 and stage <= 31):
 			for house_rect in [Rect2(36, 91, 152, 130), Rect2(268, 85, 152, 130), Rect2(460, 91, 152, 130), Rect2(714, 82, 152, 130)]:
 				if house_rect.grow(8).has_point(player):
 					player = previous_position
@@ -430,6 +485,11 @@ func _process(delta: float) -> void:
 		naruto_pos = Vector2(520, 275)
 		mizuki = Vector2(760, 255)
 		say(["Henrique atravessa o Portão de Konoha e chega à trilha da floresta.", "Naruto está ali com o Pergaminho dos Selos, exausto depois de treinar uma técnica proibida.", "Henrique: Então foi você... Mas por quê?", "Naruto: Mizuki-sensei disse que, se eu aprendesse uma técnica do pergaminho, eu poderia me formar."])
+	if lines.is_empty() and stage == 32 and player.x > 860.0:
+		stage = 33
+		rpg.complete_mission("leave_konoha_land_of_waves", 90, 50)
+		rpg.award_milestone("first_c_rank_departure", 40)
+		say(["Konoha desaparece atrás das árvores.", "Naruto anda na frente falando alto demais; Sakura reclama; Sasuke observa a estrada; Kakashi mantém o ritmo sem demonstrar pressa.", "Henrique: Primeira vez fora da vila em missão. Agora qualquer erro deixa de ser exercício.", "O grupo segue com Tazuna rumo ao País das Ondas.", "PARTIDA CONCLUÍDA — próximo: os primeiros perigos reais fora de Konoha."])
 	var eye_status := "SHARINGAN 1T" if sharingan_awakened else "OLHOS NORMAIS"
 	hud.text = "HENRIQUE • NV %d • %d RYO     | CHAKRA %d | %s" % [rpg.level, rpg.ryo, int(chakra), eye_status]
 	objective.text = OBJECTIVES[stage] + "   •   " + naruto_world.location_name(current_location_id)
@@ -445,7 +505,7 @@ func act(action: String) -> void:
 	if not lines.is_empty():
 		if action == "interact": next_line()
 		return
-	if stage == 23: return
+	if stage == 33: return
 	if action == "punch" and cooldown <= 0:
 		cooldown = 0.35
 		start_action("punch_combo", 0.48)
@@ -464,13 +524,21 @@ func act(action: String) -> void:
 			rpg.register_success("punch")
 			check_ep2_training()
 		return
-	if action == "shuriken" and cooldown <= 0 and (stage == 20 or rpg.consume_item("shuriken")):
+	if action == "shuriken" and cooldown <= 0 and (stage == 20 or stage == 27 or rpg.consume_item("shuriken")):
 		cooldown = 0.45
 		attack_flash = 0.28
 		effect_kind = "shuriken"
 		effect_origin = player
 		effect_direction = facing
 		start_action("shuriken_throw", 0.45)
+		if stage == 27 and current_location_id == "training_ground_3" and player.distance_to(target) < 190 and facing.dot((target - player).normalized()) > 0.30:
+			ep4_bell_hits += 1
+			rpg.register_success("shuriken")
+			if ep4_bell_hits >= 2:
+				rpg.award_milestone("ep4_bell_accuracy", 25)
+				stage = 28
+				say(["O segundo shuriken bate no alvo metálico com um som seco.", "Kakashi: Chega. A parte mecânica você passou.", "Ao lado, o verdadeiro teste do Time 7 chega ao ponto importante: não basta cada um tentar vencer sozinho.", "Objetivo: fale com Kakashi para encerrar a avaliação e ouvir a conclusão do teste."])
+			return
 		if stage == 20 and current_location_id == "academy" and player.distance_to(target) < 180 and facing.dot((target - player).normalized()) > 0.35:
 			ep3_shuriken_hits += 1
 			rpg.register_success("shuriken")
@@ -483,6 +551,13 @@ func act(action: String) -> void:
 		cooldown = 0.45
 		start_action("dodge_roll", 0.45)
 		player = (player + facing * 58.0).clamp(Vector2(35, 110), Vector2(925, 375))
+		if stage == 25 and current_location_id == "training_ground_3" and player.distance_to(kakashi_pos) < 190:
+			ep4_dodge_done = true
+			rpg.register_success("dodge")
+			rpg.award_milestone("ep4_survival_dodge", 15)
+			stage = 26
+			say(["Kakashi muda de direção no último instante, mas Henrique rola para fora da linha de ataque.", "Kakashi: Reflexo aceitável. Agora quero ver se você sabe desaparecer antes de receber o golpe.", "Henrique: Substituição. Entendi."])
+			return
 		if stage == 15 and current_location_id == "central_plaza" and player.distance_to(konohamaru_pos) < 180:
 			ep2_dodge_done = true
 			rpg.register_success("dodge")
@@ -513,6 +588,15 @@ func act(action: String) -> void:
 		substitution_flash = 0.8
 		start_action("substitution", 0.70)
 		player = (player - facing * 45.0).clamp(Vector2(35, 110), Vector2(925, 375))
+		if stage == 26 and current_location_id == "training_ground_3" and player.distance_to(target) < 190:
+			ep4_substitution_done = true
+			rpg.register_success("substitution")
+			rpg.award_milestone("ep4_survival_substitution", 20)
+			stage = 27
+			if int(rpg.inventory.get("shuriken", 0)) < 2:
+				rpg.inventory["shuriken"] = 2
+			say(["O tronco recebe o ataque no lugar de Henrique.", "Sasuke olha de lado por um instante; Naruto imediatamente diz que faria melhor.", "Henrique: Claro que faria. Depois de avisar a floresta inteira.", "Kakashi aponta para o alvo dos sinos: dois acertos limpos de shuriken."])
+			return
 		if stage == 21 and current_location_id == "academy" and player.distance_to(target) < 190:
 			ep3_substitution_done = true
 			rpg.register_success("substitution")
@@ -613,6 +697,38 @@ func act(action: String) -> void:
 			rpg.complete_mission("episode3_real_evaluation", 80, 40)
 			rpg.award_milestone("earned_genin_rank", 50)
 			say(["Kakashi observa a ficha de Henrique antes de olhar para o Time 7.", "Kakashi: Então você passou na avaliação complementar.", "Henrique: Passei no que fizeram eu executar. O resto eu ainda não provei.", "Kakashi: Uma resposta menos comum do que parece.", "Naruto reclama da demora; Sakura manda Naruto parar; Sasuke continua com a mesma cara de sempre.", "Henrique: É. Definitivamente vão irritar o professor rápido.", "NARUTO EP 3 CONCLUÍDO — Henrique agora é Genin por testes concluídos no gameplay. Próximo: o teste de sobrevivência do Time 7."])
+		elif stage == 24 and current_location_id == "training_ground_3" and player.distance_to(kakashi_pos) < 135:
+			stage = 25
+			rpg.register_social_interaction()
+			say(["Kakashi mostra dois sinos e explica o teste ao Time 7.", "Naruto já parte para cima antes de pensar. Sasuke prefere observar. Sakura tenta entender o padrão de Kakashi.", "Kakashi: Henrique, seu teste paralelo é simples. Primeiro, não seja atingido.", "Henrique: Finalmente uma instrução curta."])
+		elif stage == 28 and current_location_id == "training_ground_3" and player.distance_to(kakashi_pos) < 140:
+			rpg.complete_mission("survival_test_parallel", 85, 35)
+			rpg.register_social_interaction()
+			say(["Kakashi encerra o teste. Naruto, Sasuke e Sakura descobrem que a resposta não estava em derrotá-lo individualmente, mas em agir como equipe.", "Kakashi: O Time 7 continua. Henrique, seus resultados ficam registrados separadamente.", "Henrique: Melhor. Eu não quero crédito pelo trabalho dos três.", "Kakashi: Continue pensando assim quando uma missão deixar de ser treino.", "EP 4-5 CONCLUÍDOS — próximo: a primeira missão C e a saída de Konoha."])
+		elif stage == 29 and current_location_id == "hokage_residence" and player.distance_to(hiruzen_pos) < 135:
+			stage = 30
+			rpg.register_social_interaction()
+			say(["Hiruzen explica que o Time 7 receberá uma missão de escolta de nível C.", "Naruto comemora como se já tivesse derrotado um exército.", "Sasuke: Idiota.", "Sakura: Pela primeira vez, tenta não estragar tudo.", "Henrique observa o cliente encostado ao lado da sala: Tazuna."])
+		elif stage == 30 and current_location_id == "hokage_residence" and player.distance_to(tazuna_pos) < 135:
+			stage = 31
+			current_location_id = "village_gate"
+			background.set_location(naruto_world.location(current_location_id))
+			player = Vector2(165, 300)
+			kakashi_pos = Vector2(690, 245)
+			naruto_pos = Vector2(385, 300)
+			sasuke_pos = Vector2(485, 265)
+			sakura_pos = Vector2(570, 310)
+			tazuna_pos = Vector2(780, 285)
+			say(["Tazuna mede os jovens com os olhos e não parece impressionado.", "Tazuna: Esses são os ninjas que vão me proteger?", "Henrique: Se você queria quatro Hokage, escolheu a missão errada.", "Kakashi interrompe antes que a conversa piore e manda todos encontrarem-no no Portão de Konoha."])
+		elif stage == 31 and current_location_id == "village_gate" and player.distance_to(kakashi_pos) < 140:
+			stage = 32
+			player = Vector2(120, 300)
+			naruto_pos = Vector2(340, 285)
+			sasuke_pos = Vector2(450, 260)
+			sakura_pos = Vector2(535, 305)
+			kakashi_pos = Vector2(650, 255)
+			tazuna_pos = Vector2(755, 290)
+			say(["Kakashi confere o grupo antes de atravessar o portão.", "Naruto: Finalmente! Uma missão de verdade!", "Sakura: Para de gritar no portão da vila!", "Sasuke segue sem responder. Tazuna apenas suspira.", "Henrique olha para trás uma última vez.", "Henrique: Então é agora que começa de verdade."])
 
 func start_action(name: String, duration: float) -> void:
 	if not art.character_art.henrique_actions.has(name):
@@ -628,7 +744,7 @@ func check_ep2_training() -> void:
 		say(["Konohamaru tenta copiar os movimentos, tropeça e levanta rápido como se nada tivesse acontecido.", "Naruto ri, mas admite que o garoto tem coragem.", "Uma voz irritada interrompe o treino: Ebisu finalmente encontrou Konohamaru.", "Objetivo: fale com Ebisu."])
 
 func can_roam_konoha() -> bool:
-	return not (stage >= 9 and stage <= 12) and lines.is_empty()
+	return not (stage >= 9 and stage <= 12) and not (stage >= 24 and stage <= 28) and stage < 32 and lines.is_empty()
 
 func change_to_neighbor(direction: String, spawn: Vector2) -> void:
 	var next_id := naruto_world.neighbor(current_location_id, direction)
@@ -642,6 +758,8 @@ func change_to_neighbor(direction: String, spawn: Vector2) -> void:
 func toggle_konoha_map() -> void:
 	if not lines.is_empty():
 		return
+	if (stage >= 24 and stage <= 28) or stage >= 32:
+		return
 	if progress_panel.visible:
 		progress_panel.hide()
 	if techniques_panel.visible:
@@ -653,6 +771,9 @@ func toggle_konoha_map() -> void:
 		map_title.text = "KONOHA • %s  |  30 ÁREAS CONECTADAS" % naruto_world.location_name(current_location_id)
 
 func travel_to_location(id: String) -> void:
+	if (stage >= 24 and stage <= 28) or stage >= 32:
+		map_title.text = "Viagem bloqueada durante esta sequência."
+		return
 	if stage >= 9 and stage <= 12:
 		map_title.text = "Viagem bloqueada durante o incidente do Pergaminho dos Selos."
 		return
@@ -691,13 +812,23 @@ func refresh_progression() -> void:
 	elif stage >= 13 and stage <= 17:
 		chapter = "NARUTO CLÁSSICO • EP 2 — KONOHAMARU"
 		story_percent = int(clampf(float(stage - 13) / 4.0, 0.0, 1.0) * 100.0)
-	elif stage >= 18:
+	elif stage >= 18 and stage <= 23:
 		chapter = "NARUTO CLÁSSICO • EP 3 — SASUKE E SAKURA"
 		story_percent = int(clampf(float(stage - 18) / 5.0, 0.0, 1.0) * 100.0)
+	elif stage >= 24 and stage <= 28:
+		chapter = "NARUTO CLÁSSICO • EP 4-5 — SOBREVIVÊNCIA"
+		story_percent = int(clampf(float(stage - 24) / 4.0, 0.0, 1.0) * 100.0)
+	elif stage >= 29:
+		chapter = "NARUTO CLÁSSICO • EP 6 — PRIMEIRA MISSÃO C"
+		story_percent = int(clampf(float(stage - 29) / 4.0, 0.0, 1.0) * 100.0)
 	if stage == 17:
 		chapter = "NARUTO CLÁSSICO • EP 2 CONCLUÍDO"
-	if stage >= 23:
+	if stage == 23:
 		chapter = "NARUTO CLÁSSICO • EP 3 CONCLUÍDO"
+	if stage == 28:
+		chapter = "NARUTO CLÁSSICO • EP 4-5 CONCLUÍDOS"
+	if stage >= 33:
+		chapter = "NARUTO CLÁSSICO • EP 6 • FORA DE KONOHA"
 	var sharingan_text := "Sharingan 1 Tomoe" if sharingan_awakened else "Ainda não despertado nesta linha do tempo"
 	var jutsu_text := "Kunai • Shuriken • Katon: Bola de Fogo"
 	if sharingan_awakened:
