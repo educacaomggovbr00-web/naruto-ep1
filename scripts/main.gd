@@ -1,6 +1,6 @@
 extends Node2D
 
-# Original playable fan-game prologue, before the events of episode 1.
+# Playable fan adaptation starting at Naruto Classic Episode 1.
 var player := Vector2(185, 270)
 var stage := 7
 var hits := 0
@@ -334,7 +334,7 @@ func refresh_progression() -> void:
 	var chapter := "NARUTO CLÁSSICO • EP 1"
 	if stage >= 12:
 		chapter = "NARUTO CLÁSSICO • EP 1 CONCLUÍDO"
-	var story_percent := int(clampf(float(stage) / 12.0, 0.0, 1.0) * 100.0)
+	var story_percent := int(clampf(float(stage - 7) / 5.0, 0.0, 1.0) * 100.0)
 	var sharingan_text := "Sharingan 1 Tomoe" if sharingan_awakened else "Ainda não despertado nesta linha do tempo"
 	var jutsu_text := "Kunai • Shuriken • Katon: Bola de Fogo"
 	if sharingan_awakened:
