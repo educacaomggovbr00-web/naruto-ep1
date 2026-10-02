@@ -89,7 +89,50 @@ func run_checks() -> void:
 	assert(game.stage == 17, "Talking to Ebisu must conclude Episode 2")
 	assert(game.rpg.completed_missions.has("konohamaru_first_meeting"), "Episode 2 completion must reward progression")
 	close_dialogue(game)
-	assert(game.restart.visible, "Episode 2 ending must expose replay")
+	assert(game.stage == 18 and game.episode_3_started, "Closing Episode 2 must begin Episode 3")
+
+	# Episode 3: Team 7 is formed while Henrique earns his own advancement through actual tests.
+	close_dialogue(game)
+	game.player = Vector2(360, 265)
+	game.act("interact")
+	assert(game.stage == 19, "Iruka must introduce the Team 7 orientation beat")
+	close_dialogue(game)
+
+	game.player = game.sasuke_pos
+	game.act("interact")
+	assert(game.stage == 20, "Talking to Sasuke must open Henrique's real evaluation")
+	assert(int(game.rpg.real_stats["restraint_choices"]) == 1, "Calm Sasuke interaction must shape Henrique's personality")
+	close_dialogue(game)
+
+	for i in range(3):
+		game.player = game.target - Vector2(100, 0)
+		game.facing = Vector2.RIGHT
+		game.cooldown = 0.0
+		game.action_timer = 0.0
+		game.action_state = ""
+		game.act("shuriken")
+	assert(game.stage == 21, "Three real shuriken hits must advance the evaluation")
+	assert(int(game.rpg.technique_mastery["shuriken"]) >= 3, "Only successful hits must raise shuriken mastery")
+	close_dialogue(game)
+
+	game.player = game.target - Vector2(70, 0)
+	game.cooldown = 0.0
+	game.action_timer = 0.0
+	game.action_state = ""
+	game.chakra = 100
+	game.act("substitution")
+	assert(game.stage == 22, "Successful substitution near the target must pass the control test")
+	assert(game.rpg.mission_rank == "Genin", "Henrique becomes Genin only after completing both gameplay tests")
+	assert(int(game.rpg.technique_mastery["substitution"]) >= 1, "Successful substitution must raise mastery")
+	close_dialogue(game)
+
+	game.player = game.kakashi_pos
+	game.act("interact")
+	assert(game.stage == 23, "Talking to Kakashi must conclude Episode 3")
+	assert(game.rpg.completed_missions.has("episode3_real_evaluation"), "Episode 3 must record the completed evaluation mission")
+	assert(game.rpg.total_xp > 0, "Real progression must record earned total XP")
+	close_dialogue(game)
+	assert(game.restart.visible, "Episode 3 ending must expose replay")
 
 	# Every requested basic/classic action must resolve through the animation manifest.
 	var required_actions := [
@@ -124,7 +167,7 @@ func run_checks() -> void:
 	game.act("substitution")
 	assert(game.action_state == "substitution" and game.substitution_flash > 0.0, "Substitution animation/effect must trigger")
 
-	print("PASS: Episodes 1-2, progression, top-down cast, MUGEN battle art and Henrique basic animation catalog")
+	print("PASS: Episodes 1-3, real gameplay progression, dynamic personality, Team 7 cast and Henrique animation catalog")
 	game.queue_free()
 	await process_frame
 	quit()
