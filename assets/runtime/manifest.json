@@ -10,116 +10,116 @@
     "frames": 5,
     "cell_w": 96,
     "cell_h": 84,
-    "fps": 8
+    "fps": 8.0
   },
   "henrique_actions": {
     "hurt": {
       "frames": 6,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "shadow_clone": {
       "frames": 6,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "death": {
       "frames": 5,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "shuriken_throw": {
       "frames": 5,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "fall": {
       "frames": 4,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "get_up": {
       "frames": 4,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "katon_fireball": {
       "frames": 4,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "kunai_attack": {
       "frames": 4,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "punch_combo": {
       "frames": 4,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "walk": {
       "frames": 4,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "crouch": {
       "frames": 3,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "idle": {
       "frames": 3,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "jump": {
       "frames": 3,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "down": {
       "frames": 2,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "run": {
       "frames": 2,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "slide": {
       "frames": 2,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "substitution": {
       "frames": 2,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "dodge_roll": {
       "frames": 1,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     }
   },
   "naruto_actions": {
@@ -127,103 +127,103 @@
       "frames": 7,
       "cell_w": 144,
       "cell_h": 112,
-      "fps": 10
+      "fps": 10.0
     },
     "rasengan_charge": {
       "frames": 6,
       "cell_w": 144,
       "cell_h": 112,
-      "fps": 10
+      "fps": 10.0
     },
     "kick": {
       "frames": 7,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "shadow_clone": {
       "frames": 7,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "crouch": {
       "frames": 6,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "idle": {
       "frames": 6,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "punch_combo": {
       "frames": 6,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "walk": {
       "frames": 6,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "fall": {
       "frames": 5,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "jump": {
       "frames": 5,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "kunai": {
       "frames": 5,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "shuriken": {
       "frames": 5,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "substitution": {
       "frames": 5,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "hurt": {
       "frames": 4,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "down": {
       "frames": 2,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "run": {
       "frames": 2,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     },
     "get_up": {
       "frames": 1,
       "cell_w": 112,
       "cell_h": 96,
-      "fps": 10
+      "fps": 10.0
     }
   }
 }
