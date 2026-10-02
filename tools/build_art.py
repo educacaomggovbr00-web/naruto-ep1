@@ -71,7 +71,7 @@ rows=[
 '......off..ffo..........',
 '.....offf..fffo.........',
 '.....oooo..oooo.........']
-for name,hair,shirt,light,pants in [('henrique','202431','24354c','405471','c1b79b'),('naruto','e8be56','d57836','edaa4d','d6813d'),('iruka','403536','49634b','68875c','344657'),('mizuki','abb7bc','646d84','969cb0','495269'),('sasuke','182433','344b72','52698e','e8e2d5'),('sakura','d98aa4','b94e62','d96f7f','e4d8d0'),('konohamaru','3b2b25','d9ad45','e7c86c','6d7c89'),('ebisu','26252b','2f3442','555d70','363b48'),('kakashi','d9dde5','4d6b4e','6f8b68','27313c')]:
+for name,hair,shirt,light,pants in [('henrique','202431','24354c','405471','c1b79b'),('naruto','e8be56','d57836','edaa4d','d6813d'),('iruka','403536','49634b','68875c','344657'),('mizuki','abb7bc','646d84','969cb0','495269'),('sasuke','182433','344b72','52698e','e8e2d5'),('sakura','d98aa4','b94e62','d96f7f','e4d8d0'),('konohamaru','3b2b25','d9ad45','e7c86c','6d7c89'),('ebisu','26252b','2f3442','555d70','363b48'),('kakashi','d9dde5','4d6b4e','6f8b68','27313c'),('hiruzen','d8d3cf','eee7df','c95a4c','d8d4cd'),('tazuna','7f7d78','667483','8794a2','424b55')]:
     palette={'o':'182733','h':hair,'H':'58606b' if name=='henrique' else 'f4d878' if name=='naruto' else '75868b','s':'dfad87','E':'262633','t':shirt,'T':light,'b':'393a43','p':pants,'w':'eee4c9','f':'293c50'}
     atlas=[]
     for direction_index,direction in enumerate(['front','back','side']):
