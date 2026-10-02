@@ -102,7 +102,8 @@ func run_checks() -> void:
 		var frame_id: int = game.art.character_art.frame_for_action(action, 0.25)
 		assert(frame_id >= 0 and frame_id < game.art.character_art.henrique_frames.size(), "Animation frame out of range: " + action)
 
-	assert(game.art.character_art.henrique_frames.size() == 24, "Detailed Henrique gameplay atlas must stay mapped")
+	assert(game.art.character_art.henrique_frames.size() == 86, "Exact Henrique board must expose all 86 runtime frames")
+	assert(game.art.character_art.henrique_manifest["source_git_blob"] == "265335ebcdd1d4a16052f968c4c2fb7a21e86b49", "Henrique runtime must use the exact uploaded PNG")
 	assert(game.art.character_art.mugen_actions["idle"].size() == 4, "Imported fan-MUGEN idle cycle must load")
 	assert(game.art.NARUTO.get_width() == 216, "Top-down Naruto overworld atlas must load")
 	assert(game.art.SASUKE.get_width() == 216, "Sasuke overworld atlas must load")
