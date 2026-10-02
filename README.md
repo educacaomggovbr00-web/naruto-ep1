@@ -154,3 +154,15 @@ A referência visual enviada pelo usuário agora está representada no projeto c
 Os NPCs novos já aparecem em locais coerentes de Konoha, e os VFX básicos já participam de Katon, clone, substituição, impactos e Sharingan. O inventário também passou a registrar pergaminhos, ryō, ramen, dango, água e remédio.
 
 Detalhes em `docs/GRAPHICS_PACK.md`.
+
+
+## Imagens enviadas no chat — agora usadas de verdade
+
+As duas pranchas mais recentes fornecidas pelo usuário foram recortadas, tiveram o fundo escuro removido nos sprites e foram compactadas em um pacote mobile de 45 recursos.
+
+O runtime agora prioriza:
+- overworld de Naruto, Sasuke, Sakura e Kakashi tirado da prancha enviada;
+- animações do Naruto tiradas da folha enviada, incluindo idle, andar, correr, pulo, queda, agachar, socos, chute, kunai, shuriken, clone, substituição, Rasengan, dano, cair e levantar;
+- mapa de Konoha e cenários de campo de treino/floresta tirados da prancha.
+
+O pack fica em `assets/user_pack/user_assets.json.gz` e é decodificado por `scripts/user_asset_pack.gd`. Os sprites antigos permanecem apenas como fallback. Detalhes: `docs/USER_IMAGE_ASSETS.md`.
