@@ -1,12 +1,12 @@
 extends RefCounted
 
-# Mobile-safe rendering: use clean files from assets/runtime when available.
-# The multi-megabyte reference boards are source material only and are never decoded here.
+# Mobile-safe rendering from the final user-provided sprite atlas.
+# Large source boards under assets/references are never decoded during gameplay.
 var user_assets = preload("res://scripts/user_asset_pack.gd").new()
 
 const HENRIQUE_FALLBACK: Texture2D = preload("res://assets/art/henrique.svg")
-const HENRIQUE_SCALE: float = 0.82
 
+# Keep the old mapping only as story/action metadata; visuals now come from the runtime atlas.
 var henrique_manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/characters/henrique-board-frames.json"))
 var henrique_frames: Array = henrique_manifest["frames"]
 var henrique_actions: Dictionary = henrique_manifest["actions"]
@@ -33,29 +33,58 @@ func current_henrique_action(host: Node2D) -> String:
 		return "katon_fireball" if String(host.effect_kind) == "katon" else "kunai_attack"
 	if host.movement != Vector2.ZERO and host.lines.is_empty():
 		return "run" if bool(host.sprinting) else "walk"
-	if host.facing.y < -0.4:
-		return "idle_back"
 	return "idle"
 
 func henrique_frame(host: Node2D) -> int:
 	return frame_for_action(current_henrique_action(host), float(host.visual_clock))
 
+func _draw_strip_frame(
+	host: Node2D,
+	texture: Texture2D,
+	meta: Dictionary,
+	at: Vector2,
+	target_max: Vector2,
+	mirror: bool,
+	tint: Color
+) -> bool:
+	if texture == null or meta.is_empty():
+		return false
+	var frames: int = maxi(int(meta.get("frames", 1)), 1)
+	var cell_w: float = float(meta.get("cell_w", texture.get_width()))
+	var cell_h: float = float(meta.get("cell_h", texture.get_height()))
+	var fps: float = float(meta.get("fps", 10.0))
+	if cell_w <= 0.0 or cell_h <= 0.0:
+		return false
+	var frame_index: int = int(float(host.visual_clock) * fps) % frames
+	var source: Rect2 = Rect2(float(frame_index) * cell_w, 0.0, cell_w, cell_h)
+	var fit_scale: float = min(target_max.x / cell_w, target_max.y / cell_h)
+	var draw_size: Vector2 = Vector2(cell_w, cell_h) * fit_scale
+	host.draw_set_transform(at + Vector2(0, 12), 0.0, Vector2(-1.0 if mirror else 1.0, 1.0))
+	host.draw_texture_rect_region(
+		texture,
+		Rect2(Vector2(-draw_size.x / 2.0, -draw_size.y), draw_size),
+		source,
+		tint
+	)
+	host.draw_set_transform(Vector2.ZERO)
+	return true
+
 func _draw_henrique_runtime_overworld(host: Node2D) -> bool:
 	var texture: Texture2D = user_assets.overworld("henrique")
 	if texture == null:
 		return false
-	var frame_count: int = 4
-	var frame_width: float = float(texture.get_width()) / float(frame_count)
-	var frame_height: float = float(texture.get_height())
+	var meta: Dictionary = user_assets.overworld_meta()
+	var frame_count: int = maxi(int(meta.get("frames", 4)), 1)
+	var frame_width: float = float(meta.get("cell_w", float(texture.get_width()) / float(frame_count)))
+	var frame_height: float = float(meta.get("cell_h", texture.get_height()))
 	if frame_width <= 0.0 or frame_height <= 0.0:
 		return false
 	var frame_index: int = 0
-	var face: Vector2 = host.facing
-	if face.y < -0.4:
+	if host.facing.y < -0.4:
 		frame_index = 1
-	elif face.x < -0.4:
+	elif host.facing.x < -0.4:
 		frame_index = 2
-	elif face.x > 0.4:
+	elif host.facing.x > 0.4:
 		frame_index = 3
 	var source_rect: Rect2 = Rect2(frame_width * float(frame_index), 0.0, frame_width, frame_height)
 	var target_height: float = 72.0
@@ -73,18 +102,28 @@ func _draw_henrique_runtime_overworld(host: Node2D) -> bool:
 	host.draw_string(ThemeDB.fallback_font, host.player + Vector2(-28, -90), "Henrique", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
 	return true
 
+func _draw_henrique_runtime_action(host: Node2D) -> bool:
+	var action_name: String = current_henrique_action(host)
+	var texture: Texture2D = user_assets.henrique_action(action_name)
+	var meta: Dictionary = user_assets.action_meta("henrique_actions", action_name)
+	if texture == null or meta.is_empty():
+		return false
+	var tint: Color = Color("b7c1d8") if int(host.stage) >= 8 and int(host.stage) <= 12 else Color.WHITE
+	shadow(host, host.player)
+	if not _draw_strip_frame(host, texture, meta, host.player, Vector2(124, 100), host.facing.x < 0.0, tint):
+		return false
+	host.draw_string(ThemeDB.fallback_font, host.player + Vector2(-28, -90), "Henrique", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
+	return true
+
 func _draw_henrique_fallback(host: Node2D) -> void:
-	var face: Vector2 = host.facing
 	var row: int = 0
-	if face.y < -0.4:
+	if host.facing.y < -0.4:
 		row = 1
-	elif absf(face.x) > 0.4:
+	elif absf(host.facing.x) > 0.4:
 		row = 2
 	var moving: bool = host.movement != Vector2.ZERO and host.lines.is_empty()
 	var frame: int = int(float(host.visual_clock) * 9.0) % 3 if moving else 0
-	if String(host.action_state) != "" or float(host.attack_flash) > 0.0:
-		frame = 1
-	var mirror: bool = row == 2 and face.x < 0.0
+	var mirror: bool = row == 2 and host.facing.x < 0.0
 	var bob: float = -2.0 if moving and frame == 1 else 0.0
 	var tint: Color = Color("b7c1d8") if int(host.stage) >= 8 and int(host.stage) <= 12 else Color.WHITE
 	shadow(host, host.player)
@@ -102,6 +141,8 @@ func draw_henrique(host: Node2D) -> void:
 	if String(host.action_state) == "" and float(host.attack_flash) <= 0.0:
 		if _draw_henrique_runtime_overworld(host):
 			return
+	if _draw_henrique_runtime_action(host):
+		return
 	_draw_henrique_fallback(host)
 
 func select_mugen_frame(action_name: String, clock: float) -> Dictionary:
@@ -137,28 +178,6 @@ func _mugen_texture(frame: Dictionary) -> Texture2D:
 		return result
 	return null
 
-func _naruto_user_rects(action_name: String) -> Array:
-	var frames: Dictionary = {
-		"idle":[[31,0,39,98],[98,0,39,98],[167,0,39,98],[232,0,38,98]],
-		"walk":[[1,0,25,98],[78,0,44,98],[147,0,42,98],[209,0,47,98],[280,0,51,98]],
-		"run":[[1,0,49,98],[107,0,76,98],[198,0,70,98],[282,0,65,98],[355,0,18,98]],
-		"jump":[[30,0,132,123],[179,0,123,123],[319,0,56,123]],
-		"fall":[[1,0,44,123],[84,0,54,123],[158,0,29,123],[212,0,60,123],[300,0,24,123]],
-		"crouch":[[14,0,44,123],[100,0,150,123],[273,0,20,123]],
-		"punch_combo":[[20,0,52,94],[88,0,86,94],[193,0,45,94],[270,0,56,94],[354,0,60,94],[446,0,73,94],[553,0,48,94],[619,0,64,94]],
-		"kick":[[4,0,34,94],[83,0,83,94],[184,0,65,94],[280,0,79,94],[384,0,101,94],[501,0,78,94],[603,0,45,94]],
-		"kunai":[[20,0,61,75],[127,0,30,75],[215,0,28,75],[295,0,28,75],[391,0,28,75]],
-		"shuriken":[[2,0,30,75],[79,0,93,75],[206,0,29,75],[308,0,29,75],[408,0,29,75]],
-		"shadow_clone":[[20,0,58,83],[91,0,36,83],[140,0,85,83],[263,0,21,83],[334,0,22,83],[367,0,22,83],[404,0,107,83],[544,0,29,83],[603,0,30,83],[660,0,29,83]],
-		"substitution":[[12,0,35,83],[94,0,139,83],[241,0,22,83],[312,0,146,83]],
-		"rasengan_charge":[[14,0,199,105],[242,0,308,105],[562,0,15,105],[584,0,20,105]],
-		"rasengan_attack":[[1,0,23,105],[36,0,134,105],[180,0,186,105],[434,0,51,105],[515,0,62,105],[593,0,63,105],[676,0,87,105]],
-		"hurt":[[13,0,157,87],[182,0,78,87],[279,0,167,87]],
-		"down":[[1,0,178,87],[244,0,129,87],[385,0,25,87]],
-		"get_up":[[1,0,73,87],[83,0,21,87],[112,0,188,87],[319,0,14,87],[340,0,113,87]]
-	}
-	return frames.get(action_name, frames["idle"])
-
 func _draw_user_naruto_action(host: Node2D, at: Vector2, action_name: String) -> bool:
 	var resolved: String = action_name
 	if resolved == "attack":
@@ -167,23 +186,11 @@ func _draw_user_naruto_action(host: Node2D, at: Vector2, action_name: String) ->
 		resolved = "shadow_clone"
 	elif resolved == "rasengan":
 		resolved = "rasengan_attack"
-	if not user_assets.has_asset("naruto_actions/%s.png" % resolved):
-		return false
 	var texture: Texture2D = user_assets.naruto_action(resolved)
-	if texture == null:
+	var meta: Dictionary = user_assets.action_meta("naruto_actions", resolved)
+	if texture == null or meta.is_empty():
 		return false
-	var rects: Array = _naruto_user_rects(resolved)
-	if rects.is_empty():
-		return false
-	var fps: float = 8.0 if resolved == "idle" else 11.0
-	var frame_index: int = int(float(host.visual_clock) * fps) % rects.size()
-	var data: Array = rects[frame_index]
-	var region: Rect2 = Rect2(float(data[0]), float(data[1]), float(data[2]), float(data[3]))
-	var max_size: Vector2 = Vector2(126, 108)
-	var scale_value: float = min(max_size.x / region.size.x, max_size.y / region.size.y)
-	var draw_size: Vector2 = region.size * scale_value
-	host.draw_texture_rect_region(texture, Rect2(at + Vector2(-draw_size.x / 2.0, -draw_size.y + 8.0), draw_size), region)
-	return true
+	return _draw_strip_frame(host, texture, meta, at, Vector2(132, 112), false, Color.WHITE)
 
 func draw_naruto_mugen(host: Node2D, at: Vector2, action_name: String = "run", scale_factor: float = 0.52) -> void:
 	host.draw_rect(Rect2(at + Vector2(-92, -138), Vector2(184, 158)), Color(0.035, 0.08, 0.11, 0.78))

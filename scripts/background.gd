@@ -143,14 +143,14 @@ func _draw() -> void:
 		var pos := Vector2(22 + i * 39, 384 + (i % 4) * 12)
 		draw_rect(Rect2(pos, Vector2(2, 8)), Color("b0aa61"))
 		draw_rect(Rect2(pos + Vector2(-2, 1), Vector2(6, 3)), Color("d1b989"))
-	# Base scenery cropped from the exact visual boards supplied by the user.
-	var exact_background: Texture2D = null
-	if area == 1:
-		exact_background = user_assets.world("konoha_map")
-	elif area == 0:
-		exact_background = user_assets.stage_texture("training")
-	else:
-		exact_background = user_assets.stage_texture("forest")
+	# Lightweight exact crops from the user boards. Prefer a location-specific panel;
+	# fall back to the training/forest crops only for story areas outside normal Konoha roam.
+	var exact_background: Texture2D = user_assets.location(location_id)
+	if exact_background == null:
+		if area == 0:
+			exact_background = user_assets.location("training_ground_3")
+		elif area == 2:
+			exact_background = user_assets.location("forest")
 	if exact_background != null:
 		draw_rect(Rect2(0, 78, 960, 367), Color("1a2a2f"))
 		draw_texture_rect(exact_background, Rect2(0, 78, 960, 367), false)

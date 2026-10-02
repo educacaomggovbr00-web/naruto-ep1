@@ -1,22 +1,15 @@
 # Runtime assets
 
-This folder is reserved for lightweight assets that the game may load during play.
+This folder contains the mobile-safe final visual pack used by the game.
 
-Expected layout:
+- `runtime_full_atlas.png`: one transparent atlas with overworld sprites, action strips, portraits, stages and world panels.
+- `manifest.json`: regions and animation metadata used to expose every sprite as a lightweight AtlasTexture.
 
-- overworld/<character>.png
-- battle/<character>.png
-- naruto_actions/<action>.png
-- henrique_actions/<action>.png
-- characters/<character>.png
-- stages/<stage>.png
-- world/<asset>.png
+The original large boards remain in `assets/references/` only as source/reference material and are ignored by Godot.
 
-Rules:
-- large source boards stay in `assets/references/` and are ignored by Godot;
-- no HTTP downloads during gameplay;
-- no gzip/base64/JSON pixel reconstruction during gameplay;
-- pixel art uses nearest filtering;
-- when a runtime PNG is absent, the game falls back to the bundled lightweight SVG/MUGEN assets.
-
-This directory is the only destination for final cropped runtime PNGs.
+Runtime rules:
+- no HTTP downloads;
+- no gzip/base64 pixel reconstruction;
+- no decoding of the large reference boards during gameplay;
+- nearest-neighbor filtering for pixel art;
+- SVG/MUGEN assets remain only as fallback if a region is missing.

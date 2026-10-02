@@ -8,7 +8,12 @@ func draw(host: Node2D, stage_id: String) -> void:
 		"plaza": exact_key = "village"
 		"forest": exact_key = "forest"
 		"bridge": exact_key = "bridge"
+		"academy": exact_key = "academy"
+		"chunin_exam": exact_key = "chunin_exam"
+		"valley": exact_key = "valley"
+		"river": exact_key = "river"
 		"training_ground": exact_key = "training"
+		"interior": exact_key = "interior"
 	if not exact_key.is_empty():
 		var exact: Texture2D = user_assets.stage_texture(exact_key)
 		if exact != null:
