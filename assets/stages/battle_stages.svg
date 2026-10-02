@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="576" height="192" viewBox="0 0 576 192">
+<defs><style>.t{font:10px sans-serif;fill:#f3e4c0}.b{stroke:#14222b;stroke-width:3}</style></defs>
+<g transform="translate(0,0)"><rect width="192" height="64" fill="#a8a18d" class="b"/><circle cx="96" cy="39" r="24" fill="#c7b892"/><text x="8" y="14" class="t">PRAÇA</text></g>
+<g transform="translate(192,0)"><rect width="192" height="64" fill="#53705a" class="b"/><g fill="#36543c"><circle cx="35" cy="30" r="25"/><circle cx="85" cy="25" r="27"/><circle cx="140" cy="32" r="24"/></g><text x="8" y="14" class="t">FLORESTA</text></g>
+<g transform="translate(384,0)"><rect width="192" height="64" fill="#56889a" class="b"/><rect x="25" y="28" width="142" height="18" fill="#b8b2a6"/><text x="8" y="14" class="t">PONTE</text></g>
+<g transform="translate(0,64)"><rect width="192" height="64" fill="#d1c3a5" class="b"/><rect x="55" y="17" width="85" height="37" fill="#d9c7a4"/><text x="8" y="14" class="t">ACADEMIA</text></g>
+<g transform="translate(192,64)"><rect width="192" height="64" fill="#8f8c82" class="b"/><circle cx="96" cy="38" r="24" fill="none" stroke="#d7d1c5" stroke-width="8"/><text x="8" y="14" class="t">EXAME CHUNIN</text></g>
+<g transform="translate(384,64)"><rect width="192" height="64" fill="#566f63" class="b"/><rect x="0" y="28" width="50" height="36" fill="#737874"/><rect x="142" y="28" width="50" height="36" fill="#737874"/><text x="8" y="14" class="t">VALE DO FIM</text></g>
+<g transform="translate(0,128)"><rect width="192" height="64" fill="#5e8da2" class="b"/><path d="M0 38H192" stroke="#b9dce5" stroke-width="3" stroke-dasharray="20 8"/><text x="8" y="14" class="t">RIO</text></g>
+<g transform="translate(192,128)"><rect width="192" height="64" fill="#baa47b" class="b"/><circle cx="70" cy="35" r="16" fill="#d7bd87"/><circle cx="125" cy="35" r="16" fill="#a55349"/><text x="8" y="14" class="t">CAMPO DE TREINO</text></g>
+<g transform="translate(384,128)"><rect width="192" height="64" fill="#9c8167" class="b"/><g stroke="#5e4c3f" stroke-width="3"><path d="M35 0V64M75 0V64M115 0V64M155 0V64"/></g><text x="8" y="14" class="t">INTERIOR</text></g>
+</svg>
