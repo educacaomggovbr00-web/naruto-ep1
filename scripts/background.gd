@@ -7,6 +7,7 @@ const TREE = preload("res://assets/art/tree.svg")
 const BUSH = preload("res://assets/art/bush.svg")
 const HOUSE = preload("res://assets/art/house.svg")
 const LANTERN = preload("res://assets/art/lantern.svg")
+var user_assets = preload("res://scripts/user_asset_pack.gd").new()
 var area := -1
 var night := false
 var location_id := "academy"
@@ -142,6 +143,18 @@ func _draw() -> void:
 		var pos := Vector2(22 + i * 39, 384 + (i % 4) * 12)
 		draw_rect(Rect2(pos, Vector2(2, 8)), Color("b0aa61"))
 		draw_rect(Rect2(pos + Vector2(-2, 1), Vector2(6, 3)), Color("d1b989"))
+	# Base scenery cropped from the exact visual boards supplied by the user.
+	var exact_background: Texture2D = null
+	if area == 1:
+		exact_background = user_assets.world("konoha_map")
+	elif area == 0:
+		exact_background = user_assets.stage_texture("training")
+	else:
+		exact_background = user_assets.stage_texture("forest")
+	if exact_background != null:
+		draw_rect(Rect2(0, 78, 960, 367), Color("1a2a2f"))
+		draw_texture_rect(exact_background, Rect2(0, 78, 960, 367), false)
+
 	# Konoha free-roam location dressing. Same lightweight tile base, different landmark identity.
 	if area == 1:
 		draw_rect(Rect2(18, 138, 250, 25), Color(0.08, 0.13, 0.15, 0.78))
