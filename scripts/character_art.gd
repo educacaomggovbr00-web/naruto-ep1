@@ -31,9 +31,9 @@ func current_henrique_action(host: Node2D) -> String:
 		return String(host.action_state)
 	if float(host.attack_flash) > 0.0:
 		return "katon_fireball" if String(host.effect_kind) == "katon" else "kunai_attack"
-	if Vector2(host.movement) != Vector2.ZERO and host.lines.is_empty():
+	if host.movement != Vector2.ZERO and host.lines.is_empty():
 		return "run" if bool(host.sprinting) else "walk"
-	if Vector2(host.facing).y < -0.4:
+	if host.facing.y < -0.4:
 		return "idle_back"
 	return "idle"
 
@@ -50,7 +50,7 @@ func _draw_henrique_runtime_overworld(host: Node2D) -> bool:
 	if frame_width <= 0.0 or frame_height <= 0.0:
 		return false
 	var frame_index: int = 0
-	var face: Vector2 = Vector2(host.facing)
+	var face: Vector2 = host.facing
 	if face.y < -0.4:
 		frame_index = 1
 	elif face.x < -0.4:
@@ -60,35 +60,35 @@ func _draw_henrique_runtime_overworld(host: Node2D) -> bool:
 	var source_rect: Rect2 = Rect2(frame_width * float(frame_index), 0.0, frame_width, frame_height)
 	var target_height: float = 72.0
 	var target_width: float = frame_width * (target_height / frame_height)
-	var moving: bool = Vector2(host.movement) != Vector2.ZERO
+	var moving: bool = host.movement != Vector2.ZERO
 	var bob: float = -2.0 if moving and int(float(host.visual_clock) * 9.0) % 2 == 1 else 0.0
 	var tint: Color = Color("b7c1d8") if int(host.stage) >= 8 and int(host.stage) <= 12 else Color.WHITE
-	shadow(host, Vector2(host.player))
+	shadow(host, host.player)
 	host.draw_texture_rect_region(
 		texture,
-		Rect2(Vector2(host.player) + Vector2(-target_width / 2.0, -64.0 + bob), Vector2(target_width, target_height)),
+		Rect2(host.player + Vector2(-target_width / 2.0, -64.0 + bob), Vector2(target_width, target_height)),
 		source_rect,
 		tint
 	)
-	host.draw_string(ThemeDB.fallback_font, Vector2(host.player) + Vector2(-28, -90), "Henrique", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
+	host.draw_string(ThemeDB.fallback_font, host.player + Vector2(-28, -90), "Henrique", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
 	return true
 
 func _draw_henrique_fallback(host: Node2D) -> void:
-	var face: Vector2 = Vector2(host.facing)
+	var face: Vector2 = host.facing
 	var row: int = 0
 	if face.y < -0.4:
 		row = 1
 	elif absf(face.x) > 0.4:
 		row = 2
-	var moving: bool = Vector2(host.movement) != Vector2.ZERO and host.lines.is_empty()
+	var moving: bool = host.movement != Vector2.ZERO and host.lines.is_empty()
 	var frame: int = int(float(host.visual_clock) * 9.0) % 3 if moving else 0
 	if String(host.action_state) != "" or float(host.attack_flash) > 0.0:
 		frame = 1
 	var mirror: bool = row == 2 and face.x < 0.0
 	var bob: float = -2.0 if moving and frame == 1 else 0.0
 	var tint: Color = Color("b7c1d8") if int(host.stage) >= 8 and int(host.stage) <= 12 else Color.WHITE
-	shadow(host, Vector2(host.player))
-	host.draw_set_transform(Vector2(host.player) + Vector2(0, bob), 0.0, Vector2(-1.0 if mirror else 1.0, 1.0))
+	shadow(host, host.player)
+	host.draw_set_transform(host.player + Vector2(0, bob), 0.0, Vector2(-1.0 if mirror else 1.0, 1.0))
 	host.draw_texture_rect_region(
 		HENRIQUE_FALLBACK,
 		Rect2(-30, -64, 60, 70),
@@ -96,7 +96,7 @@ func _draw_henrique_fallback(host: Node2D) -> void:
 		tint
 	)
 	host.draw_set_transform(Vector2.ZERO)
-	host.draw_string(ThemeDB.fallback_font, Vector2(host.player) + Vector2(-28, -90), "Henrique", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
+	host.draw_string(ThemeDB.fallback_font, host.player + Vector2(-28, -90), "Henrique", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
 
 func draw_henrique(host: Node2D) -> void:
 	if String(host.action_state) == "" and float(host.attack_flash) <= 0.0:
