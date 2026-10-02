@@ -747,7 +747,7 @@ func can_roam_konoha() -> bool:
 	return not (stage >= 9 and stage <= 12) and not (stage >= 24 and stage <= 28) and stage < 32 and lines.is_empty()
 
 func change_to_neighbor(direction: String, spawn: Vector2) -> void:
-	var next_id := naruto_world.neighbor(current_location_id, direction)
+	var next_id: String = str(naruto_world.neighbor(current_location_id, direction))
 	if next_id.is_empty():
 		player = player.clamp(Vector2(35, 110), Vector2(925, 375))
 		return
@@ -833,7 +833,7 @@ func refresh_progression() -> void:
 	var jutsu_text := "Kunai • Shuriken • Katon: Bola de Fogo"
 	if sharingan_awakened:
 		jutsu_text += " • Sharingan 1T"
-	var rank_text := rpg.mission_rank
+	var rank_text: String = str(rpg.mission_rank)
 	progress_text.text = "[b]ERA:[/b] %s\n[b]IDADE:[/b] 12 anos     [b]RANK REAL:[/b] %s\n[b]NÍVEL:[/b] %d     [b]XP GANHO:[/b] %d total     [b]RYO:[/b] %d     [b]CHAKRA:[/b] %d / 100\n[b]HISTÓRIA:[/b] %d%%     [b]MISSÕES REAIS:[/b] %d\n\n[b]PERSONALIDADE EM JOGO[/b]\n%s\nInterações: %d • Iniciativa: %d • Controle: %d\n\n[b]DOMÍNIO COMPROVADO[/b]\nKunai: %s (%d) • Shuriken: %s (%d)\nEsquiva: %s (%d) • Soco: %s (%d) • Substituição: %s (%d)\n\n[b]ARSENAL[/b]\n%s\n%s\nKunai x%d • Shuriken x%d\n\n[i]Nada sobe só porque a história disse. Acertos, testes e missões concluídas alimentam estes números.[/i]" % [
 		chapter, rank_text, rpg.level, rpg.total_xp, rpg.ryo, int(chakra), story_percent, rpg.completed_missions.size(),
 		rpg.personality_summary(), int(rpg.real_stats["social_interactions"]), int(rpg.real_stats["initiative_choices"]), int(rpg.real_stats["restraint_choices"]),
