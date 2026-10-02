@@ -24,7 +24,7 @@ func set_location(info: Dictionary) -> void:
 		queue_redraw()
 
 func set_area(stage: int) -> void:
-	var next_area := 0 if stage <= 1 else 1 if stage == 2 or stage == 5 or stage == 6 or stage == 7 or stage == 8 or stage >= 13 else 2
+	var next_area := 0 if stage <= 1 or (stage >= 24 and stage <= 28) else 2 if (stage >= 9 and stage <= 12) or stage >= 32 else 1
 	var next_night := stage == 3 or stage == 4 or stage == 5 or stage == 6 or (stage >= 8 and stage <= 12)
 	if next_area != area or next_night != night:
 		area = next_area
