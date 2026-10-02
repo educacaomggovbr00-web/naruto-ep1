@@ -25,12 +25,12 @@ func run_checks() -> void:
 	assert(game.techniques_panel.visible, "Technique menu must open")
 	game.toggle_techniques()
 	assert(not game.techniques_panel.visible, "Technique menu must close")
-	game.toggle_konoha_map()
-	assert(game.map_panel.visible, "Konoha map must open")
-	game.toggle_konoha_map()
-	assert(not game.map_panel.visible, "Konoha map must close")
 
 	close_dialogue(game)
+	game.toggle_konoha_map()
+	assert(game.map_panel.visible, "Konoha map must open after dialogue closes")
+	game.toggle_konoha_map()
+	assert(not game.map_panel.visible, "Konoha map must close")
 	game.player = game.naruto_pos
 	game.act("interact")
 	assert(game.stage == 8, "Academy scene must trigger the scroll alarm")
