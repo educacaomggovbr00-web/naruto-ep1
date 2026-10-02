@@ -1,125 +1,229 @@
 {
-  "version": 6,
-  "atlas": "runtime_full_atlas.png",
-  "runtime_policy": "single-atlas-mobile",
-  "assets": {
-    "battle/henrique.png": {"x":2,"y":1271,"w":480,"h":84},
-    "battle/kakashi.png": {"x":484,"y":1271,"w":480,"h":84},
-    "battle/naruto.png": {"x":966,"y":1271,"w":480,"h":84},
-    "battle/sakura.png": {"x":1448,"y":1271,"w":480,"h":84},
-    "battle/sasuke.png": {"x":2,"y":1357,"w":480,"h":84},
-    "characters/henrique.png": {"x":848,"y":1357,"w":97,"h":81},
-    "characters/kakashi.png": {"x":611,"y":1357,"w":123,"h":81},
-    "characters/naruto.png": {"x":947,"y":1357,"w":95,"h":81},
-    "characters/sakura.png": {"x":484,"y":1357,"w":125,"h":81},
-    "characters/sasuke.png": {"x":736,"y":1357,"w":110,"h":81},
-    "henrique_actions/crouch.png": {"x":2,"y":1075,"w":336,"h":96},
-    "henrique_actions/death.png": {"x":2,"y":683,"w":560,"h":96},
-    "henrique_actions/dodge_roll.png": {"x":454,"y":1173,"w":112,"h":96},
-    "henrique_actions/down.png": {"x":1016,"y":1075,"w":224,"h":96},
-    "henrique_actions/fall.png": {"x":564,"y":879,"w":448,"h":96},
-    "henrique_actions/get_up.png": {"x":1014,"y":879,"w":448,"h":96},
-    "henrique_actions/hurt.png": {"x":2,"y":487,"w":672,"h":96},
-    "henrique_actions/idle.png": {"x":340,"y":1075,"w":336,"h":96},
-    "henrique_actions/jump.png": {"x":678,"y":1075,"w":336,"h":96},
-    "henrique_actions/katon_fireball.png": {"x":1464,"y":879,"w":448,"h":96},
-    "henrique_actions/kunai_attack.png": {"x":2,"y":977,"w":448,"h":96},
-    "henrique_actions/punch_combo.png": {"x":452,"y":977,"w":448,"h":96},
-    "henrique_actions/run.png": {"x":1242,"y":1075,"w":224,"h":96},
-    "henrique_actions/shadow_clone.png": {"x":676,"y":487,"w":672,"h":96},
-    "henrique_actions/shuriken_throw.png": {"x":564,"y":683,"w":560,"h":96},
-    "henrique_actions/slide.png": {"x":1468,"y":1075,"w":224,"h":96},
-    "henrique_actions/substitution.png": {"x":1694,"y":1075,"w":224,"h":96},
-    "henrique_actions/walk.png": {"x":902,"y":977,"w":448,"h":96},
-    "locations/academy.png": {"x":1284,"y":1173,"w":143,"h":89},
-    "locations/central_plaza.png": {"x":1429,"y":1173,"w":138,"h":89},
-    "locations/forest.png": {"x":1270,"y":2,"w":136,"h":120},
-    "locations/henrique_home.png": {"x":1408,"y":2,"w":113,"h":120},
-    "locations/ichiraku.png": {"x":1060,"y":1173,"w":222,"h":89},
-    "locations/streets.png": {"x":1523,"y":2,"w":110,"h":120},
-    "locations/training_ground_3.png": {"x":1130,"y":2,"w":138,"h":120},
-    "naruto_actions/crouch.png": {"x":1350,"y":487,"w":672,"h":96},
-    "naruto_actions/down.png": {"x":2,"y":1173,"w":224,"h":96},
-    "naruto_actions/fall.png": {"x":1126,"y":683,"w":560,"h":96},
-    "naruto_actions/get_up.png": {"x":568,"y":1173,"w":112,"h":96},
-    "naruto_actions/hurt.png": {"x":1352,"y":977,"w":448,"h":96},
-    "naruto_actions/idle.png": {"x":2,"y":585,"w":672,"h":96},
-    "naruto_actions/jump.png": {"x":2,"y":781,"w":560,"h":96},
-    "naruto_actions/kick.png": {"x":2,"y":389,"w":784,"h":96},
-    "naruto_actions/kunai.png": {"x":564,"y":781,"w":560,"h":96},
-    "naruto_actions/punch_combo.png": {"x":676,"y":585,"w":672,"h":96},
-    "naruto_actions/rasengan_attack.png": {"x":2,"y":275,"w":1008,"h":112},
-    "naruto_actions/rasengan_charge.png": {"x":1012,"y":275,"w":864,"h":112},
-    "naruto_actions/run.png": {"x":228,"y":1173,"w":224,"h":96},
-    "naruto_actions/shadow_clone.png": {"x":788,"y":389,"w":784,"h":96},
-    "naruto_actions/shuriken.png": {"x":1126,"y":781,"w":560,"h":96},
-    "naruto_actions/substitution.png": {"x":2,"y":879,"w":560,"h":96},
-    "naruto_actions/walk.png": {"x":1350,"y":585,"w":672,"h":96},
-    "overworld/anbu.png": {"x":1044,"y":1357,"w":256,"h":72},
-    "overworld/ayame.png": {"x":1302,"y":1357,"w":256,"h":72},
-    "overworld/ebisu.png": {"x":1560,"y":1357,"w":256,"h":72},
-    "overworld/henrique.png": {"x":2,"y":1443,"w":256,"h":72},
-    "overworld/hiruzen.png": {"x":260,"y":1443,"w":256,"h":72},
-    "overworld/iruka.png": {"x":518,"y":1443,"w":256,"h":72},
-    "overworld/kakashi.png": {"x":776,"y":1443,"w":256,"h":72},
-    "overworld/konohamaru.png": {"x":1034,"y":1443,"w":256,"h":72},
-    "overworld/mizuki.png": {"x":1292,"y":1443,"w":256,"h":72},
-    "overworld/naruto.png": {"x":1550,"y":1443,"w":256,"h":72},
-    "overworld/sakura.png": {"x":2,"y":1517,"w":256,"h":72},
-    "overworld/sasuke.png": {"x":260,"y":1517,"w":256,"h":72},
-    "overworld/teuchi.png": {"x":518,"y":1517,"w":256,"h":72},
-    "stages/academy.png": {"x":1725,"y":1173,"w":74,"h":86},
-    "stages/bridge.png": {"x":1801,"y":1173,"w":74,"h":86},
-    "stages/chunin_exam.png": {"x":1569,"y":1173,"w":77,"h":86},
-    "stages/forest.png": {"x":1648,"y":1173,"w":75,"h":86},
-    "stages/interior.png": {"x":682,"y":1173,"w":120,"h":91},
-    "stages/river.png": {"x":891,"y":1173,"w":83,"h":91},
-    "stages/training.png": {"x":804,"y":1173,"w":85,"h":91},
-    "stages/valley.png": {"x":976,"y":1173,"w":82,"h":91},
-    "stages/village.png": {"x":1877,"y":1173,"w":72,"h":86},
-    "world/items_ui.png": {"x":971,"y":2,"w":157,"h":269},
-    "world/konoha_map.png": {"x":2,"y":2,"w":449,"h":271},
-    "world/map_examples.png": {"x":453,"y":2,"w":516,"h":269}
+  "version": 7,
+  "runtime_policy": "individual-png-mobile",
+  "overworld": {
+    "frames": 4,
+    "cell_w": 64,
+    "cell_h": 72
   },
-  "overworld": {"frames":4,"cell_w":64,"cell_h":72},
-  "battle": {"frames":5,"cell_w":96,"cell_h":84,"fps":8.0},
+  "battle": {
+    "frames": 5,
+    "cell_w": 96,
+    "cell_h": 84,
+    "fps": 8
+  },
   "henrique_actions": {
-    "hurt":{"frames":6,"cell_w":112,"cell_h":96,"fps":10.0},
-    "shadow_clone":{"frames":6,"cell_w":112,"cell_h":96,"fps":10.0},
-    "death":{"frames":5,"cell_w":112,"cell_h":96,"fps":10.0},
-    "shuriken_throw":{"frames":5,"cell_w":112,"cell_h":96,"fps":10.0},
-    "fall":{"frames":4,"cell_w":112,"cell_h":96,"fps":10.0},
-    "get_up":{"frames":4,"cell_w":112,"cell_h":96,"fps":10.0},
-    "katon_fireball":{"frames":4,"cell_w":112,"cell_h":96,"fps":10.0},
-    "kunai_attack":{"frames":4,"cell_w":112,"cell_h":96,"fps":10.0},
-    "punch_combo":{"frames":4,"cell_w":112,"cell_h":96,"fps":10.0},
-    "walk":{"frames":4,"cell_w":112,"cell_h":96,"fps":10.0},
-    "crouch":{"frames":3,"cell_w":112,"cell_h":96,"fps":10.0},
-    "idle":{"frames":3,"cell_w":112,"cell_h":96,"fps":10.0},
-    "jump":{"frames":3,"cell_w":112,"cell_h":96,"fps":10.0},
-    "down":{"frames":2,"cell_w":112,"cell_h":96,"fps":10.0},
-    "run":{"frames":2,"cell_w":112,"cell_h":96,"fps":10.0},
-    "slide":{"frames":2,"cell_w":112,"cell_h":96,"fps":10.0},
-    "substitution":{"frames":2,"cell_w":112,"cell_h":96,"fps":10.0},
-    "dodge_roll":{"frames":1,"cell_w":112,"cell_h":96,"fps":10.0}
+    "hurt": {
+      "frames": 6,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "shadow_clone": {
+      "frames": 6,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "death": {
+      "frames": 5,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "shuriken_throw": {
+      "frames": 5,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "fall": {
+      "frames": 4,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "get_up": {
+      "frames": 4,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "katon_fireball": {
+      "frames": 4,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "kunai_attack": {
+      "frames": 4,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "punch_combo": {
+      "frames": 4,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "walk": {
+      "frames": 4,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "crouch": {
+      "frames": 3,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "idle": {
+      "frames": 3,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "jump": {
+      "frames": 3,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "down": {
+      "frames": 2,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "run": {
+      "frames": 2,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "slide": {
+      "frames": 2,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "substitution": {
+      "frames": 2,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "dodge_roll": {
+      "frames": 1,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    }
   },
   "naruto_actions": {
-    "rasengan_attack":{"frames":7,"cell_w":144,"cell_h":112,"fps":10.0},
-    "rasengan_charge":{"frames":6,"cell_w":144,"cell_h":112,"fps":10.0},
-    "kick":{"frames":7,"cell_w":112,"cell_h":96,"fps":10.0},
-    "shadow_clone":{"frames":7,"cell_w":112,"cell_h":96,"fps":10.0},
-    "crouch":{"frames":6,"cell_w":112,"cell_h":96,"fps":10.0},
-    "idle":{"frames":6,"cell_w":112,"cell_h":96,"fps":10.0},
-    "punch_combo":{"frames":6,"cell_w":112,"cell_h":96,"fps":10.0},
-    "walk":{"frames":6,"cell_w":112,"cell_h":96,"fps":10.0},
-    "fall":{"frames":5,"cell_w":112,"cell_h":96,"fps":10.0},
-    "jump":{"frames":5,"cell_w":112,"cell_h":96,"fps":10.0},
-    "kunai":{"frames":5,"cell_w":112,"cell_h":96,"fps":10.0},
-    "shuriken":{"frames":5,"cell_w":112,"cell_h":96,"fps":10.0},
-    "substitution":{"frames":5,"cell_w":112,"cell_h":96,"fps":10.0},
-    "hurt":{"frames":4,"cell_w":112,"cell_h":96,"fps":10.0},
-    "down":{"frames":2,"cell_w":112,"cell_h":96,"fps":10.0},
-    "run":{"frames":2,"cell_w":112,"cell_h":96,"fps":10.0},
-    "get_up":{"frames":1,"cell_w":112,"cell_h":96,"fps":10.0}
+    "rasengan_attack": {
+      "frames": 7,
+      "cell_w": 144,
+      "cell_h": 112,
+      "fps": 10
+    },
+    "rasengan_charge": {
+      "frames": 6,
+      "cell_w": 144,
+      "cell_h": 112,
+      "fps": 10
+    },
+    "kick": {
+      "frames": 7,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "shadow_clone": {
+      "frames": 7,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "crouch": {
+      "frames": 6,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "idle": {
+      "frames": 6,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "punch_combo": {
+      "frames": 6,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "walk": {
+      "frames": 6,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "fall": {
+      "frames": 5,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "jump": {
+      "frames": 5,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "kunai": {
+      "frames": 5,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "shuriken": {
+      "frames": 5,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "substitution": {
+      "frames": 5,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "hurt": {
+      "frames": 4,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "down": {
+      "frames": 2,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "run": {
+      "frames": 2,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    },
+    "get_up": {
+      "frames": 1,
+      "cell_w": 112,
+      "cell_h": 96,
+      "fps": 10
+    }
   }
 }
