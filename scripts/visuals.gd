@@ -38,7 +38,6 @@ func _draw_user_overworld_actor(host: Node2D, at: Vector2, key: String, directio
 	var source: Texture2D = character_art.user_assets.overworld(key)
 	if source == null:
 		return false
-	var frame_width: float = float(source.get_width()) / 4.0
 	var frame_height: float = float(source.get_height())
 	var direction_index: int = 0
 	if direction.y < -0.4:
@@ -47,8 +46,17 @@ func _draw_user_overworld_actor(host: Node2D, at: Vector2, key: String, directio
 		direction_index = 2
 	elif direction.x > 0.4:
 		direction_index = 3
+	var frame_sets: Dictionary = {
+		"naruto":[[0,42],[42,42],[84,42],[126,42]],
+		"sasuke":[[0,38],[38,37],[75,37],[112,38]],
+		"sakura":[[0,37],[37,37],[74,36],[110,37]],
+		"kakashi":[[0,47],[47,47],[94,47],[141,47]]
+	}
+	var frame_data: Array = frame_sets.get(key, [[0,int(source.get_width() / 4)]])[direction_index]
+	var frame_x: float = float(frame_data[0])
+	var frame_width: float = float(frame_data[1])
 	var bob: float = -2.0 if moving and int(clock * 9.0) % 2 == 1 else 0.0
-	var source_rect := Rect2(frame_width * float(direction_index), 0.0, frame_width, frame_height)
+	var source_rect: Rect2 = Rect2(frame_x, 0.0, frame_width, frame_height)
 	var target_height: float = 70.0
 	var scale_value: float = target_height / frame_height
 	var target_width: float = frame_width * scale_value
