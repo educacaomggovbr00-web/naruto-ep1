@@ -166,3 +166,12 @@ O runtime agora prioriza:
 - mapa de Konoha e cenários de campo de treino/floresta tirados da prancha.
 
 O pack fica em `assets/user_pack/user_assets.json.gz` e é decodificado por `scripts/user_asset_pack.gd`. Os sprites antigos permanecem apenas como fallback. Detalhes: `docs/USER_IMAGE_ASSETS.md`.
+
+
+### Integração mais recente das imagens exatas
+
+- O Henrique em exploração agora prioriza o overworld recortado da prancha mais recente; as animações de ação continuam usando a folha detalhada já integrada.
+- O menu **MAPA** usa a imagem de Konoha recortada da prancha como fundo visual.
+- O menu **PROGRESSO** mostra o recorte exato de itens/UI enviado pelo usuário.
+- Os cenários de batalha de praça/vila, floresta, ponte e campo de treino priorizam os recortes exatos antes dos cenários procedurais de fallback.
+- O teste automático verifica que Henrique, itens/UI e os cenários exatos são realmente decodificados pelo runtime.
