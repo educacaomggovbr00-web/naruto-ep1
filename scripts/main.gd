@@ -400,7 +400,7 @@ func _process(delta: float) -> void:
 				if house_rect.grow(8).has_point(player):
 					player = previous_position
 		player = player.clamp(Vector2(35, 110), Vector2(925, 375))
-		if stage == 8 and player.distance_to(Vector2(885, 275)) < 55:
+		if stage == 8 and current_location_id == "village_gate" and player.distance_to(Vector2(885, 275)) < 55:
 			stage = 9
 			current_location_id = "village_gate"
 			background.set_location(naruto_world.location(current_location_id))
@@ -443,7 +443,7 @@ func act(action: String) -> void:
 	if action == "punch" and cooldown <= 0:
 		cooldown = 0.35
 		start_action("punch_combo", 0.48)
-		if stage == 19 and player.distance_to(sasuke_pos) < 145:
+		if stage == 19 and current_location_id == "academy" and player.distance_to(sasuke_pos) < 145:
 			rpg.register_personality_choice("initiative")
 			rpg.register_success("punch")
 			ep3_sasuke_resolved = true
@@ -453,7 +453,7 @@ func act(action: String) -> void:
 				rpg.inventory["shuriken"] = 3
 			say(["Henrique dá um golpe de teste; Sasuke recua antes do impacto completo.", "Sasuke: Era isso?", "Henrique: Era pra ver se você estava acordado.", "Iruka corta a provocação antes que vire luta.", "Iruka: Se vocês querem provar alguma coisa, façam isso numa avaliação. Henrique: três shuriken no alvo. Só acerto vale."])
 			return
-		if stage == 15 and player.distance_to(konohamaru_pos) < 150:
+		if stage == 15 and current_location_id == "central_plaza" and player.distance_to(konohamaru_pos) < 150:
 			ep2_punch_done = true
 			rpg.register_success("punch")
 			check_ep2_training()
@@ -465,7 +465,7 @@ func act(action: String) -> void:
 		effect_origin = player
 		effect_direction = facing
 		start_action("shuriken_throw", 0.45)
-		if stage == 20 and player.distance_to(target) < 180 and facing.dot((target - player).normalized()) > 0.35:
+		if stage == 20 and current_location_id == "academy" and player.distance_to(target) < 180 and facing.dot((target - player).normalized()) > 0.35:
 			ep3_shuriken_hits += 1
 			rpg.register_success("shuriken")
 			if ep3_shuriken_hits >= 3:
@@ -477,7 +477,7 @@ func act(action: String) -> void:
 		cooldown = 0.45
 		start_action("dodge_roll", 0.45)
 		player = (player + facing * 58.0).clamp(Vector2(35, 110), Vector2(925, 375))
-		if stage == 15 and player.distance_to(konohamaru_pos) < 180:
+		if stage == 15 and current_location_id == "central_plaza" and player.distance_to(konohamaru_pos) < 180:
 			ep2_dodge_done = true
 			rpg.register_success("dodge")
 			check_ep2_training()
@@ -507,7 +507,7 @@ func act(action: String) -> void:
 		substitution_flash = 0.8
 		start_action("substitution", 0.70)
 		player = (player - facing * 45.0).clamp(Vector2(35, 110), Vector2(925, 375))
-		if stage == 21 and player.distance_to(target) < 190:
+		if stage == 21 and current_location_id == "academy" and player.distance_to(target) < 190:
 			ep3_substitution_done = true
 			rpg.register_success("substitution")
 			rpg.award_milestone("ep3_substitution_control", 30)
@@ -562,7 +562,7 @@ func act(action: String) -> void:
 			rpg.complete_mission("scroll_alarm", 80, 0)
 			story_era = 1
 			say(["Henrique adormece. No sonho: fogo, o símbolo Uchiha e uma silhueta com olhos vermelhos.", "Sinos de emergência rompem o silêncio da madrugada.", "Um ninja anuncia que o Pergaminho dos Selos desapareceu.", "Henrique corre até a janela. Uma figura de roupa laranja some na direção da floresta.", "Henrique: Naruto...?", "FIM DO EP -1 — a continuação começa agora."])
-		elif stage == 7 and player.distance_to(naruto_pos) < 105:
+		elif stage == 7 and current_location_id == "academy" and player.distance_to(naruto_pos) < 105:
 			stage = 8
 			player = Vector2(185, 270)
 			say(["Na Academia, Naruto falha novamente na prova de graduação ao não executar corretamente o Bunshin.", "Iruka não pode aprová-lo, embora saiba o quanto Naruto quer ser reconhecido.", "Mais tarde, Mizuki conversa com Naruto longe dos outros alunos.", "Henrique reconhece o mesmo comportamento estranho da noite anterior.", "Pouco depois, o alarme toca: Naruto levou o Pergaminho dos Selos. Henrique corre para a saída leste."])
@@ -576,23 +576,23 @@ func act(action: String) -> void:
 			stage = 12
 			rpg.complete_mission("academy_day", 60, 20)
 			say(["Depois da luta, Iruka reconhece o esforço de Naruto e entrega a ele sua própria bandana da Folha.", "Naruto finalmente consegue o símbolo de que tanto precisava: agora pode começar seu caminho como ninja.", "Henrique observa em silêncio, ainda pensando no Sharingan recém-desperto e nas intenções de Mizuki.", "NARUTO EP 1 CONCLUÍDO — adaptação jogável de fã pelo ponto de vista de Henrique Uchiha.", "Próximo: EP 2 — Konohamaru e os primeiros passos de Naruto como ninja."])
-		elif stage == 13 and player.distance_to(naruto_pos) < 120:
+		elif stage == 13 and current_location_id == "hokage_residence" and player.distance_to(naruto_pos) < 120:
 			stage = 14
 			current_location_id = "central_plaza"
 			background.set_location(naruto_world.location(current_location_id))
 			say(["Naruto termina seu registro e, no caminho de volta, tromba com Konohamaru.", "Konohamaru: Você não vai ficar me tratando diferente só porque eu sou neto do Hokage?", "Naruto: Por que eu faria isso?", "Konohamaru fica impressionado e começa a seguir Naruto pela vila.", "Henrique: Pronto. Agora ele arrumou um mini-Naruto."])
-		elif stage == 14 and player.distance_to(konohamaru_pos) < 115:
+		elif stage == 14 and current_location_id == "central_plaza" and player.distance_to(konohamaru_pos) < 115:
 			stage = 15
 			say(["Konohamaru quer ser reconhecido pela vila e acha que virar Hokage rapidamente resolveria tudo.", "Naruto responde que título nenhum substitui treino e esforço.", "Konohamaru desafia os dois a mostrarem alguma coisa de verdade.", "Objetivo: perto de Konohamaru, use ESQUIVA e depois SOCO."])
-		elif stage == 16 and player.distance_to(ebisu_pos) < 125:
+		elif stage == 16 and current_location_id == "central_plaza" and player.distance_to(ebisu_pos) < 125:
 			stage = 17
 			rpg.complete_mission("konohamaru_first_meeting", 70, 30)
 			say(["Ebisu chega procurando Konohamaru e encontra Naruto, Henrique e o garoto no meio do treino.", "Depois da discussão, Konohamaru percebe que ser reconhecido não é algo que se consegue apenas usando o nome do avô.", "Naruto segue seu caminho com uma nova sombra pequena correndo atrás dele.", "Henrique: Essa vila só fica mais estranha a cada dia.", "NARUTO EP 2 CONCLUÍDO — próximo passo: formação dos times e a apresentação do Time 7."])
-		elif stage == 18 and player.distance_to(Vector2(360, 265)) < 125:
+		elif stage == 18 and current_location_id == "academy" and player.distance_to(Vector2(360, 265)) < 125:
 			rpg.register_social_interaction()
 			stage = 19
 			say(["Iruka termina de anunciar as equipes. Naruto, Sakura e Sasuke formam o Time 7.", "Naruto olha para Sasuke como se a sala tivesse acabado de declarar guerra.", "Henrique: Três pessoas que não conseguem ficar cinco minutos em silêncio. Vai dar muito certo.", "Iruka: Henrique, sua avaliação ainda está aberta. Antes disso, fale com Sasuke e depois venha para o alvo."])
-		elif stage == 19 and player.distance_to(sasuke_pos) < 120:
+		elif stage == 19 and current_location_id == "academy" and player.distance_to(sasuke_pos) < 120:
 			rpg.register_social_interaction()
 			rpg.register_personality_choice("restraint")
 			ep3_sasuke_resolved = true
@@ -601,7 +601,7 @@ func act(action: String) -> void:
 			if int(rpg.inventory.get("shuriken", 0)) < 3:
 				rpg.inventory["shuriken"] = 3
 			say(["Sasuke: Você ficou olhando desde que anunciaram os times.", "Henrique: Estou tentando descobrir qual de vocês três vai irritar o Kakashi primeiro.", "Sasuke: Hn.", "Henrique não compra briga. A rivalidade existe, mas ele prefere medir alguém pelo que faz, não pelo sobrenome.", "Iruka chama Henrique para a avaliação: três acertos de shuriken no alvo. Erro não conta."])
-		elif stage == 22 and player.distance_to(kakashi_pos) < 130:
+		elif stage == 22 and current_location_id == "academy" and player.distance_to(kakashi_pos) < 130:
 			rpg.register_social_interaction()
 			stage = 23
 			rpg.complete_mission("episode3_real_evaluation", 80, 40)
