@@ -8,38 +8,38 @@ const TILE_SIZE: Vector2i = Vector2i(32, 32)
 const SOURCE_ID: int = 0
 const TILE_TEXTURE: Texture2D = preload("res://assets/tiles/konoha_academy_tiles.svg")
 
-const GRASS := Vector2i(0, 0)
-const PATH := Vector2i(1, 0)
-const STONE := Vector2i(2, 0)
-const WALL := Vector2i(3, 0)
-const WINDOW := Vector2i(4, 0)
-const DOOR := Vector2i(5, 0)
-const ROOF := Vector2i(6, 0)
-const ROOF_EDGE := Vector2i(7, 0)
-const BUSH := Vector2i(0, 1)
-const TREE := Vector2i(1, 1)
-const FENCE := Vector2i(2, 1)
-const SIGN := Vector2i(3, 1)
-const TARGET_TILE := Vector2i(4, 1)
-const POST := Vector2i(5, 1)
-const GRASS_ALT := Vector2i(6, 1)
-const PATH_EDGE := Vector2i(7, 1)
-const WALL_TOP := Vector2i(0, 2)
-const WINDOW_LOW := Vector2i(1, 2)
-const PATH_ALT := Vector2i(2, 2)
-const STONE_ALT := Vector2i(3, 2)
-const BENCH := Vector2i(4, 2)
-const FENCE_CROSS := Vector2i(5, 2)
-const GRASS_DARK := Vector2i(6, 2)
-const STONE_CLEAN := Vector2i(7, 2)
-const WATER := Vector2i(0, 3)
-const RAIL := Vector2i(1, 3)
-const SHRUB := Vector2i(2, 3)
-const PATH_VERTICAL := Vector2i(3, 3)
-const STONE_EDGE := Vector2i(4, 3)
-const LAMP := Vector2i(5, 3)
-const CRATE := Vector2i(6, 3)
-const CROSSROAD := Vector2i(7, 3)
+const GRASS: Vector2i = Vector2i(0, 0)
+const PATH: Vector2i = Vector2i(1, 0)
+const STONE: Vector2i = Vector2i(2, 0)
+const WALL: Vector2i = Vector2i(3, 0)
+const WINDOW: Vector2i = Vector2i(4, 0)
+const DOOR: Vector2i = Vector2i(5, 0)
+const ROOF: Vector2i = Vector2i(6, 0)
+const ROOF_EDGE: Vector2i = Vector2i(7, 0)
+const BUSH: Vector2i = Vector2i(0, 1)
+const TREE: Vector2i = Vector2i(1, 1)
+const FENCE: Vector2i = Vector2i(2, 1)
+const SIGN: Vector2i = Vector2i(3, 1)
+const TARGET_TILE: Vector2i = Vector2i(4, 1)
+const POST: Vector2i = Vector2i(5, 1)
+const GRASS_ALT: Vector2i = Vector2i(6, 1)
+const PATH_EDGE: Vector2i = Vector2i(7, 1)
+const WALL_TOP: Vector2i = Vector2i(0, 2)
+const WINDOW_LOW: Vector2i = Vector2i(1, 2)
+const PATH_ALT: Vector2i = Vector2i(2, 2)
+const STONE_ALT: Vector2i = Vector2i(3, 2)
+const BENCH: Vector2i = Vector2i(4, 2)
+const FENCE_CROSS: Vector2i = Vector2i(5, 2)
+const GRASS_DARK: Vector2i = Vector2i(6, 2)
+const STONE_CLEAN: Vector2i = Vector2i(7, 2)
+const WATER: Vector2i = Vector2i(0, 3)
+const RAIL: Vector2i = Vector2i(1, 3)
+const SHRUB: Vector2i = Vector2i(2, 3)
+const PATH_VERTICAL: Vector2i = Vector2i(3, 3)
+const STONE_EDGE: Vector2i = Vector2i(4, 3)
+const LAMP: Vector2i = Vector2i(5, 3)
+const CRATE: Vector2i = Vector2i(6, 3)
+const CROSSROAD: Vector2i = Vector2i(7, 3)
 
 const SOLID_TILES: Array[Vector2i] = [
 	WALL, WINDOW, DOOR, ROOF, ROOF_EDGE, TREE, FENCE, POST,
@@ -57,20 +57,20 @@ func _ready() -> void:
 	set_active(true)
 
 func _build_tileset() -> void:
-	var set_resource := TileSet.new()
+	var set_resource: TileSet = TileSet.new()
 	set_resource.tile_size = TILE_SIZE
 	set_resource.add_physics_layer()
 	set_resource.set_physics_layer_collision_layer(0, 1)
 	set_resource.set_physics_layer_collision_mask(0, 1)
 
-	var atlas := TileSetAtlasSource.new()
+	var atlas: TileSetAtlasSource = TileSetAtlasSource.new()
 	atlas.texture = TILE_TEXTURE
 	atlas.texture_region_size = TILE_SIZE
 	atlas.use_texture_padding = false
 
 	for y in range(4):
 		for x in range(8):
-			var coords := Vector2i(x, y)
+			var coords: Vector2i = Vector2i(x, y)
 			atlas.create_tile(coords)
 
 	for coords in SOLID_TILES:
@@ -111,7 +111,7 @@ func _build_academy() -> void:
 	# 960x544 world = 30x17 cells. Base grass stays crisp at 32px.
 	for y in range(17):
 		for x in range(30):
-			var tile := GRASS if (x + y) % 5 != 0 else GRASS_ALT
+			var tile: Vector2i = GRASS if (x + y) % 5 != 0 else GRASS_ALT
 			_place(Vector2i(x, y), tile)
 
 	# Main village road and academy courtyard.
