@@ -127,9 +127,9 @@ func render(host: Node2D) -> void:
 		actor(host, host.sakura_pos, SAKURA, Vector2.RIGHT, true, host.visual_clock, "Sakura", false)
 		actor(host, host.kakashi_pos, KAKASHI, Vector2.RIGHT, true, host.visual_clock, "Kakashi", false)
 	elif host.stage >= 24 and host.stage <= 28 and host.current_location_id == "training_ground_3":
-		var naruto_move := host.stage == 25
-		var sasuke_move := host.stage == 26
-		var sakura_move := host.stage == 27
+		var naruto_move: bool = int(host.stage) == 25
+		var sasuke_move: bool = int(host.stage) == 26
+		var sakura_move: bool = int(host.stage) == 27
 		actor(host, host.naruto_pos + Vector2(sin(host.visual_clock * 1.8) * 24 if naruto_move else 0, 0), NARUTO, Vector2.RIGHT, naruto_move, host.visual_clock, "Naruto", false)
 		actor(host, host.sasuke_pos + Vector2(cos(host.visual_clock * 1.4) * 18 if sasuke_move else 0, 0), SASUKE, Vector2.LEFT, sasuke_move, host.visual_clock, "Sasuke", false)
 		actor(host, host.sakura_pos + Vector2(0, sin(host.visual_clock * 1.6) * 12 if sakura_move else 0), SAKURA, Vector2.UP, sakura_move, host.visual_clock, "Sakura", false)
@@ -163,7 +163,7 @@ func render(host: Node2D) -> void:
 		actor(host, host.tazuna_pos, TAZUNA, Vector2.LEFT, false, host.visual_clock, "Tazuna", false)
 		marker(host, host.kakashi_pos, host.visual_clock)
 	elif host.stage == 32 or host.stage == 33:
-		var march := Vector2(sin(host.visual_clock * 1.1) * 22, 0)
+		var march: Vector2 = Vector2(sin(float(host.visual_clock) * 1.1) * 22.0, 0.0)
 		actor(host, host.naruto_pos + march, NARUTO, Vector2.RIGHT, true, host.visual_clock, "Naruto", false)
 		actor(host, host.sasuke_pos + march * 0.8, SASUKE, Vector2.RIGHT, true, host.visual_clock, "Sasuke", false)
 		actor(host, host.sakura_pos + march * 0.6, SAKURA, Vector2.RIGHT, true, host.visual_clock, "Sakura", false)
@@ -192,7 +192,7 @@ func render(host: Node2D) -> void:
 		host.draw_line(player_pos + Vector2(-8, -12), player_pos + Vector2(8, -8), Color(0.66, 0.46, 0.28, 0.8 * alpha), 3)
 
 	if host.naruto_battle_flash > 0.0:
-		var action := "run" if host.naruto_battle_flash > 0.8 else "idle"
+		var action: String = "run" if float(host.naruto_battle_flash) > 0.8 else "idle"
 		character_art.draw_naruto_mugen(host, Vector2(790, 374), action, 0.48)
 
 	if host.attack_flash > 0:
@@ -200,16 +200,16 @@ func render(host: Node2D) -> void:
 		var at: Vector2 = host.effect_origin + host.effect_direction * progress * 125
 		if host.effect_kind == "katon":
 			for i in range(18):
-				var shift := Vector2(-host.effect_direction.x * i * 2, sin(i * 2.3 + host.visual_clock * 23) * 12)
-				var size := 6 + (i % 3) * 4
+				var shift: Vector2 = Vector2(-float(host.effect_direction.x) * float(i) * 2.0, sin(float(i) * 2.3 + float(host.visual_clock) * 23.0) * 12.0)
+				var size: int = 6 + (i % 3) * 4
 				host.draw_rect(Rect2(at + shift - Vector2(size, size) / 2, Vector2(size, size)), Color("df653e"))
 			for i in range(9):
-				var shift := Vector2(cos(i * 1.7) * 12, sin(i * 2.8) * 10)
+				var shift: Vector2 = Vector2(cos(float(i) * 1.7) * 12.0, sin(float(i) * 2.8) * 10.0)
 				host.draw_rect(Rect2(at + shift - Vector2(4, 4), Vector2(8, 8)), Color("ffcf69"))
 			host.draw_rect(Rect2(at - Vector2(5, 5), Vector2(10, 10)), Color("fff1b0"))
 		elif host.effect_kind == "shuriken":
 			host.draw_set_transform(at, host.visual_clock * 14.0)
-			var star := PackedVector2Array([Vector2(0,-14),Vector2(4,-4),Vector2(14,0),Vector2(4,4),Vector2(0,14),Vector2(-4,4),Vector2(-14,0),Vector2(-4,-4)])
+			var star: PackedVector2Array = PackedVector2Array([Vector2(0,-14),Vector2(4,-4),Vector2(14,0),Vector2(4,4),Vector2(0,14),Vector2(-4,4),Vector2(-14,0),Vector2(-4,-4)])
 			host.draw_colored_polygon(star, Color("b7c5cf"))
 			host.draw_circle(Vector2.ZERO, 4, Color("38434b"))
 			host.draw_set_transform(Vector2.ZERO)
@@ -220,8 +220,8 @@ func render(host: Node2D) -> void:
 			host.draw_set_transform(Vector2.ZERO)
 
 	for i in range(12):
-		var x := fmod(i * 89.0 + host.visual_clock * (5 if night else 11), 940.0)
-		var y := 216 + (i % 5) * 33 + sin(host.visual_clock + i) * 13
+		var x: float = fmod(float(i) * 89.0 + float(host.visual_clock) * (5.0 if night else 11.0), 940.0)
+		var y: float = 216.0 + float(i % 5) * 33.0 + sin(float(host.visual_clock) + float(i)) * 13.0
 		host.draw_rect(Rect2(x, y, 3 if night else 5, 2), Color(0.85, 0.9, 0.54, 0.5) if night else Color(0.72, 0.76, 0.43, 0.6))
 
 	host.draw_rect(Rect2(0, 0, 960, 78), Color("142c35"))
@@ -235,7 +235,7 @@ func render(host: Node2D) -> void:
 		host.draw_string(ThemeDB.fallback_font, Vector2(566, 45), "1 TOMOE", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("e7c7b2"))
 	host.draw_rect(Rect2(610, 16, 166, 10), Color("314952"))
 	host.draw_rect(Rect2(612, 18, 162 * host.chakra / 100.0, 6), Color("66b8bd"))
-	var place := host.naruto_world.location_name(host.current_location_id)
+	var place: String = str(host.naruto_world.location_name(str(host.current_location_id)))
 	if host.stage >= 32:
 		place = "ESTRADA • FORA DE KONOHA"
 	elif host.stage == 3 or host.stage == 4:
