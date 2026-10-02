@@ -1,6 +1,8 @@
 extends RefCounted
 
 var character_art = preload("res://scripts/character_art.gd").new()
+var vfx = preload("res://scripts/vfx.gd").new()
+var graphics_catalog = preload("res://scripts/graphics_catalog.gd").new()
 const NARUTO = preload("res://assets/art/naruto.svg")
 const SASUKE = preload("res://assets/art/sasuke.svg")
 const SAKURA = preload("res://assets/art/sakura.svg")
@@ -9,6 +11,13 @@ const EBISU = preload("res://assets/art/ebisu.svg")
 const KAKASHI = preload("res://assets/art/kakashi.svg")
 const HIRUZEN = preload("res://assets/art/hiruzen.svg")
 const TAZUNA = preload("res://assets/art/tazuna.svg")
+const TEUCHI = preload("res://assets/art/teuchi.svg")
+const AYAME = preload("res://assets/art/ayame.svg")
+const ANBU = preload("res://assets/art/anbu.svg")
+const NPC_RED = preload("res://assets/art/npc_red.svg")
+const NPC_BLUE = preload("res://assets/art/npc_blue.svg")
+const NPC_WHITE = preload("res://assets/art/npc_white.svg")
+const NPC_BROWN = preload("res://assets/art/npc_brown.svg")
 const IRUKA = preload("res://assets/art/iruka.svg")
 const MIZUKI = preload("res://assets/art/mizuki.svg")
 const TARGET = preload("res://assets/art/target.svg")
@@ -30,8 +39,34 @@ func actor(host: Node2D, at: Vector2, texture: Texture2D, direction: Vector2, mo
 	host.draw_string(ThemeDB.fallback_font, at + Vector2(-28, -78), name_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("f6e9c8"))
 
 func marker(host: Node2D, at: Vector2, clock: float) -> void:
-	var y := at.y - 82 + sin(clock * 3.5) * 3
+	var y: float = at.y - 82.0 + sin(clock * 3.5) * 3.0
 	host.draw_colored_polygon(PackedVector2Array([Vector2(at.x - 6, y), Vector2(at.x + 6, y), Vector2(at.x, y + 7)]), Color("f4d085"))
+
+func ambient_konoha(host: Node2D, night: bool) -> void:
+	if host.stage >= 9 and host.stage <= 12:
+		return
+	match String(host.current_location_id):
+		"ichiraku":
+			actor(host, Vector2(535, 275), TEUCHI, Vector2.DOWN, false, host.visual_clock, "Teuchi", night)
+			actor(host, Vector2(620, 285), AYAME, Vector2.LEFT, true, host.visual_clock, "Ayame", night)
+		"hokage_residence":
+			actor(host, Vector2(850, 300), ANBU, Vector2.LEFT, false, host.visual_clock, "ANBU", night)
+		"intelligence_division":
+			actor(host, Vector2(330, 275), ANBU, Vector2.RIGHT, true, host.visual_clock, "ANBU", night)
+			actor(host, Vector2(610, 290), NPC_WHITE, Vector2.LEFT, false, host.visual_clock, "Analista", night)
+		"central_plaza":
+			if host.stage < 13 or host.stage > 17:
+				actor(host, Vector2(255, 300), NPC_RED, Vector2.RIGHT, true, host.visual_clock, "Morador", night)
+				actor(host, Vector2(735, 270), NPC_BLUE, Vector2.LEFT, true, host.visual_clock, "Morador", night)
+		"commercial_district":
+			actor(host, Vector2(285, 285), NPC_BROWN, Vector2.RIGHT, true, host.visual_clock, "Comerciante", night)
+			actor(host, Vector2(660, 300), NPC_RED, Vector2.LEFT, true, host.visual_clock, "Moradora", night)
+		"north_residential", "west_residential", "south_residential", "east_residential":
+			actor(host, Vector2(300, 300), NPC_BLUE, Vector2.RIGHT, true, host.visual_clock, "Morador", night)
+			actor(host, Vector2(680, 285), NPC_WHITE, Vector2.LEFT, false, host.visual_clock, "Moradora", night)
+		"village_gate":
+			if host.stage < 31:
+				actor(host, Vector2(275, 275), ANBU, Vector2.RIGHT, false, host.visual_clock, "Guarda", night)
 
 func render(host: Node2D) -> void:
 	var night: bool = host.stage == 3 or host.stage == 4 or host.stage == 5 or host.stage == 6 or (host.stage >= 8 and host.stage <= 12)
@@ -170,9 +205,11 @@ func render(host: Node2D) -> void:
 		actor(host, host.kakashi_pos + march * 0.4, KAKASHI, Vector2.RIGHT, true, host.visual_clock, "Kakashi", false)
 		actor(host, host.tazuna_pos + march * 0.2, TAZUNA, Vector2.RIGHT, true, host.visual_clock, "Tazuna", false)
 
+	ambient_konoha(host, night)
 	character_art.draw_henrique(host)
 
 	if host.clone_flash > 0.0:
+		vfx.smoke(host, host.player + Vector2(0, -10), host.visual_clock, 12)
 		var alpha: float = clampf(float(host.clone_flash), 0.0, 1.0)
 		var player_pos: Vector2 = host.player
 		for side in [-1, 1]:
@@ -183,6 +220,7 @@ func render(host: Node2D) -> void:
 			var smoke: Vector2 = player_pos + Vector2(float((i - 4) * 12), -8.0 + sin(float(i) * 1.4 + float(host.visual_clock) * 7.0) * 12.0)
 			host.draw_circle(smoke, 8 + (i % 3) * 3, Color(0.82, 0.86, 0.88, 0.22 * alpha))
 	if host.substitution_flash > 0.0:
+		vfx.smoke(host, host.player + Vector2(0, -12), host.visual_clock, 9)
 		var alpha: float = clampf(float(host.substitution_flash), 0.0, 1.0)
 		var player_pos: Vector2 = host.player
 		for i in range(7):
@@ -199,6 +237,7 @@ func render(host: Node2D) -> void:
 		var progress: float = 1.0 - host.attack_flash / (0.5 if host.effect_kind == "katon" else 0.2)
 		var at: Vector2 = host.effect_origin + host.effect_direction * progress * 125
 		if host.effect_kind == "katon":
+			vfx.fire(host, at, 1.35, host.visual_clock)
 			for i in range(18):
 				var shift: Vector2 = Vector2(-float(host.effect_direction.x) * float(i) * 2.0, sin(float(i) * 2.3 + float(host.visual_clock) * 23.0) * 12.0)
 				var size: int = 6 + (i % 3) * 4
@@ -208,6 +247,7 @@ func render(host: Node2D) -> void:
 				host.draw_rect(Rect2(at + shift - Vector2(4, 4), Vector2(8, 8)), Color("ffcf69"))
 			host.draw_rect(Rect2(at - Vector2(5, 5), Vector2(10, 10)), Color("fff1b0"))
 		elif host.effect_kind == "shuriken":
+			vfx.impact(host, at + host.effect_direction * 10.0, host.visual_clock)
 			host.draw_set_transform(at, host.visual_clock * 14.0)
 			var star: PackedVector2Array = PackedVector2Array([Vector2(0,-14),Vector2(4,-4),Vector2(14,0),Vector2(4,4),Vector2(0,14),Vector2(-4,4),Vector2(-14,0),Vector2(-4,-4)])
 			host.draw_colored_polygon(star, Color("b7c5cf"))
@@ -229,6 +269,7 @@ func render(host: Node2D) -> void:
 	host.draw_rect(Rect2(13, 9, 48, 55), Color("29414b"))
 	character_art.portrait(host)
 	if host.sharingan_awakened:
+		vfx.chakra_aura(host, host.player + Vector2(0, -28), host.visual_clock, false)
 		host.draw_circle(Vector2(585, 21), 11, Color("a92f2f"))
 		host.draw_circle(Vector2(585, 21), 4, Color("1b1719"))
 		host.draw_circle(Vector2(591, 17), 2, Color("1b1719"))
