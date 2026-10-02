@@ -41,6 +41,7 @@ var art = preload("res://scripts/visuals.gd").new()
 var background = preload("res://scripts/background.gd").new()
 var naruto_world = preload("res://scripts/naruto_world.gd").new()
 var rpg = preload("res://scripts/rpg_systems.gd").new()
+var external_sprites
 var story_era := 1
 var mizuki_hits := 0
 var episode_1_started := true
@@ -73,6 +74,8 @@ const OBJECTIVES := [
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	external_sprites = preload("res://scripts/external_sprite_loader.gd").new()
+	add_child(external_sprites)
 	add_child(background)
 	background.z_index = -1
 	background.set_area(stage)
