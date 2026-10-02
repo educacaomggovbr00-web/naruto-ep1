@@ -128,3 +128,20 @@ Entre os pontos implementados estão Academia, Monumento e Residência do Hokage
 A posição exata das ruas é uma adaptação de gameplay: as fontes de Naruto fornecem landmarks e relações importantes, mas não uma única planta canônica completa, rua por rua, pronta para ser convertida em tilemap. A pesquisa e a grade usada pelo jogo estão documentadas em `docs/KONOHA_WORLD.md`.
 
 Cada tipo de local recebe elementos visuais próprios e os NPCs de história só aparecem no local correto. Durante a perseguição do Pergaminho dos Selos, o fast travel é bloqueado na parte da floresta para preservar a sequência.
+
+
+## Episódios 4-5 — Teste de sobrevivência
+
+Depois do EP 3, o jogo segue para o Campo de Treinamento 3. Naruto, Sasuke e Sakura fazem o teste de sobrevivência de Kakashi como Time 7. Henrique participa apenas de uma avaliação paralela para não substituir nenhum integrante do time.
+
+No gameplay, o avanço de Henrique exige ações executadas de verdade: esquiva perto de Kakashi, substituição junto ao alvo e dois acertos de shuriken. Kakashi registra o resultado separado do Time 7. A conclusão preserva a ideia central do teste: Naruto, Sasuke e Sakura precisam deixar de agir apenas individualmente e aprender a funcionar como equipe.
+
+## Episódio 6 — Saída de Konoha
+
+A sequência seguinte leva o grupo à Residência do Hokage. Hiruzen apresenta a primeira missão C, Tazuna entra como cliente e o jogador segue até o Portão de Konoha.
+
+Naruto, Sasuke, Sakura e Kakashi permanecem visíveis durante toda a saída da vila, usando os mesmos sprites top-down do overworld já estabelecido. Henrique acompanha como apoio extra desta adaptação, enquanto o Time 7 continua sendo oficialmente Naruto, Sasuke, Sakura e Kakashi.
+
+Ao atravessar o portão, o mapa de fast travel é bloqueado e o cenário muda para a estrada fora de Konoha. A missão só é registrada quando o jogador realmente percorre o trecho de saída.
+
+A ordem narrativa foi ajustada para seguir a cronologia do anime: o teste de sobrevivência ocupa os episódios 4-5; a missão de Tazuna e a viagem ao País das Ondas começam no episódio 6.
