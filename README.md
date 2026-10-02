@@ -108,3 +108,12 @@ O jogo tenta carregar e armazenar em cache `idle_1`, `idle_2` e `walk_1..4` em `
 Outros packs JUS/NZC/MUGEN encontrados durante a pesquisa foram usados somente como referência visual quando não havia uma licença de redistribuição clara.
 
 Consulte `assets/external/CREDITS.md` e `assets/external/naruto_fan_sources.json`.
+
+
+## Henrique — PNG exato ativo no gameplay
+
+A prancha `assets/characters/file_000000003c88820e930f366203f13d4e.png` deixou de ser apenas referência: ela agora alimenta diretamente as animações do Henrique.
+
+`assets/characters/henrique-board-frames.json` mapeia 86 recortes da própria prancha. Para não exibir os painéis escuros do arquivo original, `character_art.gd` extrai cada pose sob demanda, remove o fundo por flood-fill e mantém a textura resultante em cache. Assim o jogo usa os sprites daquele PNG sem precisar trocar para o antigo `henrique-detailed.png`.
+
+As animações mapeadas incluem idle, caminhada, corrida, pulo, queda, agachar, esquiva/rolamento, deslizar, combo de socos, kunai, shuriken, Katon, clone das sombras, substituição, levar dano, cair, levantar e morte básica. Técnicas futuras continuam cadastradas como aliases temporários até terem quadros próprios.
