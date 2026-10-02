@@ -9,6 +9,19 @@ const HOUSE = preload("res://assets/art/house.svg")
 const LANTERN = preload("res://assets/art/lantern.svg")
 var area := -1
 var night := false
+var location_id := "academy"
+var location_name := "Academia Ninja"
+var location_kind := "academy"
+
+func set_location(info: Dictionary) -> void:
+	var next_id := String(info.get("id", "academy"))
+	var next_name := String(info.get("name", "Academia Ninja"))
+	var next_kind := String(info.get("kind", "academy"))
+	if next_id != location_id or next_kind != location_kind:
+		location_id = next_id
+		location_name = next_name
+		location_kind = next_kind
+		queue_redraw()
 
 func set_area(stage: int) -> void:
 	var next_area := 0 if stage <= 1 else 1 if stage == 2 or stage == 5 or stage == 6 or stage == 7 or stage == 8 or stage >= 13 else 2
@@ -129,6 +142,100 @@ func _draw() -> void:
 		var pos := Vector2(22 + i * 39, 384 + (i % 4) * 12)
 		draw_rect(Rect2(pos, Vector2(2, 8)), Color("b0aa61"))
 		draw_rect(Rect2(pos + Vector2(-2, 1), Vector2(6, 3)), Color("d1b989"))
+	# Konoha free-roam location dressing. Same lightweight tile base, different landmark identity.
+	if area == 1:
+		draw_rect(Rect2(18, 138, 250, 25), Color(0.08, 0.13, 0.15, 0.78))
+		draw_string(ThemeDB.fallback_font, Vector2(29, 156), location_name, HORIZONTAL_ALIGNMENT_LEFT, 225, 13, Color("f3d599"))
+		if location_kind == "academy":
+			draw_rect(Rect2(330, 205, 300, 76), Color("d2c49f"))
+			draw_string(ThemeDB.fallback_font, Vector2(408, 250), "ACADEMIA", HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color("51463b"))
+			draw_circle(Vector2(300, 255), 23, Color("6f8553"))
+			draw_line(Vector2(300, 270), Vector2(300, 312), Color("5e4432"), 7)
+			draw_line(Vector2(300, 278), Vector2(270, 298), Color("6e543e"), 3)
+		elif location_kind == "government":
+			draw_rect(Rect2(340, 200, 285, 92), Color("d8cab3"))
+			draw_circle(Vector2(482, 200), 92, Color("b46952"))
+			draw_string(ThemeDB.fallback_font, Vector2(448, 245), "火", HORIZONTAL_ALIGNMENT_LEFT, -1, 44, Color("efe0b8"))
+		elif location_kind == "monument":
+			for i in range(4):
+				var fx := 340 + i * 72
+				draw_circle(Vector2(fx, 220), 28, Color("ad9f80"))
+				draw_rect(Rect2(fx - 20, 245, 40, 38), Color("9a8d74"))
+		elif location_kind == "hospital":
+			draw_rect(Rect2(345, 195, 270, 100), Color("d8dddd"))
+			draw_rect(Rect2(465, 212, 30, 62), Color("9a4f4f"))
+			draw_rect(Rect2(449, 228, 62, 30), Color("9a4f4f"))
+		elif location_kind == "commercial" or location_kind == "ramen":
+			for i in range(5):
+				var sx := 250 + i * 105
+				draw_rect(Rect2(sx, 210, 84, 56), Color("a76e4e"))
+				draw_rect(Rect2(sx - 4, 202, 92, 10), Color("d4bd8e"))
+			if location_kind == "ramen":
+				draw_string(ThemeDB.fallback_font, Vector2(424, 248), "ICHIRAKU", HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color("ffe1a0"))
+		elif location_kind == "cemetery" or location_kind == "memorial":
+			for i in range(9):
+				var gx := 230 + (i % 5) * 105
+				var gy := 220 + int(i / 5) * 58
+				draw_rect(Rect2(gx, gy, 24, 37), Color("77796f"))
+				draw_rect(Rect2(gx - 4, gy + 34, 32, 5), Color("5e625d"))
+			if location_kind == "memorial":
+				draw_rect(Rect2(446, 192, 68, 115), Color("4d5351"))
+		elif location_kind == "library":
+			draw_rect(Rect2(335, 195, 290, 103), Color("c6b995"))
+			for i in range(6):
+				draw_rect(Rect2(360 + i * 41, 213, 25, 48), Color("5a443a"))
+				draw_rect(Rect2(362 + i * 41, 217, 21, 4), Color("d0ac6f"))
+		elif location_kind == "uchiha":
+			for bx in [360, 480, 600]:
+				draw_rect(Rect2(bx, 195, 4, 92), Color("4a3731"))
+				draw_circle(Vector2(bx + 2, 210), 18, Color("b54949"))
+				draw_rect(Rect2(bx - 16, 210, 36, 14), Color("e1ddd2"))
+				draw_circle(Vector2(bx + 2, 224), 18, Color("e1ddd2"))
+		elif location_kind == "shrine":
+			draw_rect(Rect2(438, 185, 9, 122), Color("8c3d36"))
+			draw_rect(Rect2(530, 185, 9, 122), Color("8c3d36"))
+			draw_rect(Rect2(420, 185, 137, 12), Color("a9473d"))
+			draw_rect(Rect2(432, 205, 112, 8), Color("a9473d"))
+		elif location_kind == "river":
+			draw_rect(Rect2(0, 245, 960, 110), Color("446c79"))
+			for i in range(25):
+				draw_rect(Rect2(8 + i * 39, 265 + (i % 4) * 15, 25, 3), Color("7fa0a0"))
+			draw_rect(Rect2(420, 228, 124, 145), Color("957456"))
+			for i in range(10):
+				draw_rect(Rect2(424 + i * 12, 228, 5, 145), Color("bf9d70"))
+		elif location_kind == "training":
+			for at in [Vector2(330, 245), Vector2(480, 225), Vector2(630, 255)]:
+				draw_rect(Rect2(at.x - 4, at.y, 8, 74), Color("6a4d35"))
+				draw_circle(at, 28, Color("d6bd86"))
+				draw_circle(at, 17, Color("9c5146"))
+				draw_circle(at, 7, Color("e4d2a4"))
+		elif location_kind == "hotspring":
+			draw_rect(Rect2(310, 235, 350, 105), Color("6c8e8d"))
+			for i in range(9):
+				draw_circle(Vector2(330 + i * 38, 250 + (i % 3) * 19), 11, Color(0.9, 0.95, 0.9, 0.14))
+		elif location_kind == "gate":
+			draw_rect(Rect2(300, 145, 34, 180), Color("76563b"))
+			draw_rect(Rect2(625, 145, 34, 180), Color("76563b"))
+			draw_rect(Rect2(270, 145, 420, 34), Color("9b6b45"))
+			draw_string(ThemeDB.fallback_font, Vector2(445, 170), "木ノ葉", HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color("eee0b8"))
+		elif location_kind == "plaza":
+			draw_circle(Vector2(480, 250), 60, Color("9c947f"))
+			draw_circle(Vector2(480, 250), 43, Color("b8aa8a"))
+			for at in [Vector2(350, 240), Vector2(610, 240)]:
+				draw_rect(Rect2(at.x, at.y, 70, 8), Color("73543b"))
+				draw_rect(Rect2(at.x + 5, at.y + 8, 6, 20), Color("5b4938"))
+				draw_rect(Rect2(at.x + 58, at.y + 8, 6, 20), Color("5b4938"))
+		elif location_kind == "residential":
+			for at in [Vector2(250, 195), Vector2(435, 205), Vector2(620, 190)]:
+				building(at, Color("ded4c4"))
+		elif location_kind == "service":
+			for i in range(6):
+				var cx := 330 + (i % 3) * 120
+				var cy := 210 + int(i / 3) * 62
+				draw_rect(Rect2(cx, cy, 75, 45), Color("79664e"))
+				draw_line(Vector2(cx, cy), Vector2(cx + 75, cy + 45), Color("ab9772"), 2)
+				draw_line(Vector2(cx + 75, cy), Vector2(cx, cy + 45), Color("ab9772"), 2)
+
 	if night:
 		draw_rect(Rect2(0, 0, 960, 540), Color(0.025, 0.075, 0.17, 0.53))
 		for at in [Vector2(234, 183), Vector2(677, 189), Vector2(908, 355), Vector2(402, 384)]:
