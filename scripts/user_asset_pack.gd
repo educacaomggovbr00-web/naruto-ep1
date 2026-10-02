@@ -33,9 +33,9 @@ func texture(key: String) -> Texture2D:
 	var runs: Array = entry.get("r", [])
 	if width <= 0 or height <= 0 or palette.is_empty() or runs.is_empty():
 		return null
-	var bytes := PackedByteArray()
+	var bytes: PackedByteArray = PackedByteArray()
 	bytes.resize(width * height * 4)
-	var pixel_index := 0
+	var pixel_index: int = 0
 	for i in range(0, runs.size(), 2):
 		var count: int = int(runs[i])
 		var palette_index: int = int(runs[i + 1])
@@ -56,8 +56,8 @@ func texture(key: String) -> Texture2D:
 			bytes[byte_index + 2] = bb
 			bytes[byte_index + 3] = aa
 			pixel_index += 1
-	var image := Image.create_from_data(width, height, false, Image.FORMAT_RGBA8, bytes)
-	var result := ImageTexture.create_from_image(image)
+	var image: Image = Image.create_from_data(width, height, false, Image.FORMAT_RGBA8, bytes)
+	var result: ImageTexture = ImageTexture.create_from_image(image)
 	texture_cache[key] = result
 	return result
 
