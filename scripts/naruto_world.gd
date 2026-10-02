@@ -74,7 +74,8 @@ const CLASSIC_CAST := [
 	{"name":"Rock Lee","role":"Genin","era":3},
 	{"name":"Neji Hyuga","role":"Genin","era":3},
 	{"name":"Tenten","role":"Genin","era":3},
-	{"name":"Gaara","role":"Ninja da Areia","era":3}
+	{"name":"Gaara","role":"Ninja da Areia","era":3},
+	{"name":"Tazuna","role":"Cliente da missão do País das Ondas","era":2}
 ]
 
 const JUTSU := [
