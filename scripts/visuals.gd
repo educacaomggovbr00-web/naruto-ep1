@@ -46,13 +46,13 @@ func render(host: Node2D) -> void:
 	elif host.stage == 4:
 		host.draw_texture_rect(KUNAI, Rect2(host.target - Vector2(16, 8), Vector2(32, 16)), false)
 		marker(host, host.target + Vector2(0, 36), host.visual_clock)
-	elif host.stage == 7:
+	elif host.stage == 7 and host.current_location_id == "academy":
 		actor(host, host.naruto_pos, NARUTO, Vector2.LEFT, true, host.visual_clock, "Naruto", false)
 		actor(host, Vector2(360, 260), IRUKA, Vector2.DOWN, false, host.visual_clock, "Iruka", false)
 		actor(host, Vector2(520, 245), SASUKE, Vector2.DOWN, false, host.visual_clock, "Sasuke", false)
 		actor(host, Vector2(455, 305), SAKURA, Vector2.RIGHT, true, host.visual_clock, "Sakura", false)
 		marker(host, host.naruto_pos, host.visual_clock)
-	elif host.stage == 8:
+	elif host.stage == 8 and host.current_location_id == "academy":
 		marker(host, Vector2(885, 275), host.visual_clock)
 	elif host.stage == 9:
 		actor(host, host.naruto_pos, NARUTO, Vector2.DOWN, false, host.visual_clock, "Naruto", true)
@@ -72,39 +72,39 @@ func render(host: Node2D) -> void:
 
 	if host.stage == 5:
 		marker(host, Vector2(110, 240), host.visual_clock)
-	elif host.stage == 13:
+	elif host.stage == 13 and host.current_location_id == "hokage_residence":
 		actor(host, host.naruto_pos, NARUTO, Vector2.LEFT, false, host.visual_clock, "Naruto", false)
 		actor(host, host.konohamaru_pos, KONOHAMARU, Vector2.RIGHT, true, host.visual_clock, "Konohamaru", false)
 		marker(host, host.naruto_pos, host.visual_clock)
-	elif host.stage == 14:
+	elif host.stage == 14 and host.current_location_id == "central_plaza":
 		actor(host, host.naruto_pos, NARUTO, Vector2.RIGHT, false, host.visual_clock, "Naruto", false)
 		actor(host, host.konohamaru_pos, KONOHAMARU, Vector2.LEFT, true, host.visual_clock, "Konohamaru", false)
 		marker(host, host.konohamaru_pos, host.visual_clock)
-	elif host.stage == 15:
+	elif host.stage == 15 and host.current_location_id == "central_plaza":
 		actor(host, host.naruto_pos, NARUTO, Vector2.DOWN, false, host.visual_clock, "Naruto", false)
 		actor(host, host.konohamaru_pos, KONOHAMARU, Vector2.LEFT, false, host.visual_clock, "Konohamaru", false)
 		marker(host, host.konohamaru_pos, host.visual_clock)
-	elif host.stage == 16:
+	elif host.stage == 16 and host.current_location_id == "central_plaza":
 		actor(host, host.naruto_pos, NARUTO, Vector2.RIGHT, false, host.visual_clock, "Naruto", false)
 		actor(host, host.konohamaru_pos, KONOHAMARU, Vector2.RIGHT, false, host.visual_clock, "Konohamaru", false)
 		actor(host, host.ebisu_pos, EBISU, Vector2.LEFT, false, host.visual_clock, "Ebisu", false)
 		marker(host, host.ebisu_pos, host.visual_clock)
-	elif host.stage == 17:
+	elif host.stage == 17 and host.current_location_id == "central_plaza":
 		actor(host, host.naruto_pos, NARUTO, Vector2.RIGHT, true, host.visual_clock, "Naruto", false)
 		actor(host, host.konohamaru_pos, KONOHAMARU, Vector2.RIGHT, true, host.visual_clock, "Konohamaru", false)
 		actor(host, host.ebisu_pos, EBISU, Vector2.LEFT, false, host.visual_clock, "Ebisu", false)
-	elif host.stage == 18:
+	elif host.stage == 18 and host.current_location_id == "academy":
 		actor(host, Vector2(360, 265), IRUKA, Vector2.DOWN, false, host.visual_clock, "Iruka", false)
 		actor(host, host.naruto_pos, NARUTO, Vector2.RIGHT, true, host.visual_clock, "Naruto", false)
 		actor(host, host.sasuke_pos, SASUKE, Vector2.LEFT, false, host.visual_clock, "Sasuke", false)
 		actor(host, host.sakura_pos, SAKURA, Vector2.UP, false, host.visual_clock, "Sakura", false)
 		marker(host, Vector2(360, 265), host.visual_clock)
-	elif host.stage == 19:
+	elif host.stage == 19 and host.current_location_id == "academy":
 		actor(host, host.naruto_pos, NARUTO, Vector2.RIGHT, false, host.visual_clock, "Naruto", false)
 		actor(host, host.sasuke_pos, SASUKE, Vector2.LEFT, false, host.visual_clock, "Sasuke", false)
 		actor(host, host.sakura_pos, SAKURA, Vector2.UP, false, host.visual_clock, "Sakura", false)
 		marker(host, host.sasuke_pos, host.visual_clock)
-	elif host.stage == 20 or host.stage == 21:
+	elif (host.stage == 20 or host.stage == 21) and host.current_location_id == "academy":
 		actor(host, Vector2(360, 265), IRUKA, Vector2.RIGHT, false, host.visual_clock, "Iruka", false)
 		actor(host, host.naruto_pos, NARUTO, Vector2.RIGHT, false, host.visual_clock, "Naruto", false)
 		actor(host, host.sasuke_pos, SASUKE, Vector2.LEFT, false, host.visual_clock, "Sasuke", false)
@@ -113,13 +113,13 @@ func render(host: Node2D) -> void:
 		marker(host, host.target, host.visual_clock)
 		if host.stage == 20:
 			host.draw_string(ThemeDB.fallback_font, host.target + Vector2(-16, 45), "%d / 3" % host.ep3_shuriken_hits, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("fcdfa2"))
-	elif host.stage == 22:
+	elif host.stage == 22 and host.current_location_id == "academy":
 		actor(host, host.naruto_pos, NARUTO, Vector2.RIGHT, false, host.visual_clock, "Naruto", false)
 		actor(host, host.sasuke_pos, SASUKE, Vector2.LEFT, false, host.visual_clock, "Sasuke", false)
 		actor(host, host.sakura_pos, SAKURA, Vector2.UP, false, host.visual_clock, "Sakura", false)
 		actor(host, host.kakashi_pos, KAKASHI, Vector2.LEFT, false, host.visual_clock, "Kakashi", false)
 		marker(host, host.kakashi_pos, host.visual_clock)
-	elif host.stage == 23:
+	elif host.stage == 23 and host.current_location_id == "academy":
 		actor(host, host.naruto_pos, NARUTO, Vector2.RIGHT, true, host.visual_clock, "Naruto", false)
 		actor(host, host.sasuke_pos, SASUKE, Vector2.RIGHT, true, host.visual_clock, "Sasuke", false)
 		actor(host, host.sakura_pos, SAKURA, Vector2.RIGHT, true, host.visual_clock, "Sakura", false)
@@ -190,26 +190,10 @@ func render(host: Node2D) -> void:
 		host.draw_string(ThemeDB.fallback_font, Vector2(566, 45), "1 TOMOE", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("e7c7b2"))
 	host.draw_rect(Rect2(610, 16, 166, 10), Color("314952"))
 	host.draw_rect(Rect2(612, 18, 162 * host.chakra / 100.0, 6), Color("66b8bd"))
-	var place := "CAMPO DE TREINO"
-	if host.stage == 2:
-		place = "KONOHA • PRAÇA"
-	elif host.stage == 3 or host.stage == 4:
+	var place := host.naruto_world.location_name(host.current_location_id)
+	if host.stage == 3 or host.stage == 4:
 		place = "FLORESTA • NOITE"
-	elif host.stage == 5 or host.stage == 6:
-		place = "KONOHA • CASA"
-	elif host.stage == 7:
-		place = "ACADEMIA • EP 1"
-	elif host.stage == 8:
-		place = "KONOHA • ALARME"
 	elif host.stage >= 9 and host.stage <= 12:
 		place = "FLORESTA • PERGAMINHO"
-	elif host.stage == 13:
-		place = "GABINETE • EP 2"
-	elif host.stage >= 14 and host.stage <= 17:
-		place = "KONOHA • EP 2"
-	elif host.stage >= 18 and host.stage <= 21:
-		place = "ACADEMIA • EP 3"
-	elif host.stage >= 22:
-		place = "KONOHA • TIME 7"
 	host.draw_string(ThemeDB.fallback_font, Vector2(790, 26), place, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("d6c89f"))
 	host.draw_rect(Rect2(0, 445, 960, 95), Color(0.045, 0.10, 0.15, 0.70))
