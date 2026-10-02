@@ -1,5 +1,7 @@
 extends RefCounted
 
+var user_assets = preload("res://scripts/user_asset_pack.gd").new()
+
 const HENRIQUE_SOURCE = preload("res://assets/characters/file_000000003c88820e930f366203f13d4e.png")
 const HENRIQUE_SCALE := 0.82
 var henrique_manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/characters/henrique-board-frames.json"))
@@ -145,26 +147,78 @@ func select_mugen_frame(action_name: String, clock: float) -> Dictionary:
 			break
 	return selected
 
+func _naruto_user_rects(action_name: String) -> Array:
+	var frames: Dictionary = {
+		"idle":[[31,0,39,98],[98,0,39,98],[167,0,39,98],[232,0,38,98]],
+		"walk":[[1,0,25,98],[78,0,44,98],[147,0,42,98],[209,0,47,98],[280,0,51,98]],
+		"run":[[1,0,49,98],[107,0,76,98],[198,0,70,98],[282,0,65,98],[355,0,18,98]],
+		"jump":[[30,0,132,123],[179,0,123,123],[319,0,56,123]],
+		"fall":[[1,0,44,123],[84,0,54,123],[158,0,29,123],[212,0,60,123],[300,0,24,123]],
+		"crouch":[[14,0,44,123],[100,0,150,123],[273,0,20,123]],
+		"punch_combo":[[20,0,52,94],[88,0,86,94],[193,0,45,94],[270,0,56,94],[354,0,60,94],[446,0,73,94],[553,0,48,94],[619,0,64,94]],
+		"kick":[[4,0,34,94],[83,0,83,94],[184,0,65,94],[280,0,79,94],[384,0,101,94],[501,0,78,94],[603,0,45,94]],
+		"kunai":[[20,0,61,75],[127,0,30,75],[215,0,28,75],[295,0,28,75],[391,0,28,75]],
+		"shuriken":[[2,0,30,75],[79,0,93,75],[206,0,29,75],[308,0,29,75],[408,0,29,75]],
+		"shadow_clone":[[20,0,58,83],[91,0,36,83],[140,0,85,83],[263,0,21,83],[334,0,22,83],[367,0,22,83],[404,0,107,83],[544,0,29,83],[603,0,30,83],[660,0,29,83]],
+		"substitution":[[12,0,35,83],[94,0,139,83],[241,0,22,83],[312,0,146,83]],
+		"rasengan_charge":[[14,0,199,105],[242,0,308,105],[562,0,15,105],[584,0,20,105]],
+		"rasengan_attack":[[1,0,23,105],[36,0,134,105],[180,0,186,105],[434,0,51,105],[515,0,62,105],[593,0,63,105],[676,0,87,105]],
+		"hurt":[[13,0,157,87],[182,0,78,87],[279,0,167,87]],
+		"down":[[1,0,178,87],[244,0,129,87],[385,0,25,87]],
+		"get_up":[[1,0,73,87],[83,0,21,87],[112,0,188,87],[319,0,14,87],[340,0,113,87]]
+	}
+	return frames.get(action_name, frames["idle"])
+
+func _draw_user_naruto_action(host: Node2D, at: Vector2, action_name: String) -> bool:
+	var resolved: String = action_name
+	if resolved == "attack":
+		resolved = "punch_combo"
+	elif resolved == "clone":
+		resolved = "shadow_clone"
+	elif resolved == "rasengan":
+		resolved = "rasengan_attack"
+	if not user_assets.has_asset("naruto_actions/%s.png" % resolved):
+		resolved = "idle" if action_name == "idle" else "run"
+	var texture: Texture2D = user_assets.naruto_action(resolved)
+	if texture == null:
+		return false
+	var rects: Array = _naruto_user_rects(resolved)
+	if rects.is_empty():
+		return false
+	var fps: float = 8.0 if resolved == "idle" else 11.0
+	var frame_index: int = int(float(host.visual_clock) * fps) % rects.size()
+	var data: Array = rects[frame_index]
+	var region := Rect2(float(data[0]), float(data[1]), float(data[2]), float(data[3]))
+	var max_size := Vector2(126, 108)
+	var scale_value: float = min(max_size.x / region.size.x, max_size.y / region.size.y)
+	var draw_size: Vector2 = region.size * scale_value
+	host.draw_texture_rect_region(texture, Rect2(at + Vector2(-draw_size.x / 2.0, -draw_size.y + 8.0), draw_size), region)
+	return true
+
 func draw_naruto_mugen(host: Node2D, at: Vector2, action_name: String = "run", scale_factor: float = 0.52) -> void:
 	host.draw_rect(Rect2(at + Vector2(-92, -138), Vector2(184, 158)), Color(0.035, 0.08, 0.11, 0.78))
 	host.draw_rect(Rect2(at + Vector2(-92, -138), Vector2(184, 4)), Color("d4a54f"))
 	host.draw_string(ThemeDB.fallback_font, at + Vector2(-78, -112), "NARUTO • BATALHA 2D", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("f6e4bc"))
 
-	# Prefer the researched internet fan-sprite pack when it has finished loading.
+	# First choice: frames cropped from the exact Naruto sheet supplied by the user.
+	if _draw_user_naruto_action(host, at, action_name):
+		host.draw_string(ThemeDB.fallback_font, at + Vector2(-78, 10), "SPRITE DA SUA IMAGEM", HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color("9ed4c9"))
+		return
+
+	# Secondary fallback: researched fan-sprite pack when available.
 	if host.external_sprites != null:
-		var external_action := "idle" if action_name == "idle" else "walk"
+		var external_action: String = "idle" if action_name == "idle" else "walk"
 		var external_texture: Texture2D = host.external_sprites.naruto_texture(external_action, host.visual_clock)
 		if external_texture != null:
-			var max_size := Vector2(118, 112)
-			var tex_size := external_texture.get_size()
+			var max_size: Vector2 = Vector2(118, 112)
+			var tex_size: Vector2 = external_texture.get_size()
 			var fit_scale: float = min(max_size.x / tex_size.x, max_size.y / tex_size.y)
-			var draw_size := tex_size * fit_scale
+			var draw_size: Vector2 = tex_size * fit_scale
 			host.draw_texture_rect(external_texture, Rect2(at + Vector2(-draw_size.x / 2.0, -draw_size.y + 8), draw_size), false)
-			host.draw_string(ThemeDB.fallback_font, at + Vector2(-78, 10), "FAN SPRITE • MIT", HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color("9ed4c9"))
 			return
 
-	# Offline fallback: bundled classic Naruto MUGEN frames already in the project.
-	var selected := select_mugen_frame(action_name, host.visual_clock)
+	# Final offline fallback: bundled MUGEN frames already in the project.
+	var selected: Dictionary = select_mugen_frame(action_name, host.visual_clock)
 	var texture: Texture2D = selected["texture"]
 	var axis: Array = selected["axis"]
 	var offset: Array = selected["offset"]
