@@ -23,14 +23,54 @@ const MIZUKI = preload("res://assets/art/mizuki.svg")
 const TARGET = preload("res://assets/art/target.svg")
 const KUNAI = preload("res://assets/art/kunai.svg")
 
+func _user_actor_key(texture: Texture2D) -> String:
+	if texture == NARUTO:
+		return "naruto"
+	if texture == SASUKE:
+		return "sasuke"
+	if texture == SAKURA:
+		return "sakura"
+	if texture == KAKASHI:
+		return "kakashi"
+	return ""
+
+func _draw_user_overworld_actor(host: Node2D, at: Vector2, key: String, direction: Vector2, moving: bool, clock: float, name_text: String, night: bool) -> bool:
+	var source: Texture2D = character_art.user_assets.overworld(key)
+	if source == null:
+		return false
+	var frame_width: float = float(source.get_width()) / 4.0
+	var frame_height: float = float(source.get_height())
+	var direction_index: int = 0
+	if direction.y < -0.4:
+		direction_index = 1
+	elif direction.x < -0.4:
+		direction_index = 2
+	elif direction.x > 0.4:
+		direction_index = 3
+	var bob: float = -2.0 if moving and int(clock * 9.0) % 2 == 1 else 0.0
+	var source_rect := Rect2(frame_width * float(direction_index), 0.0, frame_width, frame_height)
+	var target_height: float = 70.0
+	var scale_value: float = target_height / frame_height
+	var target_width: float = frame_width * scale_value
+	host.draw_set_transform(at + Vector2(0, 12), 0, Vector2(1, 0.3))
+	host.draw_circle(Vector2.ZERO, 17, Color(0.07, 0.13, 0.17, 0.38))
+	host.draw_set_transform(Vector2.ZERO)
+	var tint: Color = Color("b1bbd2") if night else Color.WHITE
+	host.draw_texture_rect_region(source, Rect2(at + Vector2(-target_width / 2.0, -64.0 + bob), Vector2(target_width, target_height)), source_rect, tint)
+	host.draw_string(ThemeDB.fallback_font, at + Vector2(-28, -78), name_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("f6e9c8"))
+	return true
+
 func actor(host: Node2D, at: Vector2, texture: Texture2D, direction: Vector2, moving: bool, clock: float, name_text: String, night: bool) -> void:
-	var frame := int(clock * 9.0) % 3 if moving else 0
-	var row := 0
+	var exact_key: String = _user_actor_key(texture)
+	if not exact_key.is_empty() and _draw_user_overworld_actor(host, at, exact_key, direction, moving, clock, name_text, night):
+		return
+	var frame: int = int(clock * 9.0) % 3 if moving else 0
+	var row: int = 0
 	if direction.y < -0.4:
 		row = 1
 	elif absf(direction.x) > 0.4:
 		row = 2
-	var bob := -2.0 if moving and frame == 1 else 0.0
+	var bob: float = -2.0 if moving and frame == 1 else 0.0
 	host.draw_set_transform(at + Vector2(0, 12), 0, Vector2(1, 0.3))
 	host.draw_circle(Vector2.ZERO, 17, Color(0.07, 0.13, 0.17, 0.38))
 	host.draw_set_transform(at + Vector2(0, bob), 0, Vector2(-1 if row == 2 and direction.x < 0 else 1, 1))
