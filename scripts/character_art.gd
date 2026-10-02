@@ -119,7 +119,38 @@ func current_henrique_action(host: Node2D) -> String:
 func henrique_frame(host: Node2D) -> int:
 	return frame_for_action(current_henrique_action(host), host.visual_clock)
 
+func _draw_user_henrique_overworld(host: Node2D) -> bool:
+	var texture: Texture2D = user_assets.overworld("henrique")
+	if texture == null:
+		return false
+	var frame_count: int = 4
+	var frame_width: float = float(texture.get_width()) / float(frame_count)
+	var frame_height: float = float(texture.get_height())
+	var frame_index: int = 0
+	if host.facing.y < -0.4:
+		frame_index = 1
+	elif host.facing.x < -0.4:
+		frame_index = 2
+	elif host.facing.x > 0.4:
+		frame_index = 3
+	var source_rect := Rect2(frame_width * float(frame_index), 0.0, frame_width, frame_height)
+	var target_height: float = 72.0
+	var target_width: float = frame_width * (target_height / frame_height)
+	var bob: float = -2.0 if host.movement != Vector2.ZERO and int(float(host.visual_clock) * 9.0) % 2 == 1 else 0.0
+	shadow(host, host.player)
+	host.draw_texture_rect_region(
+		texture,
+		Rect2(host.player + Vector2(-target_width / 2.0, -64.0 + bob), Vector2(target_width, target_height)),
+		source_rect,
+		Color("b7c1d8") if host.stage >= 8 and host.stage <= 12 else Color.WHITE
+	)
+	host.draw_string(ThemeDB.fallback_font, host.player + Vector2(-28, -90), "Henrique", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
+	return true
+
 func draw_henrique(host: Node2D) -> void:
+	# Normal exploration now uses the exact Henrique overworld strip cropped from the latest image.
+	if host.action_state == "" and host.attack_flash <= 0.0 and _draw_user_henrique_overworld(host):
+		return
 	var frame_id := henrique_frame(host)
 	var texture := _henrique_frame_texture(frame_id)
 	if texture == null:
