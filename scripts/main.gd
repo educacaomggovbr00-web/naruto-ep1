@@ -21,6 +21,9 @@ var dialogue: Button
 var restart: Button
 var progress_button: Button
 var progress_panel: Panel
+var map_button: Button
+var map_panel: Panel
+var map_title: Label
 var progress_text: RichTextLabel
 var techniques_button: Button
 var techniques_panel: Panel
@@ -58,6 +61,7 @@ var kakashi_pos := Vector2(785, 250)
 var ep3_shuriken_hits := 0
 var ep3_substitution_done := false
 var ep3_sasuke_resolved := false
+var current_location_id := "academy"
 const OBJECTIVES := [
 	"TREINO • Acerte 3 vezes o alvo com kunai (J / botão KUNAI).",
 	"CHAKRA • Use Katon perto do alvo (K / botão KATON).",
@@ -92,6 +96,7 @@ func _ready() -> void:
 	add_child(background)
 	background.z_index = -1
 	background.set_area(stage)
+	background.set_location(naruto_world.location(current_location_id))
 	var layer := CanvasLayer.new()
 	add_child(layer)
 	hud = Label.new()
@@ -163,6 +168,44 @@ func _ready() -> void:
 		tech.pressed.connect(func(): use_technique(tech_action))
 		style_button(tech)
 		techniques_panel.add_child(tech)
+
+	map_button = Button.new()
+	map_button.text = "MAPA"
+	map_button.position = Vector2(840, 88)
+	map_button.size = Vector2(105, 42)
+	map_button.pressed.connect(toggle_konoha_map)
+	style_button(map_button)
+	layer.add_child(map_button)
+
+	map_panel = Panel.new()
+	map_panel.position = Vector2(60, 74)
+	map_panel.size = Vector2(840, 362)
+	map_panel.visible = false
+	var map_style := StyleBoxFlat.new()
+	map_style.bg_color = Color("10232d")
+	map_style.border_color = Color("6d8788")
+	map_style.set_border_width_all(3)
+	map_style.set_corner_radius_all(8)
+	map_panel.add_theme_stylebox_override("panel", map_style)
+	layer.add_child(map_panel)
+
+	map_title = Label.new()
+	map_title.position = Vector2(18, 10)
+	map_title.size = Vector2(790, 28)
+	map_title.add_theme_font_size_override("font_size", 18)
+	map_title.add_theme_color_override("font_color", Color("f3dfb4"))
+	map_panel.add_child(map_title)
+
+	for info in naruto_world.all_konoha_locations():
+		var place_button := Button.new()
+		place_button.text = String(info["short"])
+		place_button.position = Vector2(18 + int(info["x"]) * 160, 44 + int(info["y"]) * 49)
+		place_button.size = Vector2(150, 42)
+		place_button.add_theme_font_size_override("font_size", 11)
+		var place_id: String = String(info["id"])
+		place_button.pressed.connect(func(): travel_to_location(place_id))
+		style_button(place_button)
+		map_panel.add_child(place_button)
 
 	progress_button = Button.new()
 	progress_button.text = "PROGRESSO"
@@ -243,6 +286,8 @@ func begin_episode_1() -> void:
 	episode_1_started = true
 	story_era = 1
 	stage = 7
+	current_location_id = "academy"
+	background.set_location(naruto_world.location(current_location_id))
 	player = Vector2(185, 270)
 	naruto_pos = Vector2(620, 265)
 	naruto_action = "idle"
@@ -253,6 +298,8 @@ func begin_episode_2() -> void:
 	episode_2_started = true
 	current_episode = 2
 	stage = 13
+	current_location_id = "hokage_residence"
+	background.set_location(naruto_world.location(current_location_id))
 	player = Vector2(210, 280)
 	naruto_pos = Vector2(610, 270)
 	konohamaru_pos = Vector2(700, 280)
@@ -266,6 +313,8 @@ func begin_episode_3() -> void:
 	episode_3_started = true
 	current_episode = 3
 	stage = 18
+	current_location_id = "academy"
+	background.set_location(naruto_world.location(current_location_id))
 	player = Vector2(180, 285)
 	naruto_pos = Vector2(425, 270)
 	sasuke_pos = Vector2(600, 250)
@@ -307,6 +356,7 @@ func down(action: String, key: Key, alternate: Key = KEY_NONE) -> bool:
 func _process(delta: float) -> void:
 	visual_clock += delta
 	background.set_area(stage)
+	background.set_location(naruto_world.location(current_location_id))
 	cooldown = maxf(0.0, cooldown - delta)
 	attack_flash = maxf(0.0, attack_flash - delta)
 	naruto_battle_flash = maxf(0.0, naruto_battle_flash - delta)
@@ -328,7 +378,7 @@ func _process(delta: float) -> void:
 		naruto_action = "run" if lines.is_empty() else "idle"
 	elif stage >= 11:
 		naruto_action = "idle"
-	if lines.is_empty() and stage < 23 and not progress_panel.visible and action_timer <= 0.0:
+	if lines.is_empty() and stage < 23 and not progress_panel.visible and not map_panel.visible and action_timer <= 0.0:
 		movement = Vector2(float(down("right", KEY_D, KEY_RIGHT)) - float(down("left", KEY_A, KEY_LEFT)), float(down("down", KEY_S, KEY_DOWN)) - float(down("up", KEY_W, KEY_UP))).normalized()
 		if movement != Vector2.ZERO:
 			facing = movement
@@ -336,6 +386,15 @@ func _process(delta: float) -> void:
 		sprinting = down("run", KEY_R) and not sneaking
 		var previous_position := player
 		player += movement * (95.0 if sneaking else 240.0 if sprinting else 180.0) * delta
+		if can_roam_konoha():
+			if player.x < 26.0 and movement.x < 0.0:
+				change_to_neighbor("west", Vector2(910, player.y))
+			elif player.x > 934.0 and movement.x > 0.0:
+				change_to_neighbor("east", Vector2(50, player.y))
+			elif player.y < 104.0 and movement.y < 0.0:
+				change_to_neighbor("north", Vector2(player.x, 360))
+			elif player.y > 382.0 and movement.y > 0.0:
+				change_to_neighbor("south", Vector2(player.x, 120))
 		if stage == 2 or stage == 5 or stage == 7 or stage == 8 or (stage >= 13 and stage <= 16) or (stage >= 18 and stage <= 23):
 			for house_rect in [Rect2(36, 91, 152, 130), Rect2(268, 85, 152, 130), Rect2(460, 91, 152, 130), Rect2(714, 82, 152, 130)]:
 				if house_rect.grow(8).has_point(player):
@@ -343,6 +402,8 @@ func _process(delta: float) -> void:
 		player = player.clamp(Vector2(35, 110), Vector2(925, 375))
 		if stage == 8 and player.distance_to(Vector2(885, 275)) < 55:
 			stage = 9
+			current_location_id = "village_gate"
+			background.set_location(naruto_world.location(current_location_id))
 			player = Vector2(170, 275)
 			naruto_pos = Vector2(520, 275)
 			mizuki = Vector2(760, 255)
@@ -365,7 +426,7 @@ func _process(delta: float) -> void:
 					say(["Henrique: Ele sumiu entre as árvores...", "Há uma kunai no chão. Será que ele deixou cair?"])
 	var eye_status := "SHARINGAN 1T" if sharingan_awakened else "OLHOS NORMAIS"
 	hud.text = "HENRIQUE • NV %d • %d RYO     | CHAKRA %d | %s" % [rpg.level, rpg.ryo, int(chakra), eye_status]
-	objective.text = OBJECTIVES[stage]
+	objective.text = OBJECTIVES[stage] + "   •   " + naruto_world.location_name(current_location_id)
 	if stage == 3:
 		objective.text += "  %d%%" % int(trail_progress / 12 * 100)
 	elif stage == 10:
@@ -373,7 +434,7 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func act(action: String) -> void:
-	if progress_panel.visible:
+	if progress_panel.visible or map_panel.visible:
 		return
 	if not lines.is_empty():
 		if action == "interact": next_line()
@@ -517,6 +578,8 @@ func act(action: String) -> void:
 			say(["Depois da luta, Iruka reconhece o esforço de Naruto e entrega a ele sua própria bandana da Folha.", "Naruto finalmente consegue o símbolo de que tanto precisava: agora pode começar seu caminho como ninja.", "Henrique observa em silêncio, ainda pensando no Sharingan recém-desperto e nas intenções de Mizuki.", "NARUTO EP 1 CONCLUÍDO — adaptação jogável de fã pelo ponto de vista de Henrique Uchiha.", "Próximo: EP 2 — Konohamaru e os primeiros passos de Naruto como ninja."])
 		elif stage == 13 and player.distance_to(naruto_pos) < 120:
 			stage = 14
+			current_location_id = "central_plaza"
+			background.set_location(naruto_world.location(current_location_id))
 			say(["Naruto termina seu registro e, no caminho de volta, tromba com Konohamaru.", "Konohamaru: Você não vai ficar me tratando diferente só porque eu sou neto do Hokage?", "Naruto: Por que eu faria isso?", "Konohamaru fica impressionado e começa a seguir Naruto pela vila.", "Henrique: Pronto. Agora ele arrumou um mini-Naruto."])
 		elif stage == 14 and player.distance_to(konohamaru_pos) < 115:
 			stage = 15
@@ -558,7 +621,41 @@ func check_ep2_training() -> void:
 		ebisu_pos = Vector2(800, 265)
 		say(["Konohamaru tenta copiar os movimentos, tropeça e levanta rápido como se nada tivesse acontecido.", "Naruto ri, mas admite que o garoto tem coragem.", "Uma voz irritada interrompe o treino: Ebisu finalmente encontrou Konohamaru.", "Objetivo: fale com Ebisu."])
 
+func can_roam_konoha() -> bool:
+	return not (stage >= 9 and stage <= 12) and lines.is_empty()
+
+func change_to_neighbor(direction: String, spawn: Vector2) -> void:
+	var next_id := naruto_world.neighbor(current_location_id, direction)
+	if next_id.is_empty():
+		player = player.clamp(Vector2(35, 110), Vector2(925, 375))
+		return
+	current_location_id = next_id
+	player = spawn.clamp(Vector2(35, 110), Vector2(925, 375))
+	background.set_location(naruto_world.location(current_location_id))
+
+func toggle_konoha_map() -> void:
+	if progress_panel.visible:
+		progress_panel.hide()
+	if techniques_panel.visible:
+		techniques_panel.hide()
+	map_panel.visible = not map_panel.visible
+	if map_panel.visible:
+		held.clear()
+		movement = Vector2.ZERO
+		map_title.text = "KONOHA • %s  |  30 ÁREAS CONECTADAS" % naruto_world.location_name(current_location_id)
+
+func travel_to_location(id: String) -> void:
+	if stage >= 9 and stage <= 12:
+		map_title.text = "Viagem bloqueada durante o incidente do Pergaminho dos Selos."
+		return
+	current_location_id = id
+	player = Vector2(480, 300)
+	background.set_location(naruto_world.location(current_location_id))
+	map_panel.hide()
+
 func toggle_techniques() -> void:
+	if map_panel.visible:
+		map_panel.hide()
 	if progress_panel.visible:
 		progress_panel.hide()
 	techniques_panel.visible = not techniques_panel.visible
@@ -568,6 +665,8 @@ func use_technique(action: String) -> void:
 	act(action)
 
 func toggle_progression() -> void:
+	if map_panel.visible:
+		map_panel.hide()
 	if techniques_panel.visible:
 		techniques_panel.hide()
 	progress_panel.visible = not progress_panel.visible
