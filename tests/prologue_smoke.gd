@@ -141,7 +141,69 @@ func run_checks() -> void:
 	assert(game.rpg.completed_missions.has("episode3_real_evaluation"), "Episode 3 must record the completed evaluation mission")
 	assert(game.rpg.total_xp > 0, "Real progression must record earned total XP")
 	close_dialogue(game)
-	assert(game.restart.visible, "Episode 3 ending must expose replay")
+	assert(game.stage == 24 and game.episode_4_started, "Episode 3 must flow into the survival-test arc")
+
+	# Episodes 4-5: Team 7 survival test stays canon-focused while Henrique earns a parallel result.
+	close_dialogue(game)
+	game.player = game.kakashi_pos
+	game.act("interact")
+	assert(game.stage == 25, "Kakashi must start the survival test")
+	close_dialogue(game)
+
+	game.player = game.kakashi_pos - Vector2(90, 0)
+	game.facing = Vector2.RIGHT
+	game.cooldown = 0.0
+	game.action_timer = 0.0
+	game.action_state = ""
+	game.act("dodge")
+	assert(game.stage == 26 and game.ep4_dodge_done, "A real dodge near Kakashi must advance the parallel test")
+	close_dialogue(game)
+
+	game.player = game.target - Vector2(80, 0)
+	game.facing = Vector2.RIGHT
+	game.cooldown = 0.0
+	game.action_timer = 0.0
+	game.action_state = ""
+	game.chakra = 100
+	game.act("substitution")
+	assert(game.stage == 27 and game.ep4_substitution_done, "Substitution at the bell target must advance the test")
+	close_dialogue(game)
+
+	for i in range(2):
+		game.player = game.target - Vector2(100, 0)
+		game.facing = Vector2.RIGHT
+		game.cooldown = 0.0
+		game.action_timer = 0.0
+		game.action_state = ""
+		game.act("shuriken")
+	assert(game.stage == 28 and game.ep4_bell_hits >= 2, "Two real shuriken hits must finish the mechanical test")
+	close_dialogue(game)
+	game.player = game.kakashi_pos
+	game.act("interact")
+	assert(game.rpg.completed_missions.has("survival_test_parallel"), "Survival-test result must be recorded")
+	close_dialogue(game)
+	assert(game.stage == 29 and game.episode_6_started, "Survival-test conclusion must flow into the first C-rank mission")
+
+	# Episode 6: Hiruzen assigns the escort mission, Tazuna joins, and the group leaves Konoha.
+	close_dialogue(game)
+	game.player = game.hiruzen_pos
+	game.act("interact")
+	assert(game.stage == 30, "Hiruzen must brief the first C-rank mission")
+	close_dialogue(game)
+	game.player = game.tazuna_pos
+	game.act("interact")
+	assert(game.stage == 31 and game.current_location_id == "village_gate", "Talking to Tazuna must move the group to the village gate")
+	close_dialogue(game)
+	game.player = game.kakashi_pos
+	game.act("interact")
+	assert(game.stage == 32, "Talking to Kakashi at the gate must start the departure")
+	close_dialogue(game)
+	game.player = Vector2(875, 300)
+	game._process(0.1)
+	assert(game.stage == 33, "Walking down the outside road must complete the departure from Konoha")
+	assert(game.rpg.completed_missions.has("leave_konoha_land_of_waves"), "Leaving Konoha must be recorded as a real mission milestone")
+	close_dialogue(game)
+	assert(game.restart.visible, "Departure ending must expose replay")
 
 	# Every requested basic/classic action must resolve through the animation manifest.
 	var required_actions := [
@@ -163,6 +225,8 @@ func run_checks() -> void:
 	assert(game.art.KONOHAMARU.get_width() == 216, "Konohamaru overworld atlas must load")
 	assert(game.art.EBISU.get_width() == 216, "Ebisu overworld atlas must load")
 	assert(game.art.KAKASHI.get_width() == 216, "Kakashi overworld atlas must load")
+	assert(game.art.HIRUZEN.get_width() == 216, "Hiruzen overworld atlas must load")
+	assert(game.art.TAZUNA.get_width() == 216, "Tazuna overworld atlas must load")
 
 	# Exercise action effects without requiring combat targets.
 	game.stage = 15
@@ -177,7 +241,7 @@ func run_checks() -> void:
 	game.act("substitution")
 	assert(game.action_state == "substitution" and game.substitution_flash > 0.0, "Substitution animation/effect must trigger")
 
-	print("PASS: Episodes 1-3, 30-zone Konoha overworld, real progression, Team 7 cast and Henrique animation catalog")
+	print("PASS: Episodes 1-6, survival test, Team 7 departure, 30-zone Konoha and real Henrique progression")
 	game.queue_free()
 	await process_frame
 	quit()
