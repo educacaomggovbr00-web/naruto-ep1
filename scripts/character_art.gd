@@ -70,13 +70,28 @@ func select_mugen_frame(action_name: String, clock: float) -> Dictionary:
 	return selected
 
 func draw_naruto_mugen(host: Node2D, at: Vector2, action_name: String = "run", scale_factor: float = 0.52) -> void:
+	host.draw_rect(Rect2(at + Vector2(-92, -138), Vector2(184, 158)), Color(0.035, 0.08, 0.11, 0.78))
+	host.draw_rect(Rect2(at + Vector2(-92, -138), Vector2(184, 4)), Color("d4a54f"))
+	host.draw_string(ThemeDB.fallback_font, at + Vector2(-78, -112), "NARUTO • BATALHA 2D", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("f6e4bc"))
+
+	# Prefer the researched internet fan-sprite pack when it has finished loading.
+	if host.external_sprites != null:
+		var external_action := "idle" if action_name == "idle" else "walk"
+		var external_texture: Texture2D = host.external_sprites.naruto_texture(external_action, host.visual_clock)
+		if external_texture != null:
+			var max_size := Vector2(118, 112)
+			var tex_size := external_texture.get_size()
+			var fit_scale: float = min(max_size.x / tex_size.x, max_size.y / tex_size.y)
+			var draw_size := tex_size * fit_scale
+			host.draw_texture_rect(external_texture, Rect2(at + Vector2(-draw_size.x / 2.0, -draw_size.y + 8), draw_size), false)
+			host.draw_string(ThemeDB.fallback_font, at + Vector2(-78, 10), "FAN SPRITE • MIT", HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color("9ed4c9"))
+			return
+
+	# Offline fallback: bundled classic Naruto MUGEN frames already in the project.
 	var selected := select_mugen_frame(action_name, host.visual_clock)
 	var texture: Texture2D = selected["texture"]
 	var axis: Array = selected["axis"]
 	var offset: Array = selected["offset"]
-	host.draw_rect(Rect2(at + Vector2(-92, -138), Vector2(184, 158)), Color(0.035, 0.08, 0.11, 0.78))
-	host.draw_rect(Rect2(at + Vector2(-92, -138), Vector2(184, 4)), Color("d4a54f"))
-	host.draw_string(ThemeDB.fallback_font, at + Vector2(-78, -112), "NARUTO • BATALHA 2D", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("f6e4bc"))
 	host.draw_set_transform(at + Vector2(0, 12), 0, Vector2(1, 1))
 	host.draw_texture_rect(texture, Rect2(Vector2((offset[0] - axis[0]) * scale_factor, (offset[1] - axis[1]) * scale_factor), texture.get_size() * scale_factor), false)
 	host.draw_set_transform(Vector2.ZERO)
