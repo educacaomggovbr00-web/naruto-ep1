@@ -97,3 +97,14 @@ Além de KUNAI, KATON e AÇÃO, existe um botão TÉCNICAS para celular. Ele exp
 - substituição
 
 O manifesto também registra estados de dano, queda, levantar e morte básica, além das animações avançadas já guardadas para fases futuras. O atlas transparente atual tem 24 poses e reutiliza algumas delas para representar ações adicionais até que cada pose da folha visual enviada seja exportada como frame transparente individual.
+
+
+## Sprites pesquisados na internet
+
+Foi adicionado um pacote opcional de sprites 2D fan-made do Naruto vindo do projeto público `vikas0304/vscode-anime`. O repositório usa licença MIT e informa no README que a arte de sprites da versão inicial foi gerada com IA.
+
+O jogo tenta carregar e armazenar em cache `idle_1`, `idle_2` e `walk_1..4` em `user://external_sprites/`. Se o aparelho estiver sem internet ou o download falhar, a apresentação de batalha volta automaticamente para os quadros MUGEN já incluídos no projeto.
+
+Outros packs JUS/NZC/MUGEN encontrados durante a pesquisa foram usados somente como referência visual quando não havia uma licença de redistribuição clara.
+
+Consulte `assets/external/CREDITS.md` e `assets/external/naruto_fan_sources.json`.
