@@ -213,6 +213,18 @@ func _ready() -> void:
 	map_title.add_theme_color_override("font_color", Color("f3dfb4"))
 	map_panel.add_child(map_title)
 
+	var exact_map_texture: Texture2D = art.character_art.user_assets.world("konoha_map")
+	if exact_map_texture != null:
+		var exact_map_preview := TextureRect.new()
+		exact_map_preview.position = Vector2(12, 42)
+		exact_map_preview.size = Vector2(816, 300)
+		exact_map_preview.texture = exact_map_texture
+		exact_map_preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		exact_map_preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		exact_map_preview.modulate = Color(1, 1, 1, 0.28)
+		exact_map_preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		map_panel.add_child(exact_map_preview)
+
 	for info in naruto_world.all_konoha_locations():
 		var place_button := Button.new()
 		place_button.text = String(info["short"])
@@ -255,10 +267,27 @@ func _ready() -> void:
 	progress_text.bbcode_enabled = true
 	progress_text.fit_content = false
 	progress_text.position = Vector2(24, 58)
-	progress_text.size = Vector2(672, 254)
-	progress_text.add_theme_font_size_override("normal_font_size", 16)
+	progress_text.size = Vector2(470, 254)
+	progress_text.add_theme_font_size_override("normal_font_size", 15)
 	progress_text.add_theme_color_override("default_color", Color("dbe4e6"))
 	progress_panel.add_child(progress_text)
+
+	var exact_items_texture: Texture2D = art.character_art.user_assets.world("items_ui")
+	if exact_items_texture != null:
+		var exact_items_preview := TextureRect.new()
+		exact_items_preview.position = Vector2(505, 60)
+		exact_items_preview.size = Vector2(185, 238)
+		exact_items_preview.texture = exact_items_texture
+		exact_items_preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		exact_items_preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		exact_items_preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		progress_panel.add_child(exact_items_preview)
+		var exact_label := Label.new()
+		exact_label.text = "ITENS • SUA IMAGEM"
+		exact_label.position = Vector2(516, 292)
+		exact_label.add_theme_font_size_override("font_size", 11)
+		exact_label.add_theme_color_override("font_color", Color("9ed4c9"))
+		progress_panel.add_child(exact_label)
 
 	var close_progress := Button.new()
 	close_progress.text = "FECHAR"
