@@ -51,6 +51,13 @@ var konohamaru_pos := Vector2(690, 275)
 var ebisu_pos := Vector2(790, 260)
 var ep2_dodge_done := false
 var ep2_punch_done := false
+var episode_3_started := false
+var sasuke_pos := Vector2(610, 255)
+var sakura_pos := Vector2(520, 290)
+var kakashi_pos := Vector2(785, 250)
+var ep3_shuriken_hits := 0
+var ep3_substitution_done := false
+var ep3_sasuke_resolved := false
 const OBJECTIVES := [
 	"TREINO • Acerte 3 vezes o alvo com kunai (J / botão KUNAI).",
 	"CHAKRA • Use Katon perto do alvo (K / botão KATON).",
@@ -69,7 +76,13 @@ const OBJECTIVES := [
 	"KONOHAMARU • Fale com o garoto que começou a seguir Naruto.",
 	"TREINO • Mostre uma ESQUIVA e um SOCO perto de Konohamaru.",
 	"EBISU • Fale com Ebisu depois do pequeno treino.",
-	"EP 2 CONCLUÍDO • Konohamaru decide que vai treinar para ser reconhecido."
+	"EP 2 CONCLUÍDO • Konohamaru decide que vai treinar para ser reconhecido.",
+	"EP 3 • Volte à Academia para a formação dos times.",
+	"TIME 7 • Fale com Sasuke. Você decide se provoca ou só observa.",
+	"AVALIAÇÃO • Acerte 3 shuriken no alvo. Só acerto conta como progresso.",
+	"KAWARIMI • Execute Substituição perto do alvo para concluir sua avaliação.",
+	"KAKASHI • Fale com o jōnin que chegou para buscar o Time 7.",
+	"EP 3 CONCLUÍDO • Henrique conquista seu avanço por ações comprovadas."
 ]
 
 func _ready() -> void:
@@ -220,6 +233,8 @@ func next_line() -> void:
 		elif stage == 12:
 			begin_episode_2()
 		elif stage == 17:
+			begin_episode_3()
+		elif stage == 23:
 			restart.show()
 	else:
 		dialogue.text = lines[line_index] + "\n[Toque para continuar]"
@@ -246,6 +261,22 @@ func begin_episode_2() -> void:
 	ep2_punch_done = false
 	restart.hide()
 	say(["NARUTO CLÁSSICO • EP 2 — KONOHAMARU", "Depois de finalmente se formar, Naruto vai cuidar do registro ninja e cruza com Konohamaru, neto do Terceiro Hokage.", "Konohamaru percebe que Naruto não o trata como alguém especial só por causa da família e começa a segui-lo.", "Henrique encontra os dois na praça e resolve ver no que isso vai dar."])
+
+func begin_episode_3() -> void:
+	episode_3_started = true
+	current_episode = 3
+	stage = 18
+	player = Vector2(180, 285)
+	naruto_pos = Vector2(425, 270)
+	sasuke_pos = Vector2(600, 250)
+	sakura_pos = Vector2(520, 305)
+	kakashi_pos = Vector2(790, 250)
+	target = Vector2(760, 315)
+	ep3_shuriken_hits = 0
+	ep3_substitution_done = false
+	ep3_sasuke_resolved = false
+	restart.hide()
+	say(["NARUTO CLÁSSICO • EP 3 — SASUKE E SAKURA", "Os recém-formados voltam à Academia para descobrir suas equipes. Naruto acaba no Time 7 ao lado de Sakura e Sasuke.", "Henrique não recebe promoção de graça: Iruka mantém sua avaliação aberta. Se ele quiser avançar, vai precisar provar precisão e controle na prática.", "Henrique: Melhor assim. Um título que vem sem teste não vale muita coisa."])
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
@@ -297,7 +328,7 @@ func _process(delta: float) -> void:
 		naruto_action = "run" if lines.is_empty() else "idle"
 	elif stage >= 11:
 		naruto_action = "idle"
-	if lines.is_empty() and stage < 17 and not progress_panel.visible and action_timer <= 0.0:
+	if lines.is_empty() and stage < 23 and not progress_panel.visible and action_timer <= 0.0:
 		movement = Vector2(float(down("right", KEY_D, KEY_RIGHT)) - float(down("left", KEY_A, KEY_LEFT)), float(down("down", KEY_S, KEY_DOWN)) - float(down("up", KEY_W, KEY_UP))).normalized()
 		if movement != Vector2.ZERO:
 			facing = movement
@@ -305,7 +336,7 @@ func _process(delta: float) -> void:
 		sprinting = down("run", KEY_R) and not sneaking
 		var previous_position := player
 		player += movement * (95.0 if sneaking else 240.0 if sprinting else 180.0) * delta
-		if stage == 2 or stage == 5 or stage == 7 or stage == 8 or (stage >= 13 and stage <= 16):
+		if stage == 2 or stage == 5 or stage == 7 or stage == 8 or (stage >= 13 and stage <= 16) or (stage >= 18 and stage <= 23):
 			for house_rect in [Rect2(36, 91, 152, 130), Rect2(268, 85, 152, 130), Rect2(460, 91, 152, 130), Rect2(714, 82, 152, 130)]:
 				if house_rect.grow(8).has_point(player):
 					player = previous_position
@@ -347,12 +378,23 @@ func act(action: String) -> void:
 	if not lines.is_empty():
 		if action == "interact": next_line()
 		return
-	if stage == 17: return
+	if stage == 23: return
 	if action == "punch" and cooldown <= 0:
 		cooldown = 0.35
 		start_action("punch_combo", 0.48)
+		if stage == 19 and player.distance_to(sasuke_pos) < 145:
+			rpg.register_personality_choice("initiative")
+			rpg.register_success("punch")
+			ep3_sasuke_resolved = true
+			stage = 20
+			target = Vector2(760, 315)
+			if int(rpg.inventory.get("shuriken", 0)) < 3:
+				rpg.inventory["shuriken"] = 3
+			say(["Henrique dá um golpe de teste; Sasuke recua antes do impacto completo.", "Sasuke: Era isso?", "Henrique: Era pra ver se você estava acordado.", "Iruka corta a provocação antes que vire luta.", "Iruka: Se vocês querem provar alguma coisa, façam isso numa avaliação. Henrique: três shuriken no alvo. Só acerto vale."])
+			return
 		if stage == 15 and player.distance_to(konohamaru_pos) < 150:
 			ep2_punch_done = true
+			rpg.register_success("punch")
 			check_ep2_training()
 		return
 	if action == "shuriken" and cooldown <= 0 and rpg.consume_item("shuriken"):
@@ -362,6 +404,13 @@ func act(action: String) -> void:
 		effect_origin = player
 		effect_direction = facing
 		start_action("shuriken_throw", 0.45)
+		if stage == 20 and player.distance_to(target) < 180 and facing.dot((target - player).normalized()) > 0.35:
+			ep3_shuriken_hits += 1
+			rpg.register_success("shuriken")
+			if ep3_shuriken_hits >= 3:
+				rpg.award_milestone("ep3_shuriken_accuracy", 25)
+				stage = 21
+				say(["O terceiro shuriken acerta o centro do alvo.", "Iruka: Três acertos válidos. Isso eu posso registrar.", "Henrique: Finalmente um número que significa alguma coisa.", "Próximo teste: execute Substituição perto do alvo."])
 		return
 	if action == "dodge" and cooldown <= 0:
 		cooldown = 0.45
@@ -369,6 +418,7 @@ func act(action: String) -> void:
 		player = (player + facing * 58.0).clamp(Vector2(35, 110), Vector2(925, 375))
 		if stage == 15 and player.distance_to(konohamaru_pos) < 180:
 			ep2_dodge_done = true
+			rpg.register_success("dodge")
 			check_ep2_training()
 		return
 	if action == "crouch" and cooldown <= 0:
@@ -396,6 +446,13 @@ func act(action: String) -> void:
 		substitution_flash = 0.8
 		start_action("substitution", 0.70)
 		player = (player - facing * 45.0).clamp(Vector2(35, 110), Vector2(925, 375))
+		if stage == 21 and player.distance_to(target) < 190:
+			ep3_substitution_done = true
+			rpg.register_success("substitution")
+			rpg.award_milestone("ep3_substitution_control", 30)
+			stage = 22
+			rpg.mission_rank = "Genin"
+			say(["O tronco aparece no ponto onde Henrique estava um instante antes.", "Iruka confere a execução antes de anotar o resultado.", "Iruka: Precisão e controle aprovados. Agora sim: você avançou por mérito próprio.", "Henrique: Ótimo. Então essa bandana não é decoração.", "Nesse momento, um jōnin de cabelo prateado finalmente aparece para buscar Naruto, Sasuke e Sakura."])
 		return
 	if action == "kunai" and cooldown <= 0:
 		cooldown = 0.4
@@ -411,6 +468,7 @@ func act(action: String) -> void:
 				say(["Henrique: Três acertos! Agora vou tentar o Katon."])
 		elif stage == 10 and player.distance_to(mizuki) < 170 and facing.dot((mizuki - player).normalized()) > 0.2:
 			mizuki_hits += 1
+			rpg.register_success("kunai")
 			if mizuki_hits >= 3:
 				stage = 11
 				naruto_battle_flash = 1.7
@@ -467,6 +525,25 @@ func act(action: String) -> void:
 			stage = 17
 			rpg.complete_mission("konohamaru_first_meeting", 70, 30)
 			say(["Ebisu chega procurando Konohamaru e encontra Naruto, Henrique e o garoto no meio do treino.", "Depois da discussão, Konohamaru percebe que ser reconhecido não é algo que se consegue apenas usando o nome do avô.", "Naruto segue seu caminho com uma nova sombra pequena correndo atrás dele.", "Henrique: Essa vila só fica mais estranha a cada dia.", "NARUTO EP 2 CONCLUÍDO — próximo passo: formação dos times e a apresentação do Time 7."])
+		elif stage == 18 and player.distance_to(Vector2(360, 265)) < 125:
+			rpg.register_social_interaction()
+			stage = 19
+			say(["Iruka termina de anunciar as equipes. Naruto, Sakura e Sasuke formam o Time 7.", "Naruto olha para Sasuke como se a sala tivesse acabado de declarar guerra.", "Henrique: Três pessoas que não conseguem ficar cinco minutos em silêncio. Vai dar muito certo.", "Iruka: Henrique, sua avaliação ainda está aberta. Antes disso, fale com Sasuke e depois venha para o alvo."])
+		elif stage == 19 and player.distance_to(sasuke_pos) < 120:
+			rpg.register_social_interaction()
+			rpg.register_personality_choice("restraint")
+			ep3_sasuke_resolved = true
+			stage = 20
+			target = Vector2(760, 315)
+			if int(rpg.inventory.get("shuriken", 0)) < 3:
+				rpg.inventory["shuriken"] = 3
+			say(["Sasuke: Você ficou olhando desde que anunciaram os times.", "Henrique: Estou tentando descobrir qual de vocês três vai irritar o Kakashi primeiro.", "Sasuke: Hn.", "Henrique não compra briga. A rivalidade existe, mas ele prefere medir alguém pelo que faz, não pelo sobrenome.", "Iruka chama Henrique para a avaliação: três acertos de shuriken no alvo. Erro não conta."])
+		elif stage == 22 and player.distance_to(kakashi_pos) < 130:
+			rpg.register_social_interaction()
+			stage = 23
+			rpg.complete_mission("episode3_real_evaluation", 80, 40)
+			rpg.award_milestone("earned_genin_rank", 50)
+			say(["Kakashi observa a ficha de Henrique antes de olhar para o Time 7.", "Kakashi: Então você passou na avaliação complementar.", "Henrique: Passei no que fizeram eu executar. O resto eu ainda não provei.", "Kakashi: Uma resposta menos comum do que parece.", "Naruto reclama da demora; Sakura manda Naruto parar; Sasuke continua com a mesma cara de sempre.", "Henrique: É. Definitivamente vão irritar o professor rápido.", "NARUTO EP 3 CONCLUÍDO — Henrique agora é Genin por testes concluídos no gameplay. Próximo: o teste de sobrevivência do Time 7."])
 
 func start_action(name: String, duration: float) -> void:
 	if not art.character_art.henrique_actions.has(name):
@@ -504,19 +581,28 @@ func refresh_progression() -> void:
 	var story_percent := int(clampf(float(stage - 7) / 5.0, 0.0, 1.0) * 100.0)
 	if stage == 12:
 		chapter = "NARUTO CLÁSSICO • EP 1 CONCLUÍDO"
-	elif stage >= 13:
+	elif stage >= 13 and stage <= 17:
 		chapter = "NARUTO CLÁSSICO • EP 2 — KONOHAMARU"
 		story_percent = int(clampf(float(stage - 13) / 4.0, 0.0, 1.0) * 100.0)
-	if stage >= 17:
+	elif stage >= 18:
+		chapter = "NARUTO CLÁSSICO • EP 3 — SASUKE E SAKURA"
+		story_percent = int(clampf(float(stage - 18) / 5.0, 0.0, 1.0) * 100.0)
+	if stage == 17:
 		chapter = "NARUTO CLÁSSICO • EP 2 CONCLUÍDO"
+	if stage >= 23:
+		chapter = "NARUTO CLÁSSICO • EP 3 CONCLUÍDO"
 	var sharingan_text := "Sharingan 1 Tomoe" if sharingan_awakened else "Ainda não despertado nesta linha do tempo"
 	var jutsu_text := "Kunai • Shuriken • Katon: Bola de Fogo"
 	if sharingan_awakened:
 		jutsu_text += " • Sharingan 1T"
-	progress_text.text = "[b]ERA:[/b] %s\n[b]IDADE:[/b] 12 anos     [b]RANK:[/b] Aluno da Academia\n[b]NÍVEL:[/b] %d     [b]XP:[/b] %d / %d     [b]RYO:[/b] %d     [b]CHAKRA:[/b] %d / 100\n[b]HISTÓRIA:[/b] %d%%     [b]MISSÕES CONCLUÍDAS:[/b] %d\n\n[b]ARSENAL ATUAL[/b]\n%s\n%s\nKunai x%d • Shuriken x%d • Pílula do Soldado x%d\n\n[b]BLOQUEADO NESTA FASE[/b]\nChidori • Mangekyō • Amaterasu • Susanoo • técnicas avançadas\n[i]Essas habilidades ficam para fases futuras; o jogo ainda está no começo de Naruto Clássico.[/i]" % [
-		chapter, rpg.level, rpg.xp, rpg.level * 100, rpg.ryo, int(chakra),
-		story_percent, rpg.completed_missions.size(), jutsu_text, sharingan_text,
-		int(rpg.inventory.get("kunai", 0)), int(rpg.inventory.get("shuriken", 0)), int(rpg.inventory.get("soldier_pill", 0))
+	var rank_text := rpg.mission_rank
+	progress_text.text = "[b]ERA:[/b] %s\n[b]IDADE:[/b] 12 anos     [b]RANK REAL:[/b] %s\n[b]NÍVEL:[/b] %d     [b]XP GANHO:[/b] %d total     [b]RYO:[/b] %d     [b]CHAKRA:[/b] %d / 100\n[b]HISTÓRIA:[/b] %d%%     [b]MISSÕES REAIS:[/b] %d\n\n[b]PERSONALIDADE EM JOGO[/b]\n%s\nInterações: %d • Iniciativa: %d • Controle: %d\n\n[b]DOMÍNIO COMPROVADO[/b]\nKunai: %s (%d) • Shuriken: %s (%d)\nEsquiva: %s (%d) • Soco: %s (%d) • Substituição: %s (%d)\n\n[b]ARSENAL[/b]\n%s\n%s\nKunai x%d • Shuriken x%d\n\n[i]Nada sobe só porque a história disse. Acertos, testes e missões concluídas alimentam estes números.[/i]" % [
+		chapter, rank_text, rpg.level, rpg.total_xp, rpg.ryo, int(chakra), story_percent, rpg.completed_missions.size(),
+		rpg.personality_summary(), int(rpg.real_stats["social_interactions"]), int(rpg.real_stats["initiative_choices"]), int(rpg.real_stats["restraint_choices"]),
+		rpg.mastery_label("kunai"), int(rpg.technique_mastery["kunai"]), rpg.mastery_label("shuriken"), int(rpg.technique_mastery["shuriken"]),
+		rpg.mastery_label("dodge"), int(rpg.technique_mastery["dodge"]), rpg.mastery_label("punch"), int(rpg.technique_mastery["punch"]),
+		rpg.mastery_label("substitution"), int(rpg.technique_mastery["substitution"]),
+		jutsu_text, sharingan_text, int(rpg.inventory.get("kunai", 0)), int(rpg.inventory.get("shuriken", 0))
 	]
 
 func style_button(button: Button, is_dialogue: bool = false) -> void:
