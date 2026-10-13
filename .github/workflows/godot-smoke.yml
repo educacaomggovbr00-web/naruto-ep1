@@ -31,4 +31,8 @@ jobs:
         run: timeout 180s godot --headless --path . --editor --import
 
       - name: Run Episodes 1-6 smoke test
-        run: timeout 180s godot --headless --path . --script res://tests/prologue_smoke.gd
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 60s godot --headless --path . --quit-after 600 --script res://tests/prologue_smoke.gd | tee smoke.log
+          grep -Fq "PASS: Episodes 1-6, mobile-safe local assets, Konoha and Team 7" smoke.log
