@@ -325,7 +325,7 @@ func next_line() -> void:
 			begin_episode_3()
 		elif stage == 23:
 			begin_episode_4()
-		elif stage == 28:
+		elif stage == 28 and rpg.completed_missions.has("survival_test_parallel"):
 			begin_episode_6()
 		elif stage == 33:
 			restart.show()

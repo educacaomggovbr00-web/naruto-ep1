@@ -1,0 +1,38 @@
+name: Godot RPG smoke test
+
+on:
+  push:
+    branches: [main, "fix/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout game
+        uses: actions/checkout@v4
+
+      - name: Install Godot 4.4.1
+        shell: bash
+        run: |
+          curl --fail --location --retry 3 --silent --show-error \
+            -o /tmp/godot.zip \
+            https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q /tmp/godot.zip -d /tmp
+          install -m 755 /tmp/Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+          godot --version
+
+      - name: Import project and validate resources
+        run: timeout 180s godot --headless --path . --editor --import
+
+      - name: Run Episodes 1-6 smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 60s godot --headless --path . --quit-after 600 --script res://tests/prologue_smoke.gd | tee smoke.log
+          grep -Fq "PASS: Episodes 1-6, mobile-safe local assets, Konoha and Team 7" smoke.log

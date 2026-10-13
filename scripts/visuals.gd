@@ -2,7 +2,6 @@ extends RefCounted
 
 var character_art = preload("res://scripts/character_art.gd").new()
 var vfx = preload("res://scripts/vfx.gd").new()
-var graphics_catalog = preload("res://scripts/graphics_catalog.gd").new()
 const NARUTO = preload("res://assets/art/naruto.svg")
 const SASUKE = preload("res://assets/art/sasuke.svg")
 const SAKURA = preload("res://assets/art/sakura.svg")
@@ -148,7 +147,7 @@ func render(host: Node2D) -> void:
 		actor(host, Vector2(520, 245), SASUKE, Vector2.DOWN, false, host.visual_clock, "Sasuke", false)
 		actor(host, Vector2(455, 305), SAKURA, Vector2.RIGHT, true, host.visual_clock, "Sakura", false)
 		marker(host, host.naruto_pos, host.visual_clock)
-	elif host.stage == 8 and host.current_location_id == "academy":
+	elif host.stage == 8 and host.current_location_id == "village_gate":
 		marker(host, Vector2(885, 275), host.visual_clock)
 	elif host.stage == 9:
 		actor(host, host.naruto_pos, NARUTO, Vector2.DOWN, false, host.visual_clock, "Naruto", true)
