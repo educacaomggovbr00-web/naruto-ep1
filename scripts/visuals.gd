@@ -2,7 +2,6 @@ extends RefCounted
 
 var character_art = preload("res://scripts/character_art.gd").new()
 var vfx = preload("res://scripts/vfx.gd").new()
-var graphics_catalog = preload("res://scripts/graphics_catalog.gd").new()
 const NARUTO = preload("res://assets/art/naruto.svg")
 const SASUKE = preload("res://assets/art/sasuke.svg")
 const SAKURA = preload("res://assets/art/sakura.svg")
