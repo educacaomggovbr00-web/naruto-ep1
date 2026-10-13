@@ -37,3 +37,10 @@ jobs:
           set -euo pipefail
           timeout 90s godot --headless --path . --quit-after 600 --script res://tests/prologue_smoke.gd | tee smoke.log
           grep -Fq "PASS: complete prologue progression" smoke.log
+
+      - name: Verify low-memory Android graphics path
+        shell: bash
+        run: |
+          set -euo pipefail
+          NARUTO_LOW_MEMORY=1 timeout 90s godot --headless --path . --quit-after 600 --script res://tests/prologue_smoke.gd | tee mobile-smoke.log
+          grep -Fq "PASS: complete prologue progression" mobile-smoke.log
