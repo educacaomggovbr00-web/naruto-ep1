@@ -1,12 +1,15 @@
 extends RefCounted
 
-const HENRIQUE = preload("res://assets/characters/henrique-detailed.png")
+var HENRIQUE: Texture2D = null
 var character_art = preload("res://scripts/character_art.gd").new()
-const NARUTO = preload("res://assets/art/naruto.svg")
 const IRUKA = preload("res://assets/art/iruka.svg")
 const MIZUKI = preload("res://assets/art/mizuki.svg")
 const TARGET = preload("res://assets/art/target.svg")
 const KUNAI = preload("res://assets/art/kunai.svg")
+
+func _init() -> void:
+	# Keep the compatibility reference for desktop checks without forcing mobile to load it.
+	HENRIQUE = character_art.henrique_texture
 
 func actor(host: Node2D, at: Vector2, texture: Texture2D, direction: Vector2, moving: bool, clock: float, name_text: String, night: bool) -> void:
 	var frame := int(clock * 9.0) % 3 if moving else 0
