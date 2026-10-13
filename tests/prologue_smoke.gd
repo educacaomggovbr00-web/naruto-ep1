@@ -11,6 +11,8 @@ func run_checks() -> void:
 	var game = load("res://scenes/main.tscn").instantiate()
 	root.add_child(game)
 	await process_frame
+	# MUGEN frames should not be decoded before Naruto is on screen.
+	assert(game.art.character_art.texture_cache.is_empty(), "MUGEN images must be loaded lazily")
 	close_dialogue(game)
 	game.player = game.target - Vector2(80, 0)
 	game.facing = Vector2.RIGHT
@@ -47,7 +49,11 @@ func run_checks() -> void:
 		game.stage = area
 		game.background.set_area(area)
 		await process_frame
-	assert(game.art.HENRIQUE.get_width() == 1536, "Detailed character atlas must import correctly")
+	if game.art.character_art.compact_mode:
+		assert(game.art.HENRIQUE == null, "Low-memory mode must not load the huge atlas")
+		assert(Engine.max_fps == 30, "Mobile mode must limit its frame rate")
+	else:
+		assert(game.art.HENRIQUE != null and game.art.HENRIQUE.get_width() == 1536, "Detailed character atlas must import correctly")
 	assert(game.art.character_art.henrique_frames.size() == 24, "All Henrique poses must be mapped")
 	assert(game.art.character_art.mugen_actions["idle"].size() == 4, "Original MUGEN AIR idle cycle must be loaded")
 	game.attack_flash = 0.0
