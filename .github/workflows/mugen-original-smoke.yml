@@ -1,0 +1,39 @@
+name: Naruto MUGEN original - Godot smoke test
+
+on:
+  push:
+    branches:
+      - fix/primeiro-mugen-diagnostico
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  godot-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout historical MUGEN version
+        uses: actions/checkout@v4
+
+      - name: Install Godot 4.4.1
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --silent --show-error \
+            -o /tmp/godot.zip \
+            https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q /tmp/godot.zip -d /tmp
+          install -m 755 /tmp/Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+          godot --version
+
+      - name: Import project resources
+        run: timeout 180s godot --headless --path . --editor --import
+
+      - name: Check original prologue, sprites and Naruto MUGEN
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s godot --headless --path . --quit-after 600 --script res://tests/prologue_smoke.gd | tee smoke.log
+          grep -Fq "PASS: complete prologue progression" smoke.log
