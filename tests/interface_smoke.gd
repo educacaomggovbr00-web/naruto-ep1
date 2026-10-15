@@ -14,6 +14,7 @@ func touch(game: Node, index: int, at: Vector2, pressed: bool) -> void:
 func run_checks() -> void:
 	var game = load("res://scenes/main.tscn").instantiate()
 	root.size = Vector2i(960, 540)
+	game.savegame.enabled = false
 	root.add_child(game)
 	await process_frame
 	assert(game.ui.body_label.visible_characters < game.ui.body_label.text.length())

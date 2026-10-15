@@ -26,6 +26,10 @@ func render(game: Node2D) -> void:
 		for i in range(3):
 			var x := 80.0 + i * 320.0
 			game.draw_colored_polygon(PackedVector2Array([Vector2(x, 130), Vector2(x + 45, 130), Vector2(x + 230, 445), Vector2(x + 130, 445)]), Color(1.0, 0.84, 0.54, 0.045))
+	if game.dash_time > 0:
+		for i in range(4):
+			var at: Vector2 = game.player - game.dash_direction * (20 + i * 12) + game.dash_direction.orthogonal() * (i % 2 * 14 - 7)
+			game.draw_line(at, at - game.dash_direction * 16, Color(0.6, 0.83, 0.9, 0.6 - i * 0.1), 2, true)
 	for particle in dust:
 		game.draw_circle(particle.at, 2.0 + (0.4 - particle.life) * 8, Color(0.8, 0.72, 0.51, particle.life * 0.5))
 	if game.attack_flash > 0 and game.effect_kind == "katon":

@@ -5,6 +5,9 @@ var voices: Array[AudioStreamPlayer] = []
 var ambient: AudioStreamPlayer
 var sounds: Dictionary = {}
 var voice_index := 0
+var startup_elapsed := 0.0
+var ready_for_audio := false
+var shutting_down := false
 
 func _ready() -> void:
 	for kind in ["kunai", "katon", "impact"]:
@@ -18,7 +21,14 @@ func _ready() -> void:
 	ambient.stream = synth("wind")
 	ambient.volume_db = -28
 	add_child(ambient)
-	ambient.play()
+
+func _process(delta: float) -> void:
+	if shutting_down: return
+	startup_elapsed += delta
+	if startup_elapsed >= 0.08:
+		ready_for_audio = true
+		if enabled and not ambient.playing:
+			ambient.play()
 
 func synth(kind: String) -> AudioStreamWAV:
 	const RATE := 11025
@@ -64,7 +74,7 @@ func play(kind: String) -> void:
 func set_enabled(value: bool) -> void:
 	enabled = value
 	if ambient != null:
-		if value and not ambient.playing:
+		if value and ready_for_audio and not ambient.playing:
 			ambient.play()
 		elif not value:
 			ambient.stop()
@@ -72,6 +82,8 @@ func set_enabled(value: bool) -> void:
 				voice.stop()
 
 func shutdown() -> void:
+	shutting_down = true
+	enabled = false
 	for voice in voices:
 		voice.stop()
 		voice.stream = null

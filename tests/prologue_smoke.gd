@@ -9,6 +9,7 @@ func close_dialogue(game: Node) -> void:
 
 func run_checks() -> void:
 	var game = load("res://scenes/main.tscn").instantiate()
+	game.savegame.enabled = false
 	root.add_child(game)
 	await process_frame
 	assert(game.art.character_art.compact_mode == (OS.get_environment("NARUTO_LOW_MEMORY") == "1"), "Detailed reference art must be default; compact mode is explicit")

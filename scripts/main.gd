@@ -5,6 +5,11 @@ var player := Vector2(140, 270)
 var stage := 0
 var hits := 0
 var chakra := 100.0
+var stamina := 100.0
+var dash_time := 0.0
+var dash_direction := Vector2.RIGHT
+var save_clock := 0.0
+var savegame = preload("res://scripts/save_game.gd").new()
 var cooldown := 0.0
 var facing := Vector2.RIGHT
 var target := Vector2(390, 270)
@@ -57,12 +62,14 @@ func _ready() -> void:
 	ui = preload("res://scripts/game_ui.gd").new()
 	ui.game = self
 	add_child(ui)
-	say(["NARUTO EP -1 — A Noite Antes do Começo", "Henrique Uchiha, 12 anos. Um fim de tarde em Konoha, antes do início da história de Naruto.", "Henrique: Ainda tenho muito para aprender. Vou começar pelo treino de kunai.", "Mova-se com WASD/setas ou os botões. Clique no diálogo ou pressione E para avançar."])
+	say(["NARUTO EP -1 — A Noite Antes do Começo", "Henrique Uchiha, 12 anos. Um fim de tarde em Konoha, antes do início da história de Naruto.", "Henrique: Ainda tenho muito para aprender. Vou começar pelo treino de kunai.", "WASD/setas: andar. R: correr. Q: esquiva. J/K: kunai e Katon. E ou toque: revelar a fala e depois continuar."])
+	ui.offer_resume(savegame.read_save())
 
 func say(texts: Array[String]) -> void:
 	ui.release_touches()
 	movement = Vector2.ZERO
 	sprinting = false
+	dash_time = 0
 	lines = texts
 	line_index = 0
 	ui.show_line(lines[0])
@@ -80,10 +87,14 @@ func next_line() -> void:
 		dialogue.hide()
 	else:
 		ui.show_line(lines[line_index])
+	save_checkpoint(false)
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:
+			KEY_Q: act("dodge")
+			KEY_ENTER:
+				if ui.resume_overlay.visible: ui.continue_game()
 			KEY_ESCAPE:
 				if ui.settings_panel.visible: ui.toggle_settings()
 			KEY_E, KEY_SPACE: act("interact")
@@ -97,6 +108,13 @@ func _process(delta: float) -> void:
 	movement = Vector2.ZERO
 	sprinting = false
 	visual_clock += delta
+	if ui.modal_open():
+		queue_redraw()
+		return
+	stamina = minf(100, stamina + delta * 18)
+	save_clock += delta
+	if save_clock >= 8 and lines.is_empty():
+		save_checkpoint(false)
 	background.set_area(stage)
 	cooldown = maxf(0.0, cooldown - delta)
 	attack_flash = maxf(0.0, attack_flash - delta)
@@ -107,13 +125,20 @@ func _process(delta: float) -> void:
 			facing = movement
 		var sneaking := down("sneak", KEY_SHIFT)
 		sprinting = down("run", KEY_R) and not sneaking
-		var previous_position := player
-		player += movement * (95.0 if sneaking else 240.0 if sprinting else 180.0) * delta
-		if stage == 2 or stage >= 5:
-			for house_rect in [Rect2(36, 91, 152, 130), Rect2(268, 85, 152, 130), Rect2(460, 91, 152, 130), Rect2(714, 82, 152, 130)]:
-				if house_rect.grow(8).has_point(player):
-					player = previous_position
-		player = player.clamp(Vector2(35, 110), Vector2(925, 375))
+		var previous := player
+		var speed := 95.0 if sneaking else 240.0 if sprinting else 180.0
+		if dash_time > 0:
+			movement = dash_direction
+			sprinting = true
+			speed = 440.0
+			move_with_collisions(movement * speed * minf(delta, dash_time))
+			dash_time = maxf(0, dash_time - delta)
+		else:
+			move_with_collisions(movement * speed * delta)
+		if player.is_equal_approx(previous):
+			movement = Vector2.ZERO
+			sprinting = false
+			dash_time = 0
 		if stage == 3:
 			var distance := player.distance_to(mizuki)
 			if distance < 70 or (distance < 160 and not sneaking and movement != Vector2.ZERO):
@@ -137,12 +162,27 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func act(action: String) -> void:
-	if ui.settings_panel.visible:
+	if ui.modal_open():
 		return
 	if not lines.is_empty():
 		if action == "interact": next_line()
 		return
 	if stage == 6: return
+	if action == "dodge":
+		if dash_time > 0: return
+		if stamina < 30:
+			ui.toast("Recupere o fôlego antes de esquivar.")
+			return
+		stamina -= 30
+		dash_direction = facing
+		dash_time = 0.16
+		return
+	if action in ["kunai", "katon"] and cooldown > 0:
+		ui.toast("Aguarde a técnica ficar pronta.")
+		return
+	if action == "katon" and chakra < 25:
+		ui.toast("Katon precisa de 25 de chakra.")
+		return
 	if action == "kunai" and cooldown <= 0:
 		cooldown = 0.4
 		audio.play("kunai")
@@ -154,9 +194,12 @@ func act(action: String) -> void:
 			audio.play("impact")
 			cinematic.kick(0.55)
 			hits += 1
+			ui.toast("Acerto %d / 3" % hits)
 			if hits >= 3:
 				stage = 1
 				say(["Henrique: Três acertos! Agora vou tentar o Katon."])
+		elif stage == 0:
+			ui.toast("Aproxime-se do alvo." if player.distance_to(target) >= 150 else "Vire-se para o alvo antes de lançar.")
 	elif action == "katon" and cooldown <= 0 and chakra >= 25:
 		audio.play("katon")
 		cinematic.kick(0.85)
@@ -202,11 +245,44 @@ func style_button(button: Button, is_dialogue: bool = false) -> void:
 		button.add_theme_stylebox_override(state, style)
 
 func _draw() -> void:
+	if is_instance_valid(ui) and ui.resume_overlay.visible: return
 	art.render(self)
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
-		if is_instance_valid(ui): ui.release_touches()
+	if what in [NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_WM_CLOSE_REQUEST]:
+		if is_instance_valid(ui):
+			ui.release_touches()
+			if not ui.resume_overlay.visible: save_checkpoint(false)
 		held.clear()
 		movement = Vector2.ZERO
 		sprinting = false
+
+func blocked(at: Vector2) -> bool:
+	if stage == 2 or stage >= 5:
+		for house in [Rect2(36, 91, 152, 130), Rect2(268, 85, 152, 130), Rect2(460, 91, 152, 130), Rect2(714, 82, 152, 130)]:
+			if house.grow(8).has_point(at): return true
+		if Rect2(428, 341, 296, 46).has_point(at) and not Rect2(532, 330, 98, 65).has_point(at): return true
+	if stage == 2:
+		for npc in [Vector2(640, 260), Vector2(730, 260)]:
+			if at.distance_to(npc) < 22: return true
+	return false
+
+func move_with_collisions(displacement: Vector2) -> void:
+	var steps := maxi(1, int(ceil(displacement.length() / 6.0)))
+	var step := displacement / steps
+	for i in range(steps):
+		var next := (player + Vector2(step.x, 0)).clamp(Vector2(35, 110), Vector2(925, 375))
+		if not blocked(next): player = next
+		next = (player + Vector2(0, step.y)).clamp(Vector2(35, 110), Vector2(925, 375))
+		if not blocked(next): player = next
+
+func save_checkpoint(notify: bool = true) -> bool:
+	save_clock = 0
+	var success: bool = savegame.write_save(self)
+	if notify: ui.toast("Progresso salvo." if success else "Não foi possível salvar o progresso.")
+	return success
+
+func restart_game() -> void:
+	if savegame.enabled and FileAccess.file_exists(savegame.path):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(savegame.path))
+	get_tree().reload_current_scene()

@@ -24,6 +24,7 @@ A arte dos personagens usa técnicas distintas: o atlas detalhado e os quadros M
 | Andar | WASD / setas |
 | Correr | R |
 | Furtivo | Shift |
+| Esquiva | Q |
 | Kunai | J |
 | Katon | K |
 | Interagir / diálogo | E / Espaço |
@@ -67,7 +68,7 @@ O script percorre as ações do treino antes de capturar a praça. Não usa uma 
 
 Referências originais: [Pixel Shippuden](https://www.narutostorm.com/games/english), [The Fight of Konoha](https://timyfreak.itch.io/the-fight-of-konoha) e [Village Tiles / OpenGameArt](https://opengameart.org/content/simple-nes-like-village-tiles).
 
-Naruto e personagens associados pertencem aos respectivos titulares. Projeto independente de fã. Episódio 1, save de história, trilha musical e combate completo ainda não estão implementados.
+Naruto e personagens associados pertencem aos respectivos titulares. Projeto independente de fã. Episódio 1, trilha musical e combate completo ainda não estão implementados.
 
 ## Apresentação cinematográfica
 
@@ -82,3 +83,20 @@ godot --headless --path . --script res://tests/cinematic_smoke.gd
 ```
 
 A referência a consoles descreve a direção de apresentação. O protótipo não é uma versão de PS5 nem alcança a produção de um jogo AAA. Desempenho e saída de áudio no Android continuam pendentes de teste em aparelho real.
+
+## Esquiva e progresso salvo
+
+**Q / ESQUIVA** avança na direção em que Henrique está olhando. Cada esquiva usa 30 de fôlego, recuperado automaticamente; a barra dourada abaixo do chakra mostra a reserva. Ela respeita as colisões, inclusive em quadros mais lentos. Movimento diagonal desliza junto às paredes, e a água só pode ser atravessada pela ponte. Naruto e Iruka também bloqueiam passagem.
+
+Ataques agora avisam quando falta chakra, a técnica está recarregando ou o alvo está longe/fora da mira. O personagem para a animação de caminhada quando fica bloqueado.
+
+O progresso fica em `user://prologue_save.json`. Há salvamento ao avançar falas, a cada oito segundos durante exploração e ao sair do foco/fechar a janela. **AJUSTES → SALVAR / CARREGAR** oferece controle manual. Ao abrir com um arquivo válido, **CONTINUAR** retoma a etapa, posição, chakra, fôlego e a fala atual; **NOVO JOGO** substitui esse progresso pelo início do prólogo.
+
+O arquivo usa versão e validação de campos. A escrita primeiro cria um arquivo temporário e depois substitui o anterior. Um arquivo inválido não é aplicado ao jogo; a tela inicial avisa e oferece um novo começo. O progresso é local ao aparelho e não tem sincronização em nuvem.
+
+```sh
+godot --headless --path . --script res://tests/gameplay_smoke.gd
+NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests/capture_gameplay.gd
+```
+
+Esses testes usam arquivos próprios e não alteram o progresso normal do jogador. A captura mostra esquiva, ajustes e a tela de continuar.

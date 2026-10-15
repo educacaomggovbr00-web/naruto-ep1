@@ -11,11 +11,21 @@ var portrait: TextureRect
 var typing := 0.0
 var settings_file := ConfigFile.new()
 var touch_pointers: Dictionary = {}
+var resume_overlay: Control
+var toast_panel: Panel
+var toast_label: Label
+var toast_time := 0.0
+var resume_data: Dictionary = {}
+var resume_title: Label
+var resume_subtitle: Label
+var continue_button: Button
+var hud_canvas: Node2D
+var settings_button: Button
 var opacity_slider: HSlider
 
 func _ready() -> void:
 	layer = 3
-	var hud_canvas := preload("res://scripts/hud_canvas.gd").new()
+	hud_canvas = preload("res://scripts/hud_canvas.gd").new()
 	hud_canvas.game = game
 	add_child(hud_canvas)
 	settings_file.load("user://interface.cfg")
@@ -48,19 +58,20 @@ func _ready() -> void:
 		button.button_up.connect(func(): game.held[action] = false)
 		button.set_meta("action", action)
 		touch_buttons.append(button)
-	for info in [["KUNAI", Vector2(754, 450), "kunai"], ["KATON", Vector2(821, 389), "katon"], ["AÇÃO", Vector2(881, 450), "interact"]]:
+	for info in [["ESQUIVA", Vector2(680, 450), "dodge"], ["KUNAI", Vector2(754, 450), "kunai"], ["KATON", Vector2(821, 389), "katon"], ["AÇÃO", Vector2(881, 450), "interact"]]:
 		var button := button_at(info[0], info[1], Vector2(62, 62))
 		var action: String = info[2]
-		button.add_theme_font_size_override("font_size", 12)
+		button.add_theme_font_size_override("font_size", 11 if action == "dodge" else 12)
 		button.pressed.connect(func(): game.act(action))
 		button.set_meta("action", action)
+		if action == "dodge": button.tooltip_text = "Q · Esquiva (30 de fôlego)"
 		touch_buttons.append(button)
-	var settings_button := button_at("AJUSTES", Vector2(838, 72), Vector2(106, 30))
+	settings_button = button_at("AJUSTES", Vector2(838, 72), Vector2(106, 30))
 	settings_button.add_theme_font_size_override("font_size", 10)
 	settings_button.pressed.connect(toggle_settings)
 	settings_panel = Panel.new()
 	settings_panel.position = Vector2(648, 111)
-	settings_panel.size = Vector2(296, 190)
+	settings_panel.size = Vector2(296, 236)
 	settings_panel.add_theme_stylebox_override("panel", panel_style())
 	settings_panel.z_index = 20
 	add_child(settings_panel)
@@ -93,9 +104,34 @@ func _ready() -> void:
 	game.audio.set_enabled(audio_toggle.button_pressed)
 	audio_toggle.toggled.connect(func(value: bool): game.audio.set_enabled(value); settings_file.set_value("cinema", "audio", value); save_preferences())
 	settings_panel.add_child(audio_toggle)
+	var save_button := Button.new()
+	save_button.text = "SALVAR"
+	save_button.position = Vector2(12, 195)
+	save_button.size = Vector2(129, 30)
+	game.style_button(save_button)
+	save_button.pressed.connect(func(): game.save_checkpoint())
+	settings_panel.add_child(save_button)
+	var load_button := Button.new()
+	load_button.text = "CARREGAR"
+	load_button.position = Vector2(151, 195)
+	load_button.size = Vector2(129, 30)
+	game.style_button(load_button)
+	load_button.pressed.connect(load_checkpoint)
+	settings_panel.add_child(load_button)
 	game.restart = button_at("Jogar novamente", Vector2(375, 275), Vector2(210, 46))
-	game.restart.pressed.connect(func(): get_tree().reload_current_scene())
+	game.restart.pressed.connect(game.restart_game)
 	game.restart.hide()
+	toast_panel = Panel.new()
+	toast_panel.position = Vector2(240, 321)
+	toast_panel.size = Vector2(400, 35)
+	toast_panel.add_theme_stylebox_override("panel", panel_style())
+	toast_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	toast_panel.z_index = 30
+	add_child(toast_panel)
+	toast_label = child_label(toast_panel, "", Vector2(8, 6), Vector2(384, 25), 13, Color("f0d79d"))
+	toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	toast_panel.hide()
+	build_resume_menu()
 	set_touch_opacity(touch_opacity)
 
 func panel_style() -> StyleBoxFlat:
@@ -189,8 +225,14 @@ func finish_typing() -> bool:
 	return false
 
 func _process(delta: float) -> void:
+	hud_canvas.visible = not resume_overlay.visible
+	game.hud.visible = not resume_overlay.visible
+	game.objective.visible = not resume_overlay.visible
+	settings_button.visible = not resume_overlay.visible
+	toast_time = maxf(0, toast_time - delta)
+	toast_panel.visible = toast_time > 0 and game.lines.is_empty() and not resume_overlay.visible
 	for button in touch_buttons:
-		button.visible = game.lines.is_empty() or button.get_meta("action") == "interact"
+		button.visible = not resume_overlay.visible and (game.lines.is_empty() or button.get_meta("action") == "interact")
 	if game.dialogue.visible and body_label.visible_characters >= 0:
 		typing += delta * 42
 		body_label.visible_characters = mini(int(typing), body_label.text.length())
@@ -227,12 +269,12 @@ func _input(event: InputEvent) -> void:
 			if touch_pointers.has(event.index):
 				release_pointer(event.index)
 				get_viewport().set_input_as_handled()
-		elif not settings_panel.visible:
+		elif not modal_open():
 			var button := touch_target(event.position)
 			if button != null:
 				touch_pointers[event.index] = button
 				var action: String = button.get_meta("action")
-				if action in ["kunai", "katon", "interact"]:
+				if action in ["kunai", "katon", "interact", "dodge"]:
 					game.act(action)
 				else:
 					game.held[action] = true
@@ -242,3 +284,81 @@ func _input(event: InputEvent) -> void:
 		if not button.get_global_rect().has_point(event.position):
 			release_pointer(event.index)
 		get_viewport().set_input_as_handled()
+
+func toast(text: String) -> void:
+	toast_label.text = text
+	toast_time = 2.2
+
+func modal_open() -> bool:
+	return settings_panel.visible or resume_overlay.visible
+
+func build_resume_menu() -> void:
+	resume_overlay = Control.new()
+	resume_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	resume_overlay.z_index = 40
+	add_child(resume_overlay)
+	var shade := ColorRect.new()
+	shade.color = Color(0.025, 0.06, 0.08, 0.82)
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	resume_overlay.add_child(shade)
+	var panel := Panel.new()
+	panel.position = Vector2(235, 145)
+	panel.size = Vector2(490, 238)
+	panel.add_theme_stylebox_override("panel", panel_style())
+	resume_overlay.add_child(panel)
+	resume_title = child_label(panel, "NARUTO  /  EP -1", Vector2(28, 22), Vector2(430, 30), 25, Color("e9c47d"))
+	resume_subtitle = child_label(panel, "Continue sua jornada em Konoha", Vector2(28, 62), Vector2(430, 30), 16, Color("d0dacf"))
+	continue_button = Button.new()
+	continue_button.text = "CONTINUAR  ›"
+	continue_button.position = Vector2(28, 112)
+	continue_button.size = Vector2(434, 44)
+	game.style_button(continue_button)
+	continue_button.pressed.connect(continue_game)
+	panel.add_child(continue_button)
+	var new_button := Button.new()
+	new_button.text = "NOVO JOGO"
+	new_button.position = Vector2(28, 169)
+	new_button.size = Vector2(434, 39)
+	game.style_button(new_button)
+	new_button.pressed.connect(new_game)
+	panel.add_child(new_button)
+	resume_overlay.hide()
+
+func offer_resume(data: Dictionary) -> void:
+	if data.is_empty():
+		if not game.savegame.last_error.is_empty():
+			resume_title.text = "PROGRESSO INDISPONÍVEL"
+			resume_title.add_theme_font_size_override("font_size", 21)
+			resume_subtitle.text = "Arquivo inválido. Você pode começar um novo jogo."
+			resume_subtitle.add_theme_font_size_override("font_size", 13)
+			continue_button.disabled = true
+			game.dialogue.hide()
+			resume_overlay.show()
+		return
+	resume_data = data
+	game.background.set_area(int(data.stage))
+	resume_subtitle.text = "%s · Etapa %d de 7" % [game.OBJECTIVES[int(data.stage)].split(" • ")[0], int(data.stage) + 1]
+	game.dialogue.hide()
+	resume_overlay.show()
+	release_touches()
+
+func continue_game() -> void:
+	if resume_data.is_empty(): return
+	if game.savegame.apply(game, resume_data):
+		resume_overlay.hide()
+		toast("Progresso retomado.")
+
+func new_game() -> void:
+	resume_overlay.hide()
+	resume_data.clear()
+	show_line(game.lines[game.line_index])
+	game.save_checkpoint(false)
+
+func load_checkpoint() -> void:
+	var data: Dictionary = game.savegame.read_save()
+	if data.is_empty():
+		toast("Nenhum progresso válido para carregar.")
+		return
+	settings_panel.hide()
+	game.savegame.apply(game, data)
+	toast("Progresso retomado.")

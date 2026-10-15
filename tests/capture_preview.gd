@@ -19,6 +19,7 @@ func save_frame(name: String) -> void:
 
 func capture() -> void:
 	var game = load("res://scenes/main.tscn").instantiate()
+	game.savegame.enabled = false
 	root.add_child(game)
 	root.size = Vector2i(960, 540)
 	await process_frame

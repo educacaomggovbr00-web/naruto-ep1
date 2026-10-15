@@ -3,6 +3,7 @@ func _initialize() -> void:
 	call_deferred("run_checks")
 func run_checks() -> void:
 	var game = load("res://scenes/main.tscn").instantiate()
+	game.savegame.enabled = false
 	root.add_child(game)
 	await process_frame
 	assert(game.ui.layer > 1, "Interface must stay above the world grading")

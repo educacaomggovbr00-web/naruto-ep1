@@ -73,6 +73,8 @@ func draw_hud(canvas: Node2D, host: Node2D) -> void:
 	canvas.draw_string(ThemeDB.fallback_font, Vector2(586, 20), "CHAKRA", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("adc3be"))
 	canvas.draw_rect(Rect2(640, 10, 218, 12), Color("2e4850"))
 	canvas.draw_rect(Rect2(642, 12, 214 * host.chakra / 100.0, 8), Color("69bfce"))
+	canvas.draw_rect(Rect2(640, 26, 218, 3), Color("374b4e"))
+	canvas.draw_rect(Rect2(640, 26, 218 * host.stamina / 100.0, 3), Color("d8b879"))
 	canvas.draw_string(ThemeDB.fallback_font, Vector2(869, 21), "%d / 100" % int(host.chakra), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("e3dcc0"))
 	var place := "CAMPO DE TREINO" if host.stage <= 1 else "KONOHA · PRAÇA" if host.stage == 2 else "FLORESTA · NOITE" if host.stage <= 4 else "KONOHA · CASA"
 	canvas.draw_style_box(host.polish.panel(), Rect2(16, 74, 205, 26))
