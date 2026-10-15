@@ -156,7 +156,7 @@ func _draw() -> void:
 		draw_texture_rect(exact_background, Rect2(0, 78, 960, 367), false)
 
 	# Konoha free-roam location dressing. Same lightweight tile base, different landmark identity.
-	if area == 1:
+	if area == 1 and exact_background == null:
 		draw_rect(Rect2(18, 138, 250, 25), Color(0.08, 0.13, 0.15, 0.78))
 		draw_string(ThemeDB.fallback_font, Vector2(29, 156), location_name, HORIZONTAL_ALIGNMENT_LEFT, 225, 13, Color("f3d599"))
 		if location_kind == "academy":

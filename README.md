@@ -175,3 +175,20 @@ O pack fica em `assets/user_pack/user_assets.json.gz` e é decodificado por `scr
 - O menu **PROGRESSO** mostra o recorte exato de itens/UI enviado pelo usuário.
 - Os cenários de batalha de praça/vila, floresta, ponte e campo de treino priorizam os recortes exatos antes dos cenários procedurais de fallback.
 - O teste automático verifica que Henrique, itens/UI e os cenários exatos são realmente decodificados pelo runtime.
+
+## Refinamento visual e usabilidade
+
+- Interface com moldura escura, destaque dourado, barra de chakra e identificação do episódio.
+- Cenários PNG preservados sem construções geométricas sobrepostas.
+- Folhas ao vento, luz suave durante o dia e poeira ao caminhar, sem recursos externos.
+- Círculo de identificação do jogador e sinal de missão sobre Naruto na Academia.
+- Movimento interrompido durante menus e diálogos para evitar animação de caminhada parada.
+- **M** abre o mapa; **Esc** fecha os menus; botões mostram dicas dos atalhos.
+
+Captura reproduzível do jogo renderizado (requer display gráfico ou Xvfb):
+
+```sh
+NARUTO_PREVIEW_PATH=/tmp/naruto-preview.png godot --path . --audio-driver Dummy --script res://tests/capture_preview.gd
+```
+
+O projeto continua em Godot Compatibility, 960×540. A validação automatizada cobre a progressão dos episódios 1–6; desempenho e toque precisam ser conferidos em um Android real.

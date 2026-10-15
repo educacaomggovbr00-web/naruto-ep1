@@ -114,11 +114,14 @@ func _ready() -> void:
 	background.z_index = -1
 	background.set_area(stage)
 	background.set_location(naruto_world.location(current_location_id))
+	var presentation := preload("res://scripts/presentation.gd").new()
+	presentation.game = self
+	add_child(presentation)
 	var layer := CanvasLayer.new()
 	add_child(layer)
 	hud = Label.new()
 	hud.position = Vector2(74, 10)
-	hud.add_theme_font_size_override("font_size", 20)
+	hud.add_theme_font_size_override("font_size", 16)
 	layer.add_child(hud)
 	objective = Label.new()
 	objective.position = Vector2(74, 40)
@@ -414,6 +417,12 @@ func begin_episode_6() -> void:
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:
+			KEY_M: toggle_konoha_map()
+			KEY_ESCAPE:
+				progress_panel.hide()
+				map_panel.hide()
+				techniques_panel.hide()
+				held.clear()
 			KEY_P: toggle_progression()
 			KEY_E, KEY_SPACE:
 				if not progress_panel.visible: act("interact")
@@ -438,6 +447,7 @@ func down(action: String, key: Key, alternate: Key = KEY_NONE) -> bool:
 	return held.get(action, false) or Input.is_physical_key_pressed(key) or (alternate != KEY_NONE and Input.is_physical_key_pressed(alternate))
 
 func _process(delta: float) -> void:
+	movement = Vector2.ZERO
 	visual_clock += delta
 	background.set_area(stage)
 	background.set_location(naruto_world.location(current_location_id))
@@ -462,7 +472,7 @@ func _process(delta: float) -> void:
 		naruto_action = "run" if lines.is_empty() else "idle"
 	elif stage >= 11:
 		naruto_action = "idle"
-	if lines.is_empty() and stage < 33 and not progress_panel.visible and not map_panel.visible and action_timer <= 0.0:
+	if lines.is_empty() and stage < 33 and not progress_panel.visible and not map_panel.visible and not techniques_panel.visible and action_timer <= 0.0:
 		movement = Vector2(float(down("right", KEY_D, KEY_RIGHT)) - float(down("left", KEY_A, KEY_LEFT)), float(down("down", KEY_S, KEY_DOWN)) - float(down("up", KEY_W, KEY_UP))).normalized()
 		if movement != Vector2.ZERO:
 			facing = movement
@@ -874,14 +884,19 @@ func refresh_progression() -> void:
 
 func style_button(button: Button, is_dialogue: bool = false) -> void:
 	button.focus_mode = Control.FOCUS_NONE
+	var hints := {"KUNAI": "J · Lançar kunai", "KATON": "K · Usar Katon", "AÇÃO": "E / Espaço · Conversar", "MAPA": "M · Mapa de Konoha", "PROGRESSO": "P · Progressão", "CORRER": "Segure R para correr", "FURTIVO": "Segure Shift para andar em silêncio"}
+	button.tooltip_text = hints.get(button.text, "")
 	button.add_theme_font_size_override("font_size", 18 if is_dialogue else 15)
 	button.add_theme_color_override("font_color", Color("f3dfb4"))
 	for state in ["normal", "hover", "pressed", "focus"]:
 		var style := StyleBoxFlat.new()
-		style.bg_color = Color("203b48") if state != "pressed" else Color("496066")
+		style.bg_color = Color("203640") if state == "normal" else Color("3d5961") if state == "hover" else Color("876442")
 		style.border_color = Color("b29a6c") if is_dialogue else Color("6d8788")
 		style.set_border_width_all(2)
-		style.set_corner_radius_all(5)
+		style.set_corner_radius_all(10)
+		style.shadow_color = Color(0, 0, 0, 0.3)
+		style.shadow_size = 3
+		style.shadow_offset = Vector2(0, 2)
 		style.content_margin_left = 18 if is_dialogue else 6
 		style.content_margin_right = 18 if is_dialogue else 6
 		style.content_margin_top = 10
