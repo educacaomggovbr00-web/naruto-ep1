@@ -42,3 +42,19 @@ Esses links foram referências para a primeira versão visual. A atualização d
 - Henrique usa poses próprias de idle, caminhada, corrida, kunai e Katon. Não é um personagem baixado do MUGEN. O jogo permanece em visão de cima; os movimentos laterais usam o atlas detalhado e o idle de costas aparece ao olhar para cima. Ciclos de caminhada vertical exclusivos ainda não estão disponíveis.
 
 Teste atualizado passou no Godot 4.3: importação RGBA, atlas de 24 poses, AIR idle de quatro quadros, seleção de sprint/Katon e sequência completa do prólogo. Não há exportação APK nesta mudança.
+
+## Continuação do protótipo MUGEN original
+
+Esta atualização parte de `fix/primeiro-mugen-diagnostico` e conserva o prólogo EP -1, o atlas detalhado de Henrique, os quadros AIR/MUGEN de Naruto e os mapas originais.
+
+Melhorias: luz diurna suave, poeira dos passos, indicação de acerto no treino, círculo do jogador, seta para o próximo objetivo, aviso de interação, medidor de distância/furtividade na perseguição, etapas do prólogo e estados visuais dos botões. Os efeitos são procedurais e mantêm o modo leve Android.
+
+Diálogos e perda de foco liberam os controles de toque, evitando movimento preso ao voltar ao jogo. O teste cobre essa regressão e a sequência completa nos modos detalhado e leve.
+
+Capturas reais do treino, da praça e da perseguição podem ser reproduzidas com display gráfico:
+
+```sh
+NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests/capture_preview.gd
+```
+
+Android ainda precisa de validação em aparelho; não há APK nesta atualização.

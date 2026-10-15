@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - fix/primeiro-mugen-diagnostico
+  pull_request:
+    branches:
+      - fix/primeiro-mugen-diagnostico
   workflow_dispatch:
 
 permissions:

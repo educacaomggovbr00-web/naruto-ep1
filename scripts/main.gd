@@ -25,6 +25,7 @@ var effect_kind := "kunai"
 var effect_origin := Vector2.ZERO
 var effect_direction := Vector2.RIGHT
 var art = preload("res://scripts/visuals.gd").new()
+var polish = preload("res://scripts/polish.gd").new()
 var background = preload("res://scripts/background.gd").new()
 const OBJECTIVES := [
 	"TREINO • Acerte 3 vezes o alvo com kunai (J / botão KUNAI).",
@@ -93,6 +94,9 @@ func _ready() -> void:
 	say(["NARUTO EP -1 — A Noite Antes do Começo", "Henrique Uchiha, 12 anos. Um fim de tarde em Konoha, antes do início da história de Naruto.", "Henrique: Ainda tenho muito para aprender. Vou começar pelo treino de kunai.", "Mova-se com WASD/setas ou os botões. Clique no diálogo ou pressione E para avançar."])
 
 func say(texts: Array[String]) -> void:
+	held.clear()
+	movement = Vector2.ZERO
+	sprinting = false
 	lines = texts
 	line_index = 0
 	dialogue.text = lines[0] + "\n[Toque para continuar]"
@@ -117,6 +121,8 @@ func down(action: String, key: Key, alternate: Key = KEY_NONE) -> bool:
 	return held.get(action, false) or Input.is_physical_key_pressed(key) or (alternate != KEY_NONE and Input.is_physical_key_pressed(alternate))
 
 func _process(delta: float) -> void:
+	movement = Vector2.ZERO
+	sprinting = false
 	visual_clock += delta
 	background.set_area(stage)
 	cooldown = maxf(0.0, cooldown - delta)
@@ -154,6 +160,7 @@ func _process(delta: float) -> void:
 	objective.text = OBJECTIVES[stage]
 	if stage == 3:
 		objective.text += "  %d%%" % int(trail_progress / 12 * 100)
+	polish.update(self, delta)
 	queue_redraw()
 
 func act(action: String) -> void:
@@ -202,10 +209,13 @@ func style_button(button: Button, is_dialogue: bool = false) -> void:
 	button.add_theme_color_override("font_color", Color("f3dfb4"))
 	for state in ["normal", "hover", "pressed", "focus"]:
 		var style := StyleBoxFlat.new()
-		style.bg_color = Color("203b48") if state != "pressed" else Color("496066")
+		style.bg_color = Color("203b48") if state == "normal" else Color("3f5b62") if state == "hover" else Color("786344")
 		style.border_color = Color("b29a6c") if is_dialogue else Color("6d8788")
 		style.set_border_width_all(2)
-		style.set_corner_radius_all(5)
+		style.set_corner_radius_all(9)
+		style.shadow_color = Color(0, 0, 0, 0.3)
+		style.shadow_size = 3
+		style.shadow_offset = Vector2(0, 3)
 		style.content_margin_left = 18 if is_dialogue else 6
 		style.content_margin_right = 18 if is_dialogue else 6
 		style.content_margin_top = 10
@@ -214,3 +224,9 @@ func style_button(button: Button, is_dialogue: bool = false) -> void:
 
 func _draw() -> void:
 	art.render(self)
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		held.clear()
+		movement = Vector2.ZERO
+		sprinting = false

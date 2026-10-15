@@ -14,6 +14,16 @@ func run_checks() -> void:
 	# MUGEN frames should not be decoded before Naruto is on screen.
 	assert(game.art.character_art.texture_cache.is_empty(), "MUGEN images must be loaded lazily")
 	close_dialogue(game)
+	# Dialogues and app switching must release touch input.
+	game.held["right"] = true
+	game.movement = Vector2.RIGHT
+	var regression_lines: Array[String] = ["Input regression check"]
+	game.say(regression_lines)
+	assert(game.held.is_empty() and game.movement == Vector2.ZERO, "Dialogue must release held movement")
+	close_dialogue(game)
+	game.held["run"] = true
+	game._notification(MainLoop.NOTIFICATION_APPLICATION_FOCUS_OUT)
+	assert(game.held.is_empty(), "Leaving the app must release touch controls")
 	game.player = game.target - Vector2(80, 0)
 	game.facing = Vector2.RIGHT
 	for i in range(3):

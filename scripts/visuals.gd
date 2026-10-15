@@ -70,8 +70,9 @@ func render(host: Node2D) -> void:
 		var x := fmod(i * 89.0 + host.visual_clock * (5 if night else 11), 940.0)
 		var y := 216 + (i % 5) * 33 + sin(host.visual_clock + i) * 13
 		host.draw_rect(Rect2(x, y, 3 if night else 5, 2), Color(0.85, 0.9, 0.54, 0.5) if night else Color(0.72, 0.76, 0.43, 0.6))
+	host.polish.render(host)
 	# Chakra bar, portrait and location plaque behind the CanvasLayer labels.
-	host.draw_rect(Rect2(0, 0, 960, 78), Color("142c35"))
+	host.draw_rect(Rect2(0, 0, 960, 78), Color("132832"))
 	host.draw_rect(Rect2(0, 76, 960, 2), Color("9e885c"))
 	host.draw_rect(Rect2(13, 9, 48, 55), Color("29414b"))
 	character_art.portrait(host)
@@ -79,4 +80,8 @@ func render(host: Node2D) -> void:
 	host.draw_rect(Rect2(612, 18, 162 * host.chakra / 100.0, 6), Color("66b8bd"))
 	var place := "CAMPO DE TREINO" if host.stage <= 1 else "KONOHA • PRAÇA" if host.stage == 2 else "FLORESTA • NOITE" if host.stage <= 4 else "KONOHA • CASA"
 	host.draw_string(ThemeDB.fallback_font, Vector2(790, 26), place, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("d6c89f"))
-	host.draw_rect(Rect2(0, 445, 960, 95), Color(0.045, 0.10, 0.15, 0.70))
+	host.draw_rect(Rect2(0, 445, 960, 95), Color("132832"))
+
+	for i in range(7):
+		host.draw_rect(Rect2(475 + i * 16, 489, 11, 5), Color("e3bd79") if i <= host.stage else Color("354852"))
+	host.draw_string(ThemeDB.fallback_font, Vector2(475, 478), "PRÓLOGO", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("e3bd79"))
