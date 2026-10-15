@@ -39,8 +39,9 @@ func run_checks() -> void:
 	close_dialogue(game)
 	game.player = Vector2(620, 260)
 	game.act("interact")
-	assert(game.stage == 3, "Naruto dialogue must unlock stealth")
+	assert(game.stage == 2, "Naruto conversation must remain in the village")
 	close_dialogue(game)
+	assert(game.stage == 3, "Finishing the conversation must unlock stealth")
 	game.player = game.mizuki - Vector2(180, 0)
 	game.held["sneak"] = true
 	game.trail_progress = 11.9

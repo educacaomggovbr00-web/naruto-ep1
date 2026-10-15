@@ -28,11 +28,16 @@ func render(game: Node2D) -> void:
 			game.draw_colored_polygon(PackedVector2Array([Vector2(x, 130), Vector2(x + 45, 130), Vector2(x + 230, 445), Vector2(x + 130, 445)]), Color(1.0, 0.84, 0.54, 0.045))
 	for particle in dust:
 		game.draw_circle(particle.at, 2.0 + (0.4 - particle.life) * 8, Color(0.8, 0.72, 0.51, particle.life * 0.5))
+	if game.attack_flash > 0 and game.effect_kind == "katon":
+		for i in range(10):
+			var angle: float = i * TAU / 10.0 + game.visual_clock * 4
+			var at: Vector2 = game.player + Vector2(cos(angle) * 22, -28 + sin(angle) * 30)
+			game.draw_circle(at, 2, Color(0.39, 0.8, 0.96, 0.65), true)
 	if hit_timer > 0 and game.stage <= 1:
 		var radius := 15.0 + (0.35 - hit_timer) * 80
 		game.draw_arc(game.target, radius, 0, TAU, 32, Color(1, 0.83, 0.43, hit_timer * 2), 2, true)
 		game.draw_string(ThemeDB.fallback_font, game.target + Vector2(-28, -48 - radius * 0.25), "ACERTO!", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("ffda83"))
-	if not game.lines.is_empty() or game.stage >= 6:
+	if not game.lines.is_empty() or game.stage >= 6 or game.ui.settings_panel.visible:
 		return
 	var destination: Vector2 = game.target
 	var can_talk := false

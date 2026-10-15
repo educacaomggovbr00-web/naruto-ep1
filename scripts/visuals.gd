@@ -1,6 +1,7 @@
 extends RefCounted
 
 var HENRIQUE: Texture2D = null
+var npc_art = preload("res://scripts/npc_art.gd").new()
 var character_art = preload("res://scripts/character_art.gd").new()
 const IRUKA = preload("res://assets/art/iruka.svg")
 const MIZUKI = preload("res://assets/art/mizuki.svg")
@@ -12,19 +13,8 @@ func _init() -> void:
 	HENRIQUE = character_art.henrique_texture
 
 func actor(host: Node2D, at: Vector2, texture: Texture2D, direction: Vector2, moving: bool, clock: float, name_text: String, night: bool) -> void:
-	var frame := int(clock * 9.0) % 3 if moving else 0
-	var row := 0
-	if direction.y < -0.4:
-		row = 1
-	elif absf(direction.x) > 0.4:
-		row = 2
-	var bob := -2.0 if moving and frame == 1 else 0.0
-	host.draw_set_transform(at + Vector2(0, 12), 0, Vector2(1, 0.3))
-	host.draw_circle(Vector2.ZERO, 17, Color(0.07, 0.13, 0.17, 0.38))
-	host.draw_set_transform(at + Vector2(0, bob), 0, Vector2(-1 if row == 2 and direction.x < 0 else 1, 1))
-	host.draw_texture_rect_region(texture, Rect2(-36, -70, 72, 84), Rect2((row * 3 + frame) * 24, 0, 24, 28), Color("b1bbd2") if night else Color.WHITE)
-	host.draw_set_transform(Vector2.ZERO)
-	host.draw_string(ThemeDB.fallback_font, at + Vector2(-28, -90), name_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
+	npc_art.draw(host, at, texture == MIZUKI, moving, clock, night)
+	host.draw_string(ThemeDB.fallback_font, at + Vector2(-22, -92), name_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("f6e9c8"))
 
 func marker(host: Node2D, at: Vector2, clock: float) -> void:
 	var y := at.y - 100 + sin(clock * 3.5) * 3
@@ -52,14 +42,16 @@ func render(host: Node2D) -> void:
 		var progress: float = 1.0 - host.attack_flash / (0.5 if host.effect_kind == "katon" else 0.2)
 		var at: Vector2 = host.effect_origin + host.effect_direction * progress * 125
 		if host.effect_kind == "katon":
+			for radius in [24, 18, 11]:
+				host.draw_circle(at, radius, Color(1, 0.38, 0.12, 0.11), true)
 			for i in range(18):
 				var shift := Vector2(-host.effect_direction.x * i * 2, sin(i * 2.3 + host.visual_clock * 23) * 12)
 				var size := 6 + (i % 3) * 4
-				host.draw_rect(Rect2(at + shift - Vector2(size, size) / 2, Vector2(size, size)), Color("df653e"))
+				host.draw_circle(at + shift, size * 0.65, Color("e47735"), true)
 			for i in range(9):
 				var shift := Vector2(cos(i * 1.7) * 12, sin(i * 2.8) * 10)
-				host.draw_rect(Rect2(at + shift - Vector2(4, 4), Vector2(8, 8)), Color("ffcf69"))
-			host.draw_rect(Rect2(at - Vector2(5, 5), Vector2(10, 10)), Color("fff1b0"))
+				host.draw_circle(at + shift, 4, Color("ffcf69"), true)
+			host.draw_circle(at, 7, Color("fff1b0"), true)
 		else:
 			host.draw_set_transform(at, host.effect_direction.angle())
 			host.draw_texture_rect(KUNAI, Rect2(-16, -8, 32, 16), false)
@@ -71,17 +63,17 @@ func render(host: Node2D) -> void:
 		var y := 216 + (i % 5) * 33 + sin(host.visual_clock + i) * 13
 		host.draw_rect(Rect2(x, y, 3 if night else 5, 2), Color(0.85, 0.9, 0.54, 0.5) if night else Color(0.72, 0.76, 0.43, 0.6))
 	host.polish.render(host)
-	# Chakra bar, portrait and location plaque behind the CanvasLayer labels.
-	host.draw_rect(Rect2(0, 0, 960, 78), Color("132832"))
-	host.draw_rect(Rect2(0, 76, 960, 2), Color("9e885c"))
-	host.draw_rect(Rect2(13, 9, 48, 55), Color("29414b"))
+	# Compact HUD frees the center and bottom for the world.
+	host.draw_rect(Rect2(0, 0, 960, 62), Color("142a32"))
+	host.draw_rect(Rect2(0, 60, 960, 2), Color("b69b65"))
+	host.draw_rect(Rect2(12, 5, 46, 50), Color("2c4246"))
 	character_art.portrait(host)
-	host.draw_rect(Rect2(610, 16, 166, 10), Color("314952"))
-	host.draw_rect(Rect2(612, 18, 162 * host.chakra / 100.0, 6), Color("66b8bd"))
-	var place := "CAMPO DE TREINO" if host.stage <= 1 else "KONOHA • PRAÇA" if host.stage == 2 else "FLORESTA • NOITE" if host.stage <= 4 else "KONOHA • CASA"
-	host.draw_string(ThemeDB.fallback_font, Vector2(790, 26), place, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("d6c89f"))
-	host.draw_rect(Rect2(0, 445, 960, 95), Color("132832"))
-
-	for i in range(7):
-		host.draw_rect(Rect2(475 + i * 16, 489, 11, 5), Color("e3bd79") if i <= host.stage else Color("354852"))
-	host.draw_string(ThemeDB.fallback_font, Vector2(475, 478), "PRÓLOGO", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("e3bd79"))
+	host.draw_string(ThemeDB.fallback_font, Vector2(586, 20), "CHAKRA", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("adc3be"))
+	host.draw_rect(Rect2(640, 10, 218, 12), Color("2e4850"))
+	host.draw_rect(Rect2(642, 12, 214 * host.chakra / 100.0, 8), Color("69bfce"))
+	host.draw_string(ThemeDB.fallback_font, Vector2(869, 21), "%d / 100" % int(host.chakra), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("e3dcc0"))
+	var place := "CAMPO DE TREINO" if host.stage <= 1 else "KONOHA · PRAÇA" if host.stage == 2 else "FLORESTA · NOITE" if host.stage <= 4 else "KONOHA · CASA"
+	host.draw_style_box(host.polish.panel(), Rect2(16, 74, 205, 26))
+	host.draw_string(ThemeDB.fallback_font, Vector2(29, 92), place, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("ead3a4"))
+	if host.lines.is_empty():
+		host.draw_string(ThemeDB.fallback_font, Vector2(382, 517), "PRÓLOGO  /  %02d DE 07" % (host.stage + 1), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("ecdfb8"))

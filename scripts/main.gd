@@ -13,12 +13,14 @@ var trail_progress := 0.0
 var attack_flash := 0.0
 var lines: Array[String] = []
 var line_index := 0
+var pending_forest_transition := false
 var movement := Vector2.ZERO
 var held := {}
 var hud: Label
 var objective: Label
 var dialogue: Button
 var restart: Button
+var ui: CanvasLayer
 var visual_clock := 0.0
 var sprinting := false
 var effect_kind := "kunai"
@@ -45,74 +47,38 @@ func _ready() -> void:
 	add_child(background)
 	background.z_index = -1
 	background.set_area(stage)
-	var layer := CanvasLayer.new()
-	add_child(layer)
-	hud = Label.new()
-	hud.position = Vector2(74, 10)
-	hud.add_theme_font_size_override("font_size", 20)
-	layer.add_child(hud)
-	objective = Label.new()
-	objective.position = Vector2(74, 40)
-	objective.add_theme_font_size_override("font_size", 15)
-	objective.size = Vector2(870, 34)
-	objective.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	layer.add_child(objective)
-	dialogue = Button.new()
-	dialogue.position = Vector2(120, 325)
-	dialogue.size = Vector2(720, 100)
-	dialogue.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	dialogue.pressed.connect(next_line)
-	style_button(dialogue, true)
-	layer.add_child(dialogue)
-	for item in [["←", Vector2(18, 460), "left"], ["→", Vector2(150, 460), "right"], ["↑", Vector2(84, 394), "up"], ["↓", Vector2(84, 460), "down"], ["FURTIVO", Vector2(244, 460), "sneak"], ["CORRER", Vector2(365, 460), "run"]]:
-		var button := Button.new()
-		button.text = item[0]
-		button.position = item[1]
-		button.size = Vector2(110 if item[2] == "sneak" else 95 if item[2] == "run" else 64, 64)
-		var action: String = item[2]
-		button.button_down.connect(func(): held[action] = true)
-		button.button_up.connect(func(): held[action] = false)
-		style_button(button)
-		layer.add_child(button)
-	for item in [["KUNAI", 610, "kunai"], ["KATON", 720, "katon"], ["AÇÃO", 830, "interact"]]:
-		var button := Button.new()
-		button.text = item[0]
-		button.position = Vector2(item[1], 460)
-		button.size = Vector2(105, 64)
-		var action: String = item[2]
-		button.pressed.connect(func(): act(action))
-		style_button(button)
-		layer.add_child(button)
-	restart = Button.new()
-	restart.text = "Jogar novamente"
-	restart.position = Vector2(375, 240)
-	restart.size = Vector2(210, 50)
-	restart.visible = false
-	restart.pressed.connect(func(): get_tree().reload_current_scene())
-	style_button(restart)
-	layer.add_child(restart)
+	ui = preload("res://scripts/game_ui.gd").new()
+	ui.game = self
+	add_child(ui)
 	say(["NARUTO EP -1 — A Noite Antes do Começo", "Henrique Uchiha, 12 anos. Um fim de tarde em Konoha, antes do início da história de Naruto.", "Henrique: Ainda tenho muito para aprender. Vou começar pelo treino de kunai.", "Mova-se com WASD/setas ou os botões. Clique no diálogo ou pressione E para avançar."])
 
 func say(texts: Array[String]) -> void:
-	held.clear()
+	ui.release_touches()
 	movement = Vector2.ZERO
 	sprinting = false
 	lines = texts
 	line_index = 0
-	dialogue.text = lines[0] + "\n[Toque para continuar]"
-	dialogue.show()
+	ui.show_line(lines[0])
 
 func next_line() -> void:
+	if ui.finish_typing():
+		return
 	line_index += 1
+	if pending_forest_transition and line_index >= 3:
+		pending_forest_transition = false
+		stage = 3
+		player = Vector2(450, 270)
 	if line_index >= lines.size():
 		lines.clear()
 		dialogue.hide()
 	else:
-		dialogue.text = lines[line_index] + "\n[Toque para continuar]"
+		ui.show_line(lines[line_index])
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:
+			KEY_ESCAPE:
+				if ui.settings_panel.visible: ui.toggle_settings()
 			KEY_E, KEY_SPACE: act("interact")
 			KEY_J: act("kunai")
 			KEY_K: act("katon")
@@ -128,7 +94,7 @@ func _process(delta: float) -> void:
 	cooldown = maxf(0.0, cooldown - delta)
 	attack_flash = maxf(0.0, attack_flash - delta)
 	chakra = minf(100.0, chakra + delta * 5.0)
-	if lines.is_empty() and stage < 6:
+	if lines.is_empty() and stage < 6 and not ui.settings_panel.visible:
 		movement = Vector2(float(down("right", KEY_D, KEY_RIGHT)) - float(down("left", KEY_A, KEY_LEFT)), float(down("down", KEY_S, KEY_DOWN)) - float(down("up", KEY_W, KEY_UP))).normalized()
 		if movement != Vector2.ZERO:
 			facing = movement
@@ -156,7 +122,7 @@ func _process(delta: float) -> void:
 					stage = 4
 					target = mizuki
 					say(["Henrique: Ele sumiu entre as árvores...", "Há uma kunai no chão. Será que ele deixou cair?"])
-	hud.text = "HENRIQUE UCHIHA  •  12 anos     |     CHAKRA %d" % int(chakra)
+	hud.text = "HENRIQUE UCHIHA  /  12 ANOS"
 	objective.text = OBJECTIVES[stage]
 	if stage == 3:
 		objective.text += "  %d%%" % int(trail_progress / 12 * 100)
@@ -164,6 +130,8 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func act(action: String) -> void:
+	if ui.settings_panel.visible:
+		return
 	if not lines.is_empty():
 		if action == "interact": next_line()
 		return
@@ -192,8 +160,7 @@ func act(action: String) -> void:
 			say(["Henrique: Katon!", "As chamas escapam por um instante. Seus olhos ficam vermelhos: Sharingan de um tomoe.", "Henrique: O que foi isso...? Melhor voltar para a vila."])
 	elif action == "interact":
 		if stage == 2 and player.distance_to(Vector2(640, 260)) < 95:
-			stage = 3
-			player = Vector2(450, 270)
+			pending_forest_transition = true
 			say(["Naruto: Ei! Por que você está sempre com essa cara séria?", "Henrique: E você, por que está sempre arrumando confusão?", "Iruka: Naruto! Volte para a Academia!", "Mais tarde, ao anoitecer...", "Henrique: Mizuki? O que um instrutor está fazendo perto da floresta a esta hora?"])
 		elif stage == 4 and player.distance_to(target) < 85:
 			stage = 5
@@ -227,6 +194,7 @@ func _draw() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		if is_instance_valid(ui): ui.release_touches()
 		held.clear()
 		movement = Vector2.ZERO
 		sprinting = false

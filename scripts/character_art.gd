@@ -77,8 +77,8 @@ func draw_naruto(host: Node2D, at: Vector2) -> void:
 
 func portrait(host: Node2D) -> void:
 	if compact_mode:
-		host.draw_texture_rect_region(COMPACT_HENRIQUE, Rect2(16, 10, 44, 54), Rect2(0, 0, 24, 28))
+		host.draw_texture_rect_region(COMPACT_HENRIQUE, Rect2(16, 7, 40, 48), Rect2(0, 0, 24, 28))
 		return
 	var bounds: Array = henrique_frames[0]["rect"]
 	# Region of the original texture; no baked crops or background removal.
-	host.draw_texture_rect_region(henrique_texture, Rect2(16, 10, 44, 54), Rect2(bounds[0] + 10, bounds[1], bounds[2] - 20, 135))
+	host.draw_texture_rect_region(henrique_texture, Rect2(16, 7, 40, 48), Rect2(bounds[0] + 10, bounds[1], bounds[2] - 20, 135))

@@ -32,11 +32,21 @@ func capture() -> void:
 	game.cooldown = 0
 	game.act("katon")
 	close_dialogue(game)
+	assert(game.stage == 2, "Capture must reach Konoha through playable actions")
 	game.attack_flash = 0
 	game.player = Vector2(520, 300)
 	await save_frame("original-konoha.png")
-	game.player = Vector2(620, 260)
+	game.effect_kind = "katon"
+	game.effect_origin = game.player
+	game.effect_direction = Vector2.RIGHT
+	game.attack_flash = 0.45
+	await save_frame("novo-katon.png")
+	game.attack_flash = 0
+	game.player = Vector2(560, 280)
 	game.act("interact")
+	assert(game.stage == 2 and not game.lines.is_empty(), "Naruto dialogue must begin in the village")
+	game.ui.finish_typing()
+	await save_frame("novo-dialogo.png")
 	close_dialogue(game)
 	game.player = game.mizuki - Vector2(180, 0)
 	game.held["sneak"] = true

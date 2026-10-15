@@ -1,66 +1,70 @@
 # Naruto EP -1 — A Noite Antes do Começo
 
-Protótipo jogável de fã em Godot 4.x. Abra `project.godot` e execute com F6/F5. Sem plugins ou assets externos. Renderizador Compatibility, interface 960×540 e controles de toque para telas em paisagem.
+Protótipo de fã em Godot 4.x, desenvolvido na branch **main** a partir do prólogo original `fix/primeiro-mugen-diagnostico`. Henrique Uchiha, 12 anos, treina kunai e Katon, encontra Naruto e Iruka, segue Mizuki à noite e investiga o alarme do Pergaminho dos Selos. A narrativa é uma criação de fã, anterior ao episódio 1.
 
-Henrique Uchiha tem 12 anos. Este prólogo original se passa antes dos acontecimentos do episódio 1: treino de kunai e Katon, encontro com Naruto e Iruka, perseguição furtiva de Mizuki, investigação e alarme do Pergaminho dos Selos. A narrativa é uma criação de fã, não um episódio oficial.
+Abra `project.godot` e execute com F5. Renderizador Compatibility, interface em paisagem de 960×540, sem plugins ou downloads durante o jogo.
+
+## Visual e interface
+
+- Konoha com caminhos sem textura granulada repetitiva, silhueta de montanhas, árvores de tamanhos diferentes, sombras, bancos, canal e ponte.
+- Casa com floreira, Academia com faixas, armazém com chaminé e Ichiraku com toldo; as construções mantêm as posições e colisões do protótipo.
+- Atlas detalhado original de Henrique e Naruto MUGEN preservados. Iruka e Mizuki usam desenho procedural com proporções próximas, roupa, protetor de testa, detalhes de rosto e movimentos sutis.
+- HUD compacto com retrato, missão e barra de chakra ampliada. Controles sobrepostos nas laterais deixam o centro livre.
+- Direcional compacto, botões de ação e suporte a dedos independentes para andar e correr juntos. Arrastar para fora do botão libera o comando.
+- **CONTROLES** ajusta a opacidade entre 30% e 100%, gravada em `user://interface.cfg`.
+- Diálogos com nome, retrato e texto progressivo. O primeiro toque revela a fala; o seguinte avança. A mudança para a floresta acontece no momento do anoitecer durante a conversa.
+- Folhas, vagalumes, poeira, anel de acerto, partículas de chakra e Katon com brilho e núcleo luminoso. Cenários estáticos são redesenhados apenas ao mudar de área.
+
+A arte dos personagens usa técnicas distintas: o atlas detalhado e os quadros MUGEN são mantidos, e o cenário/NPCs foram aproximados por proporção e paleta. O jogo continua sendo um protótipo.
 
 ## Controles
-- WASD/setas: andar; Shift: andar furtivamente.
-- J: kunai (olhe para o alvo a menos de 150 passos).
-- K: Katon (consome 25 de chakra, regenerado automaticamente).
-- E/Espaço: conversar, investigar e avançar diálogos.
-- Botões na tela oferecem as mesmas ações. Toque no diálogo para avançar.
 
-Durante a perseguição, mantenha distância entre 70 e 230 passos e use FURTIVO. Se for detectado, a perseguição reinicia. Complete 12 segundos seguindo Mizuki, investigue a kunai e volte para a casa à esquerda.
+| Ação | Teclado |
+| --- | --- |
+| Andar | WASD / setas |
+| Correr | R |
+| Furtivo | Shift |
+| Kunai | J |
+| Katon | K |
+| Interagir / diálogo | E / Espaço |
+| Fechar ajustes | Esc |
 
-## Estado
-Arte original em pixel art integrada: quatro personagens com nove quadros cada (frente, costas e lateral), caminhada, vila com casas e telhados, Academia, banca de ramen, canal e ponte, campo de treino, floresta noturna, lanternas, partículas de folhas/vagalumes e efeitos de kunai/Katon. Interface com retrato, barra de chakra e painéis estilizados. Os gráficos são uma interpretação própria simples; a imagem de referência não foi recortada nem usada como atlas. O episódio 1, save, música, combate completo e exportação APK ainda não estão implementados. Importação e execução headless verificadas no Godot 4.3, incluindo teste da sequência completa do prólogo. Desempenho e toque ainda precisam ser conferidos num aparelho Android real. Para Android, instalar os templates de exportação e configurar um preset Android.
+Os botões de toque oferecem as mesmas ações. Durante diálogos, apenas AÇÃO permanece visível. Diálogos, ajustes e perda de foco liberam os comandos para evitar movimento preso.
 
+Para chegar à praça das capturas: acerte o alvo três vezes com kunai, mirando a menos de 150 passos, e use Katon perto dele. Katon consome 25 de chakra. Na perseguição, mantenha 70–230 passos de distância de Mizuki e use FURTIVO; complete 12 segundos, investigue a kunai e volte para a casa à esquerda.
 
-## Arte e desempenho
+## Android e modo leve
 
-`assets/art/` contém SVGs feitos com retângulos em uma grade de pixels. O Godot importa essas texturas uma vez; o filtro nearest preserva as bordas. O cenário usa comandos CanvasItem retidos e é redesenhado apenas quando a área muda. Efeitos usam quantidades limitadas de partículas desenhadas e nenhum pós-processamento pesado.
+Henrique usa o atlas detalhado por padrão também no Android. O Android limita a execução a 30 FPS. O modo simplificado é opcional: `NARUTO_LOW_MEMORY=1` usa o pequeno atlas SVG de Henrique e tem aparência diferente das capturas detalhadas. Os quadros MUGEN são carregados sob demanda.
 
-Recriar a arte: `python tools/build_art.py` (Python 3, sem dependências).
+Toque e desempenho ainda precisam de validação em aparelho Android real. Esta atualização não inclui APK. Para exportar, instale os templates do Godot e configure um preset Android.
 
-Verificação: `godot --headless --path . --editor --quit`, depois `godot --headless --path . --script res://tests/prologue_smoke.gd`.
+## Validação
 
-## Referências pesquisadas
+```sh
+godot --headless --path . --editor --quit
+godot --headless --path . --script res://tests/prologue_smoke.gd
+NARUTO_LOW_MEMORY=1 godot --headless --path . --script res://tests/prologue_smoke.gd
+godot --headless --path . --script res://tests/interface_smoke.gd
+```
 
-- [Pixel Shippuden](https://www.narutostorm.com/games/english): referência de RPG pixel art com exploração da Vila da Folha.
-- [The Fight of Konoha](https://timyfreak.itch.io/the-fight-of-konoha): referência de apresentação de Naruto/Sasuke em pixel art.
-- [Simple NES-like Village Tiles, surt / OpenGameArt](https://opengameart.org/content/simple-nes-like-village-tiles): pesquisa de tilesets retro.
+O teste do prólogo percorre todas as etapas, consumo de chakra e caminhos gráficos. O teste da interface injeta eventos no sistema de entrada do Godot e verifica texto progressivo, toque simultâneo, liberação ao arrastar, ações, pausa nos ajustes e persistência da opacidade. Também impede o avanço duplo provocado pelo clique de mouse emulado de um toque.
 
-Esses links foram referências para a primeira versão visual. A atualização detalhada inclui arte gerada do Henrique baseada na imagem enviada pelo usuário e sprites do Naruto convertidos do pack MUGEN Real Naruto. Consulte `assets/mugen/CREDITS.md` para a origem e créditos do pack. Naruto e personagens associados pertencem aos respectivos titulares. Projeto independente de fã.
-
-
-## Sprites detalhados e MUGEN
-
-- `assets/characters/henrique-detailed.png`: atlas RGBA com 24 poses do Henrique, criado com a ferramenta integrada de geração de imagens a partir da referência enviada. `henrique-frames.json` mapeia os recortes reais da textura, mantendo o PNG original intacto.
-- `assets/mugen/naruto/`: 14 sprites originais decodificados do SFF do pack Real Naruto, com quatro animações e os tempos/eixos do AIR preservados. A espera do Naruto usa esses quadros na praça; caminhada, corrida e agachamento ficam disponíveis no manifesto, sem novas cenas para o NPC.
-- CORRER na tela ou R: sprint do Henrique. FURTIVO/Shift continua tendo prioridade na perseguição.
-- Henrique usa poses próprias de idle, caminhada, corrida, kunai e Katon. Não é um personagem baixado do MUGEN. O jogo permanece em visão de cima; os movimentos laterais usam o atlas detalhado e o idle de costas aparece ao olhar para cima. Ciclos de caminhada vertical exclusivos ainda não estão disponíveis.
-
-Teste atualizado passou no Godot 4.3: importação RGBA, atlas de 24 poses, AIR idle de quatro quadros, seleção de sprint/Katon e sequência completa do prólogo. Não há exportação APK nesta mudança.
-
-## Continuação do protótipo MUGEN original
-
-Esta atualização parte de `fix/primeiro-mugen-diagnostico` e conserva o prólogo EP -1, o atlas detalhado de Henrique, os quadros AIR/MUGEN de Naruto e os mapas originais.
-
-Melhorias: luz diurna suave, poeira dos passos, indicação de acerto no treino, círculo do jogador, seta para o próximo objetivo, aviso de interação, medidor de distância/furtividade na perseguição, etapas do prólogo e estados visuais dos botões. Os efeitos são procedurais e mantêm o modo leve Android.
-
-Diálogos e perda de foco liberam os controles de toque, evitando movimento preso ao voltar ao jogo. O teste cobre essa regressão e a sequência completa nos modos detalhado e leve.
-
-Capturas reais do treino, da praça e da perseguição podem ser reproduzidas com display gráfico:
+Com display gráfico ou Xvfb, gere capturas reais do treino, praça, diálogo, Katon e perseguição:
 
 ```sh
 NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests/capture_preview.gd
 ```
 
-Android ainda precisa de validação em aparelho; não há APK nesta atualização.
+O script percorre as ações do treino antes de capturar a praça. Não usa uma cena visual separada do jogo.
 
-## Aparência igual à captura
+## Recursos e créditos
 
-Henrique usa o atlas detalhado por padrão no desktop e no Android, inclusive no retrato. O Android mantém o limite de 30 FPS; o modo simplificado só é ativado explicitamente com `NARUTO_LOW_MEMORY=1`. O modo simplificado tem outra aparência e não corresponde à captura detalhada.
+- `assets/characters/henrique-detailed.png`: atlas RGBA original de 24 poses; recortes em `henrique-frames.json`.
+- `assets/mugen/naruto/`: 14 quadros decodificados do pack Real Naruto, preservando tempos e eixos AIR. Origem e créditos em [assets/mugen/CREDITS.md](assets/mugen/CREDITS.md).
+- `scripts/background.gd` e `scripts/npc_art.gd`: cenários e NPCs desenhados por código, sem novos recursos externos.
+- `tools/build_art.py`: gerador dos SVGs originais, ainda usados em alvos, kunai e modo leve.
 
-O jogo inicia no treino. Para chegar à praça mostrada na imagem, conclua os três acertos de kunai e use Katon perto do alvo. O teste de captura percorre essas ações antes de renderizar a praça; não usa uma cena de demonstração separada.
+Referências originais: [Pixel Shippuden](https://www.narutostorm.com/games/english), [The Fight of Konoha](https://timyfreak.itch.io/the-fight-of-konoha) e [Village Tiles / OpenGameArt](https://opengameart.org/content/simple-nes-like-village-tiles).
+
+Naruto e personagens associados pertencem aos respectivos titulares. Projeto independente de fã. Episódio 1, save de história, música e combate completo ainda não estão implementados.
