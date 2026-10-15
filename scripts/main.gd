@@ -39,7 +39,7 @@ const OBJECTIVES := [
 
 func _ready() -> void:
 	# Cap CPU/GPU work on Android, including during the opening dialogue.
-	if art.character_art.compact_mode:
+	if OS.get_name() == "Android" or art.character_art.compact_mode:
 		Engine.max_fps = 30
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	add_child(background)

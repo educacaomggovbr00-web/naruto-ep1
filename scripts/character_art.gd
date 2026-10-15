@@ -2,14 +2,16 @@ extends RefCounted
 
 const COMPACT_HENRIQUE = preload("res://assets/art/henrique.svg")
 const HENRIQUE_SCALE := 0.36
-var compact_mode: bool = OS.get_name() == "Android" or OS.has_environment("NARUTO_LOW_MEMORY")
+# Keep the reference appearance on every platform. Compact art is opt-in.
+var compact_mode: bool = OS.get_environment("NARUTO_LOW_MEMORY") == "1"
 var henrique_texture: Texture2D = null
 var henrique_frames: Array = JSON.parse_string(FileAccess.get_file_as_string("res://assets/characters/henrique-frames.json"))["frames"]
 var mugen_actions: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/mugen/naruto/animations.json"))
 var texture_cache := {}
 
 func _init() -> void:
-	# No full-size atlas on Android; the original MUGEN frames are loaded only when seen.
+	# Use the original detailed atlas by default, including on Android.
+	# Naruto MUGEN frames remain lazy-loaded.
 	if not compact_mode:
 		henrique_texture = load("res://assets/characters/henrique-detailed.png") as Texture2D
 
@@ -32,7 +34,7 @@ func draw_henrique(host: Node2D) -> void:
 	shadow(host, host.player)
 	host.draw_set_transform(host.player + Vector2(0, 14), 0, Vector2(-1 if mirror else 1, 1))
 	if compact_mode:
-		# Nine 24x28 frames; this tiny texture avoids the 1536x1024 atlas on phones.
+		# Optional nine-frame fallback for explicitly requested low-memory runs.
 		var direction_row := 2 if absf(host.facing.x) > 0.4 else 1 if host.facing.y < -0.4 else 0
 		var step := int(host.visual_clock * (13.0 if host.sprinting else 9.0)) % 3 if host.movement != Vector2.ZERO and host.lines.is_empty() else 0
 		var region := Rect2((direction_row * 3 + step) * 24, 0, 24, 28)

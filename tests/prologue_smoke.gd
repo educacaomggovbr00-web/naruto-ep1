@@ -11,6 +11,7 @@ func run_checks() -> void:
 	var game = load("res://scenes/main.tscn").instantiate()
 	root.add_child(game)
 	await process_frame
+	assert(game.art.character_art.compact_mode == (OS.get_environment("NARUTO_LOW_MEMORY") == "1"), "Detailed reference art must be default; compact mode is explicit")
 	# MUGEN frames should not be decoded before Naruto is on screen.
 	assert(game.art.character_art.texture_cache.is_empty(), "MUGEN images must be loaded lazily")
 	close_dialogue(game)

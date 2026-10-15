@@ -58,3 +58,9 @@ NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests
 ```
 
 Android ainda precisa de validação em aparelho; não há APK nesta atualização.
+
+## Aparência igual à captura
+
+Henrique usa o atlas detalhado por padrão no desktop e no Android, inclusive no retrato. O Android mantém o limite de 30 FPS; o modo simplificado só é ativado explicitamente com `NARUTO_LOW_MEMORY=1`. O modo simplificado tem outra aparência e não corresponde à captura detalhada.
+
+O jogo inicia no treino. Para chegar à praça mostrada na imagem, conclua os três acertos de kunai e use Katon perto do alvo. O teste de captura percorre essas ações antes de renderizar a praça; não usa uma cena de demonstração separada.
