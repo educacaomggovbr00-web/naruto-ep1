@@ -1,177 +1,60 @@
-# Naruto Clássico — O Começo
+# Naruto EP -1 — A Noite Antes do Começo
 
-Fangame 2D em Godot 4.x focado no início de Naruto Clássico. Henrique Uchiha tem 12 anos. O jogo abre no Episódio 1 e agora continua jogavelmente pelo Episódio 2.
+Protótipo jogável de fã em Godot 4.x. Abra `project.godot` e execute com F6/F5. Sem plugins ou assets externos. Renderizador Compatibility, interface 960×540 e controles de toque para telas em paisagem.
 
-## Direção do jogo
-
-A exploração usa visão de cima, mapa compacto e leitura de RPG portátil antigo. O combate e as cutscenes podem usar apresentação lateral mais detalhada, no estilo dos fangames 2D/JUS/NZC/MUGEN, sem misturar esse corpo lateral com o overworld.
-
-Naruto, Iruka, Mizuki, Sasuke e Sakura aparecem em escala coerente no mapa. O Naruto lateral importado do pack MUGEN deixou de ser o corpo de exploração; ele aparece apenas como apresentação curta de batalha no momento decisivo do confronto com Mizuki.
+Henrique Uchiha tem 12 anos. Este prólogo original se passa antes dos acontecimentos do episódio 1: treino de kunai e Katon, encontro com Naruto e Iruka, perseguição furtiva de Mizuki, investigação e alarme do Pergaminho dos Selos. A narrativa é uma criação de fã, não um episódio oficial.
 
 ## Controles
+- WASD/setas: andar; Shift: andar furtivamente.
+- J: kunai (olhe para o alvo a menos de 150 passos).
+- K: Katon (consome 25 de chakra, regenerado automaticamente).
+- E/Espaço: conversar, investigar e avançar diálogos.
+- Botões na tela oferecem as mesmas ações. Toque no diálogo para avançar.
 
-- WASD/setas: andar.
-- R / botão CORRER: correr.
-- Shift / FURTIVO: andar furtivamente.
-- J / KUNAI: lançar kunai.
-- K / KATON: Katon básico.
-- E/Espaço / AÇÃO: conversar e interagir.
-- P / PROGRESSO: abrir o menu de progressão.
+Durante a perseguição, mantenha distância entre 70 e 230 passos e use FURTIVO. Se for detectado, a perseguição reinicia. Complete 12 segundos seguindo Mizuki, investigue a kunai e volte para a casa à esquerda.
 
-## Progressão
+## Estado
+Arte original em pixel art integrada: quatro personagens com nove quadros cada (frente, costas e lateral), caminhada, vila com casas e telhados, Academia, banca de ramen, canal e ponte, campo de treino, floresta noturna, lanternas, partículas de folhas/vagalumes e efeitos de kunai/Katon. Interface com retrato, barra de chakra e painéis estilizados. Os gráficos são uma interpretação própria simples; a imagem de referência não foi recortada nem usada como atlas. O episódio 1, save, música, combate completo e exportação APK ainda não estão implementados. Importação e execução headless verificadas no Godot 4.3, incluindo teste da sequência completa do prólogo. Desempenho e toque ainda precisam ser conferidos num aparelho Android real. Para Android, instalar os templates de exportação e configurar um preset Android.
 
-O menu mostra nível, XP, ryo, chakra, inventário, missões, avanço da história e técnicas atuais.
 
-Começo do Episódio 1:
-- Kunai
-- Shuriken
-- Katon básico
-- movimentos e ações básicas
+## Arte e desempenho
 
-Mantidos para fases futuras, mas bloqueados agora:
-- Chidori
-- Mangekyo
-- Amaterasu
-- Susanoo
-- técnicas avançadas e transformações
+`assets/art/` contém SVGs feitos com retângulos em uma grade de pixels. O Godot importa essas texturas uma vez; o filtro nearest preserva as bordas. O cenário usa comandos CanvasItem retidos e é redesenhado apenas quando a área muda. Efeitos usam quantidades limitadas de partículas desenhadas e nenhum pós-processamento pesado.
 
-## Animações do Henrique
+Recriar a arte: `python tools/build_art.py` (Python 3, sem dependências).
 
-`assets/characters/henrique-actions.json` mantém o catálogo enviado pelo usuário: idle, caminhada, corrida, pulo, queda, agachar, esquiva, deslizar, soco, chute, combos, kunai, shuriken, Katon, Chidori, corrente elétrica, clones, substituição, Sharingan, Mangekyo, genjutsu, Susanoo, dano, levantar, Amaterasu, ataques aéreos e extras.
+Verificação: `godot --headless --path . --editor --quit`, depois `godot --headless --path . --script res://tests/prologue_smoke.gd`.
 
-O jogo só libera ações compatíveis com a fase atual da história.
+## Referências pesquisadas
 
-## Sprites 2D
+- [Pixel Shippuden](https://www.narutostorm.com/games/english): referência de RPG pixel art com exploração da Vila da Folha.
+- [The Fight of Konoha](https://timyfreak.itch.io/the-fight-of-konoha): referência de apresentação de Naruto/Sasuke em pixel art.
+- [Simple NES-like Village Tiles, surt / OpenGameArt](https://opengameart.org/content/simple-nes-like-village-tiles): pesquisa de tilesets retro.
 
-- `assets/art/naruto.svg`: overworld do Naruto clássico.
-- `assets/art/iruka.svg`: overworld do Iruka.
-- `assets/art/mizuki.svg`: overworld do Mizuki.
-- `assets/art/sasuke.svg`: overworld original do Sasuke adicionado para a Academia.
-- `assets/art/sakura.svg`: overworld original da Sakura adicionado para a Academia.
-- `assets/mugen/naruto/`: quadros de um Naruto Kid fan-MUGEN já existentes no projeto, usados apenas em apresentação de combate/cutscene.
-- `assets/characters/henrique-detailed.png`: atlas detalhado do Henrique.
+Esses links foram referências para a primeira versão visual. A atualização detalhada inclui arte gerada do Henrique baseada na imagem enviada pelo usuário e sprites do Naruto convertidos do pack MUGEN Real Naruto. Consulte `assets/mugen/CREDITS.md` para a origem e créditos do pack. Naruto e personagens associados pertencem aos respectivos titulares. Projeto independente de fã.
 
-Créditos e procedência do material MUGEN estão em `assets/mugen/CREDITS.md`.
 
-## Mundo
+## Sprites detalhados e MUGEN
 
-A praça de Konoha recebeu mais elementos de RPG top-down: caminhos quebrados, bancos, caixas, placa de direção, áreas de grama, Academia, ramen, quadro de missões, ponte/canal e marcadores de distrito.
+- `assets/characters/henrique-detailed.png`: atlas RGBA com 24 poses do Henrique, criado com a ferramenta integrada de geração de imagens a partir da referência enviada. `henrique-frames.json` mapeia os recortes reais da textura, mantendo o PNG original intacto.
+- `assets/mugen/naruto/`: 14 sprites originais decodificados do SFF do pack Real Naruto, com quatro animações e os tempos/eixos do AIR preservados. A espera do Naruto usa esses quadros na praça; caminhada, corrida e agachamento ficam disponíveis no manifesto, sem novas cenas para o NPC.
+- CORRER na tela ou R: sprint do Henrique. FURTIVO/Shift continua tendo prioridade na perseguição.
+- Henrique usa poses próprias de idle, caminhada, corrida, kunai e Katon. Não é um personagem baixado do MUGEN. O jogo permanece em visão de cima; os movimentos laterais usam o atlas detalhado e o idle de costas aparece ao olhar para cima. Ciclos de caminhada vertical exclusivos ainda não estão disponíveis.
 
-## História
+Teste atualizado passou no Godot 4.3: importação RGBA, atlas de 24 poses, AIR idle de quatro quadros, seleção de sprint/Katon e sequência completa do prólogo. Não há exportação APK nesta mudança.
 
-A abertura começa no dia da prova de graduação. Naruto falha na Academia; Mizuki o manipula; o Pergaminho dos Selos é roubado; Henrique segue os acontecimentos até a floresta e ajuda Iruka a ganhar tempo. O momento decisivo continua sendo de Naruto.
+## Continuação do protótipo MUGEN original
 
-Esta é uma adaptação jogável de fã e não reproduz o roteiro oficial palavra por palavra.
+Esta atualização parte de `fix/primeiro-mugen-diagnostico` e conserva o prólogo EP -1, o atlas detalhado de Henrique, os quadros AIR/MUGEN de Naruto e os mapas originais.
 
-## Pesquisa e direção visual
+Melhorias: luz diurna suave, poeira dos passos, indicação de acerto no treino, círculo do jogador, seta para o próximo objetivo, aviso de interação, medidor de distância/furtividade na perseguição, etapas do prólogo e estados visuais dos botões. Os efeitos são procedurais e mantêm o modo leve Android.
 
-A direção de arte foi refinada olhando referências de fangames Naruto 2D/JUS/NZC/MUGEN e mantendo a escala dos personagens coerente, além do material oficial do Episódio 1. Consulte `docs/CLASSIC_EP1_STYLE.md`.
+Diálogos e perda de foco liberam os controles de toque, evitando movimento preso ao voltar ao jogo. O teste cobre essa regressão e a sequência completa nos modos detalhado e leve.
 
-## Teste
+Capturas reais do treino, da praça e da perseguição podem ser reproduzidas com display gráfico:
 
-```
-godot --headless --path . --editor --quit
-godot --headless --path . --script res://tests/prologue_smoke.gd
+```sh
+NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests/capture_preview.gd
 ```
 
-O renderizador continua em Compatibility e a interface permanece 960×540 para manter o projeto leve no Android.
-
-
-## Episódio 2 — Konohamaru
-
-Depois da conclusão do confronto com Mizuki, o jogo passa automaticamente para o Episódio 2. Naruto já se formou e cruza com Konohamaru, neto do Terceiro Hokage. A adaptação mantém o foco em reconhecimento, esforço e no começo da relação entre Naruto e Konohamaru, sem reproduzir o roteiro oficial palavra por palavra.
-
-O Episódio 2 adiciona Konohamaru e Ebisu ao overworld, um pequeno treino interativo e recompensa própria de progressão. O próximo gancho narrativo aponta para a formação dos times e o futuro Time 7.
-
-## Menu TÉCNICAS e animações do Henrique
-
-Além de KUNAI, KATON e AÇÃO, existe um botão TÉCNICAS para celular. Ele expõe ações básicas ligadas ao catálogo do Henrique:
-
-- soco / combo básico
-- shuriken
-- esquiva/rolamento
-- agachar
-- pular
-- deslizar
-- clone das sombras
-- substituição
-
-O manifesto também registra estados de dano, queda, levantar e morte básica, além das animações avançadas já guardadas para fases futuras. O atlas transparente atual tem 24 poses e reutiliza algumas delas para representar ações adicionais até que cada pose da folha visual enviada seja exportada como frame transparente individual.
-
-
-## Sprites pesquisados na internet
-
-Foi adicionado um pacote opcional de sprites 2D fan-made do Naruto vindo do projeto público `vikas0304/vscode-anime`. O repositório usa licença MIT e informa no README que a arte de sprites da versão inicial foi gerada com IA.
-
-O jogo tenta carregar e armazenar em cache `idle_1`, `idle_2` e `walk_1..4` em `user://external_sprites/`. Se o aparelho estiver sem internet ou o download falhar, a apresentação de batalha volta automaticamente para os quadros MUGEN já incluídos no projeto.
-
-Outros packs JUS/NZC/MUGEN encontrados durante a pesquisa foram usados somente como referência visual quando não havia uma licença de redistribuição clara.
-
-Consulte `assets/external/CREDITS.md` e `assets/external/naruto_fan_sources.json`.
-
-
-## Henrique — PNG exato ativo no gameplay
-
-A prancha `assets/characters/file_000000003c88820e930f366203f13d4e.png` deixou de ser apenas referência: ela agora alimenta diretamente as animações do Henrique.
-
-`assets/characters/henrique-board-frames.json` mapeia 86 recortes da própria prancha. Para não exibir os painéis escuros do arquivo original, `character_art.gd` extrai cada pose sob demanda, remove o fundo por flood-fill e mantém a textura resultante em cache. Assim o jogo usa os sprites daquele PNG sem precisar trocar para o antigo `henrique-detailed.png`.
-
-As animações mapeadas incluem idle, caminhada, corrida, pulo, queda, agachar, esquiva/rolamento, deslizar, combo de socos, kunai, shuriken, Katon, clone das sombras, substituição, levar dano, cair, levantar e morte básica. Técnicas futuras continuam cadastradas como aliases temporários até terem quadros próprios.
-
-
-## Konoha inteira — 30 áreas
-
-Konoha agora funciona como um overworld conectado de RPG portátil antigo. O botão **MAPA** abre uma grade de 30 áreas, e o jogador também pode atravessar as bordas da tela para ir para áreas vizinhas.
-
-Entre os pontos implementados estão Academia, Monumento e Residência do Hokage, Hospital, Estação Jōnin, Arquivos, Atribuição de Missões, Distrito Comercial, Cemitério, Pedra Memorial, Biblioteca, Correio, Ichiraku, Distrito Uchiha, Polícia Militar, Santuário Naka, Rio Naka, loja de dango, Campos de Treino 3 e 44, Aviário, Divisão de Inteligência, Fontes Termais, Orfanato e Portão de Konoha, além de bairros residenciais usados para conectar o mapa.
-
-A posição exata das ruas é uma adaptação de gameplay: as fontes de Naruto fornecem landmarks e relações importantes, mas não uma única planta canônica completa, rua por rua, pronta para ser convertida em tilemap. A pesquisa e a grade usada pelo jogo estão documentadas em `docs/KONOHA_WORLD.md`.
-
-Cada tipo de local recebe elementos visuais próprios e os NPCs de história só aparecem no local correto. Durante a perseguição do Pergaminho dos Selos, o fast travel é bloqueado na parte da floresta para preservar a sequência.
-
-
-## Episódios 4-5 — Teste de sobrevivência
-
-Depois do EP 3, o jogo segue para o Campo de Treinamento 3. Naruto, Sasuke e Sakura fazem o teste de sobrevivência de Kakashi como Time 7. Henrique participa apenas de uma avaliação paralela para não substituir nenhum integrante do time.
-
-No gameplay, o avanço de Henrique exige ações executadas de verdade: esquiva perto de Kakashi, substituição junto ao alvo e dois acertos de shuriken. Kakashi registra o resultado separado do Time 7. A conclusão preserva a ideia central do teste: Naruto, Sasuke e Sakura precisam deixar de agir apenas individualmente e aprender a funcionar como equipe.
-
-## Episódio 6 — Saída de Konoha
-
-A sequência seguinte leva o grupo à Residência do Hokage. Hiruzen apresenta a primeira missão C, Tazuna entra como cliente e o jogador segue até o Portão de Konoha.
-
-Naruto, Sasuke, Sakura e Kakashi permanecem visíveis durante toda a saída da vila, usando os mesmos sprites top-down do overworld já estabelecido. Henrique acompanha como apoio extra desta adaptação, enquanto o Time 7 continua sendo oficialmente Naruto, Sasuke, Sakura e Kakashi.
-
-Ao atravessar o portão, o mapa de fast travel é bloqueado e o cenário muda para a estrada fora de Konoha. A missão só é registrada quando o jogador realmente percorre o trecho de saída.
-
-A ordem narrativa foi ajustada para seguir a cronologia do anime: o teste de sobrevivência ocupa os episódios 4-5; a missão de Tazuna e a viagem ao País das Ondas começam no episódio 6.
-
-
-## Pacote gráfico da prancha
-
-A referência visual enviada pelo usuário agora está representada no projeto como um pacote gráfico completo e leve. Foram adicionados Teuchi, Ayame, ANBU e variantes de moradores ao overworld; strips 2D de batalha para Henrique, Naruto, Sasuke, Sakura e Kakashi; biblioteca de VFX de fogo/raio/água/fumaça/impacto/aura; tileset de Konoha; ícones de itens/UI; e nove cenários de batalha.
-
-Os NPCs novos já aparecem em locais coerentes de Konoha, e os VFX básicos já participam de Katon, clone, substituição, impactos e Sharingan. O inventário também passou a registrar pergaminhos, ryō, ramen, dango, água e remédio.
-
-Detalhes em `docs/GRAPHICS_PACK.md`.
-
-
-## Imagens enviadas no chat — agora usadas de verdade
-
-As duas pranchas mais recentes fornecidas pelo usuário foram recortadas, tiveram o fundo escuro removido nos sprites e foram compactadas em um pacote mobile de 45 recursos.
-
-O runtime agora prioriza:
-- overworld de Naruto, Sasuke, Sakura e Kakashi tirado da prancha enviada;
-- animações do Naruto tiradas da folha enviada, incluindo idle, andar, correr, pulo, queda, agachar, socos, chute, kunai, shuriken, clone, substituição, Rasengan, dano, cair e levantar;
-- mapa de Konoha e cenários de campo de treino/floresta tirados da prancha.
-
-O pack fica em `assets/user_pack/user_assets.json.gz` e é decodificado por `scripts/user_asset_pack.gd`. Os sprites antigos permanecem apenas como fallback. Detalhes: `docs/USER_IMAGE_ASSETS.md`.
-
-
-### Integração mais recente das imagens exatas
-
-- O Henrique em exploração agora prioriza o overworld recortado da prancha mais recente; as animações de ação continuam usando a folha detalhada já integrada.
-- O menu **MAPA** usa a imagem de Konoha recortada da prancha como fundo visual.
-- O menu **PROGRESSO** mostra o recorte exato de itens/UI enviado pelo usuário.
-- Os cenários de batalha de praça/vila, floresta, ponte e campo de treino priorizam os recortes exatos antes dos cenários procedurais de fallback.
-- O teste automático verifica que Henrique, itens/UI e os cenários exatos são realmente decodificados pelo runtime.
+Android ainda precisa de validação em aparelho; não há APK nesta atualização.
