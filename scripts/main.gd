@@ -20,6 +20,8 @@ var hud: Label
 var objective: Label
 var dialogue: Button
 var restart: Button
+var cinematic: Node
+var audio: Node
 var ui: CanvasLayer
 var visual_clock := 0.0
 var sprinting := false
@@ -47,6 +49,11 @@ func _ready() -> void:
 	add_child(background)
 	background.z_index = -1
 	background.set_area(stage)
+	audio = preload("res://scripts/soundscape.gd").new()
+	add_child(audio)
+	cinematic = preload("res://scripts/cinematic.gd").new()
+	cinematic.game = self
+	add_child(cinematic)
 	ui = preload("res://scripts/game_ui.gd").new()
 	ui.game = self
 	add_child(ui)
@@ -138,16 +145,21 @@ func act(action: String) -> void:
 	if stage == 6: return
 	if action == "kunai" and cooldown <= 0:
 		cooldown = 0.4
+		audio.play("kunai")
 		attack_flash = 0.2
 		effect_kind = "kunai"
 		effect_origin = player
 		effect_direction = facing
 		if stage == 0 and player.distance_to(target) < 150 and facing.dot((target - player).normalized()) > 0.35:
+			audio.play("impact")
+			cinematic.kick(0.55)
 			hits += 1
 			if hits >= 3:
 				stage = 1
 				say(["Henrique: Três acertos! Agora vou tentar o Katon."])
 	elif action == "katon" and cooldown <= 0 and chakra >= 25:
+		audio.play("katon")
+		cinematic.kick(0.85)
 		chakra -= 25
 		cooldown = 1.0
 		attack_flash = 0.5

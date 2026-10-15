@@ -6,12 +6,12 @@ Abra `project.godot` e execute com F5. Renderizador Compatibility, interface em 
 
 ## Visual e interface
 
-- Konoha com caminhos sem textura granulada repetitiva, silhueta de montanhas, árvores de tamanhos diferentes, sombras, bancos, canal e ponte.
-- Casa com floreira, Academia com faixas, armazém com chaminé e Ichiraku com toldo; as construções mantêm as posições e colisões do protótipo.
+- Cenários 2.5D detalhados para Konoha, campo de treino e floresta noturna, com luz, materiais, vegetação e profundidade pintados. Apenas a imagem da área atual fica carregada.
+- Casa com floreira, Academia com faixas, armazém com chaminé e Ichiraku com toldo; o layout mantém as posições das construções e a clareira de movimentação do protótipo.
 - Atlas detalhado original de Henrique e Naruto MUGEN preservados. Iruka e Mizuki usam desenho procedural com proporções próximas, roupa, protetor de testa, detalhes de rosto e movimentos sutis.
 - HUD compacto com retrato, missão e barra de chakra ampliada. Controles sobrepostos nas laterais deixam o centro livre.
 - Direcional compacto, botões de ação e suporte a dedos independentes para andar e correr juntos. Arrastar para fora do botão libera o comando.
-- **CONTROLES** ajusta a opacidade entre 30% e 100%, gravada em `user://interface.cfg`.
+- **AJUSTES** ajusta a opacidade entre 30% e 100%, gravada em `user://interface.cfg`.
 - Diálogos com nome, retrato e texto progressivo. O primeiro toque revela a fala; o seguinte avança. A mudança para a floresta acontece no momento do anoitecer durante a conversa.
 - Folhas, vagalumes, poeira, anel de acerto, partículas de chakra e Katon com brilho e núcleo luminoso. Cenários estáticos são redesenhados apenas ao mudar de área.
 
@@ -62,9 +62,23 @@ O script percorre as ações do treino antes de capturar a praça. Não usa uma 
 
 - `assets/characters/henrique-detailed.png`: atlas RGBA original de 24 poses; recortes em `henrique-frames.json`.
 - `assets/mugen/naruto/`: 14 quadros decodificados do pack Real Naruto, preservando tempos e eixos AIR. Origem e créditos em [assets/mugen/CREDITS.md](assets/mugen/CREDITS.md).
-- `scripts/background.gd` e `scripts/npc_art.gd`: cenários e NPCs desenhados por código, sem novos recursos externos.
+- `assets/environments/`: pinturas geradas para o projeto, com procedência em [CREDITS.md](assets/environments/CREDITS.md). `scripts/npc_art.gd` desenha os NPCs por código.
 - `tools/build_art.py`: gerador dos SVGs originais, ainda usados em alvos, kunai e modo leve.
 
 Referências originais: [Pixel Shippuden](https://www.narutostorm.com/games/english), [The Fight of Konoha](https://timyfreak.itch.io/the-fight-of-konoha) e [Village Tiles / OpenGameArt](https://opengameart.org/content/simple-nes-like-village-tiles).
 
-Naruto e personagens associados pertencem aos respectivos titulares. Projeto independente de fã. Episódio 1, save de história, música e combate completo ainda não estão implementados.
+Naruto e personagens associados pertencem aos respectivos titulares. Projeto independente de fã. Episódio 1, save de história, trilha musical e combate completo ainda não estão implementados.
+
+## Apresentação cinematográfica
+
+A câmera acompanha o jogador suavemente e reage a kunai e Katon. O HUD e os controles usam uma camada separada e permanecem estáveis. Um shader simples aplica contraste, cor de dia/noite e vinheta ao mundo; os sprites e os cenários continuam sendo 2D, sem geometria 3D ou ray tracing.
+
+Há sons originais sintetizados de kunai, impacto e fogo, além de um ambiente discreto de vento e pássaros. **AJUSTES** permite desligar áudio e movimento da câmera; as preferências são gravadas no mesmo arquivo da opacidade. Os efeitos não dependem de arquivos baixados durante o jogo.
+
+Verificação adicional:
+
+```sh
+godot --headless --path . --script res://tests/cinematic_smoke.gd
+```
+
+A referência a consoles descreve a direção de apresentação. O protótipo não é uma versão de PS5 nem alcança a produção de um jogo AAA. Desempenho e saída de áudio no Android continuam pendentes de teste em aparelho real.

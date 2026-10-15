@@ -14,6 +14,10 @@ var touch_pointers: Dictionary = {}
 var opacity_slider: HSlider
 
 func _ready() -> void:
+	layer = 3
+	var hud_canvas := preload("res://scripts/hud_canvas.gd").new()
+	hud_canvas.game = game
+	add_child(hud_canvas)
 	settings_file.load("user://interface.cfg")
 	touch_opacity = clampf(float(settings_file.get_value("touch", "opacity", 0.8)), 0.3, 1.0)
 	game.hud = label_at("", Vector2(70, 7), Vector2(425, 24), 17, Color("f8e8c6"))
@@ -51,12 +55,12 @@ func _ready() -> void:
 		button.pressed.connect(func(): game.act(action))
 		button.set_meta("action", action)
 		touch_buttons.append(button)
-	var settings_button := button_at("CONTROLES", Vector2(838, 72), Vector2(106, 30))
+	var settings_button := button_at("AJUSTES", Vector2(838, 72), Vector2(106, 30))
 	settings_button.add_theme_font_size_override("font_size", 10)
 	settings_button.pressed.connect(toggle_settings)
 	settings_panel = Panel.new()
 	settings_panel.position = Vector2(648, 111)
-	settings_panel.size = Vector2(296, 122)
+	settings_panel.size = Vector2(296, 190)
 	settings_panel.add_theme_stylebox_override("panel", panel_style())
 	settings_panel.z_index = 20
 	add_child(settings_panel)
@@ -73,6 +77,22 @@ func _ready() -> void:
 	opacity_slider.drag_ended.connect(func(_changed: bool): save_preferences())
 	settings_panel.add_child(opacity_slider)
 	child_label(settings_panel, "WASD · R correr · Shift furtivo · J / K / E", Vector2(16, 88), Vector2(266, 20), 10, Color("aebeb7"))
+	var camera_toggle := CheckButton.new()
+	camera_toggle.text = "Câmera dinâmica"
+	camera_toggle.position = Vector2(12, 113)
+	camera_toggle.size = Vector2(270, 30)
+	camera_toggle.button_pressed = bool(settings_file.get_value("cinema", "motion", true))
+	game.cinematic.motion_enabled = camera_toggle.button_pressed
+	camera_toggle.toggled.connect(func(value: bool): game.cinematic.motion_enabled = value; settings_file.set_value("cinema", "motion", value); save_preferences())
+	settings_panel.add_child(camera_toggle)
+	var audio_toggle := CheckButton.new()
+	audio_toggle.text = "Som ambiente e efeitos"
+	audio_toggle.position = Vector2(12, 149)
+	audio_toggle.size = Vector2(270, 30)
+	audio_toggle.button_pressed = bool(settings_file.get_value("cinema", "audio", true))
+	game.audio.set_enabled(audio_toggle.button_pressed)
+	audio_toggle.toggled.connect(func(value: bool): game.audio.set_enabled(value); settings_file.set_value("cinema", "audio", value); save_preferences())
+	settings_panel.add_child(audio_toggle)
 	game.restart = button_at("Jogar novamente", Vector2(375, 275), Vector2(210, 46))
 	game.restart.pressed.connect(func(): get_tree().reload_current_scene())
 	game.restart.hide()

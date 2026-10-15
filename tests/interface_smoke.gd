@@ -65,6 +65,7 @@ func run_checks() -> void:
 	game._notification(MainLoop.NOTIFICATION_APPLICATION_FOCUS_OUT)
 	assert(game.ui.touch_pointers.is_empty() and game.held.is_empty())
 	print("PASS: dialogue reveal, simultaneous touch, drag release, actions, settings and saved opacity")
+	game.audio.shutdown()
 	game.queue_free()
-	await process_frame
+	await create_timer(0.1).timeout
 	quit()

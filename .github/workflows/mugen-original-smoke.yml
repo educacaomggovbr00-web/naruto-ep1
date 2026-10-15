@@ -54,3 +54,10 @@ jobs:
           set -euo pipefail
           timeout 45s godot --headless --path . --script res://tests/interface_smoke.gd | tee interface-smoke.log
           grep -Fq "PASS: dialogue reveal" interface-smoke.log
+
+      - name: Verify cinematic presentation and audio controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 45s godot --headless --path . --script res://tests/cinematic_smoke.gd | tee cinematic-smoke.log
+          grep -Fq "PASS: stable interface" cinematic-smoke.log

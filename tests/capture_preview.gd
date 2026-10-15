@@ -51,4 +51,7 @@ func capture() -> void:
 	game.player = game.mizuki - Vector2(180, 0)
 	game.held["sneak"] = true
 	await save_frame("original-furtividade.png")
+	game.audio.shutdown()
+	game.queue_free()
+	await create_timer(0.1).timeout
 	quit()

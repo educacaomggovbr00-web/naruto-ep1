@@ -77,6 +77,7 @@ func run_checks() -> void:
 	game.attack_flash = 0.5
 	assert(game.art.character_art.henrique_frame(game) == 21, "Katon must select jutsu poses")
 	print("PASS: complete prologue progression, chakra, area transitions and SVG atlas import")
+	game.audio.shutdown()
 	game.queue_free()
-	await process_frame
+	await create_timer(0.1).timeout
 	quit()

@@ -63,17 +63,19 @@ func render(host: Node2D) -> void:
 		var y := 216 + (i % 5) * 33 + sin(host.visual_clock + i) * 13
 		host.draw_rect(Rect2(x, y, 3 if night else 5, 2), Color(0.85, 0.9, 0.54, 0.5) if night else Color(0.72, 0.76, 0.43, 0.6))
 	host.polish.render(host)
+
+func draw_hud(canvas: Node2D, host: Node2D) -> void:
 	# Compact HUD frees the center and bottom for the world.
-	host.draw_rect(Rect2(0, 0, 960, 62), Color("142a32"))
-	host.draw_rect(Rect2(0, 60, 960, 2), Color("b69b65"))
-	host.draw_rect(Rect2(12, 5, 46, 50), Color("2c4246"))
-	character_art.portrait(host)
-	host.draw_string(ThemeDB.fallback_font, Vector2(586, 20), "CHAKRA", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("adc3be"))
-	host.draw_rect(Rect2(640, 10, 218, 12), Color("2e4850"))
-	host.draw_rect(Rect2(642, 12, 214 * host.chakra / 100.0, 8), Color("69bfce"))
-	host.draw_string(ThemeDB.fallback_font, Vector2(869, 21), "%d / 100" % int(host.chakra), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("e3dcc0"))
+	canvas.draw_rect(Rect2(0, 0, 960, 62), Color("142a32"))
+	canvas.draw_rect(Rect2(0, 60, 960, 2), Color("b69b65"))
+	canvas.draw_rect(Rect2(12, 5, 46, 50), Color("2c4246"))
+	character_art.portrait(canvas)
+	canvas.draw_string(ThemeDB.fallback_font, Vector2(586, 20), "CHAKRA", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("adc3be"))
+	canvas.draw_rect(Rect2(640, 10, 218, 12), Color("2e4850"))
+	canvas.draw_rect(Rect2(642, 12, 214 * host.chakra / 100.0, 8), Color("69bfce"))
+	canvas.draw_string(ThemeDB.fallback_font, Vector2(869, 21), "%d / 100" % int(host.chakra), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("e3dcc0"))
 	var place := "CAMPO DE TREINO" if host.stage <= 1 else "KONOHA · PRAÇA" if host.stage == 2 else "FLORESTA · NOITE" if host.stage <= 4 else "KONOHA · CASA"
-	host.draw_style_box(host.polish.panel(), Rect2(16, 74, 205, 26))
-	host.draw_string(ThemeDB.fallback_font, Vector2(29, 92), place, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("ead3a4"))
+	canvas.draw_style_box(host.polish.panel(), Rect2(16, 74, 205, 26))
+	canvas.draw_string(ThemeDB.fallback_font, Vector2(29, 92), place, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("ead3a4"))
 	if host.lines.is_empty():
-		host.draw_string(ThemeDB.fallback_font, Vector2(382, 517), "PRÓLOGO  /  %02d DE 07" % (host.stage + 1), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("ecdfb8"))
+		canvas.draw_string(ThemeDB.fallback_font, Vector2(382, 517), "PRÓLOGO  /  %02d DE 07" % (host.stage + 1), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("ecdfb8"))
