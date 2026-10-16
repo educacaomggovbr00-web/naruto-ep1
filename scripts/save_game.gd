@@ -32,7 +32,7 @@ func validate(data: Variant) -> bool:
 	if data.has("return_position") and not valid_vector(data.return_position,0,960): return false
 	if data.has("visited"):
 		if not data.visited is Dictionary: return false
-		for key in ["academy","home","class_intro","board","notes"]:
+		for key in ["academy","home","class_intro","board","notes","chakra_drill"]:
 			if data.visited.has(key) and not data.visited[key] is bool: return false
 	if not valid_number(data.get("hits"), 0, 3) or not valid_number(data.get("chakra"), 0, 100) or not valid_number(data.get("stamina"), 0, 100):
 		return false
@@ -113,6 +113,7 @@ func apply(game: Node2D, data: Dictionary) -> bool:
 	game.movement = Vector2.ZERO
 	game.sprinting = false
 	game.save_clock = 0
+	game.ui.practice.close()
 	game.ui.journal.hide()
 	game.ui.release_touches()
 	game.background.set_area(game.stage,game.room)

@@ -173,7 +173,7 @@ O teste cobre preparação, voo, alcance, erro de mira, assistência, contato em
 
 Use **DIÁRIO · M** no topo da tela ou a tecla **M** para consultar o objetivo e uma dica para o local atual. **VOLTAR**, **M** ou **Esc** fecham o painel. O mundo fica pausado: não há movimento, regeneração, recarga ou avanço da perseguição enquanto você lê. Ao abrir, a interface libera os dedos e descarta ataques pendentes; os controles de exploração ficam ocultos.
 
-O caminho do prólogo mostra os seis objetivos, com futuras etapas ainda ocultas. Cinco anotações opcionais acompanham as visitas à Academia e à casa, a conversa com Iruka, a revisão no quadro e os cadernos de Henrique. Essas descobertas não bloqueiam a história. O diário não abre durante falas, carregamento inicial, ajustes ou transições entre ambientes.
+O caminho do prólogo mostra os seis objetivos, com futuras etapas ainda ocultas. Seis anotações opcionais acompanham as visitas à Academia e à casa, a conversa com Iruka, a revisão no quadro, os cadernos de Henrique e a aula prática de chakra. Essas descobertas não bloqueiam a história. O diário não abre durante falas, carregamento inicial, ajustes ou transições entre ambientes.
 
 As dicas distinguem exterior, sala de aula e casa. Elas explicam como voltar à praça, encontrar Naruto ou contornar a mesa para chegar à cama. Abrir o diário não altera a etapa. A nova anotação dos cadernos usa o campo opcional `visited.notes`; arquivos antigos da versão 1 continuam carregando e recebem `false` nesse campo.
 
@@ -184,3 +184,22 @@ NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests
 ```
 
 O teste injeta teclas e toques, verifica pausa da perseguição, cancelamento de comandos, bloqueio durante diálogos, revelação gradual das etapas, dicas por cômodo e salvamento das descobertas com compatibilidade antiga. As capturas são do jogo em execução, após completar o treino e visitar os dois interiores. Toque físico, legibilidade e ergonomia em Android real permanecem pendentes.
+
+## Aula prática de controle de chakra
+
+Na etapa diurna de Konoha, entre na Academia, converse com Iruka e leia o quadro à esquerda dele. Depois aproxime-se do círculo **TREINO** no centro da sala e use **E / AÇÃO**.
+
+- A atividade usa o retrato original de Iruka e mantém o cenário e os personagens existentes.
+- Acompanhe o marcador e pressione **CONCENTRAR**, **E** ou **Espaço** dentro da faixa dourada. Complete três acertos. Cada acerto reinicia o marcador; há um pequeno intervalo para ler a reação e impedir toques repetidos.
+- Errar não consome chakra, não remove os acertos anteriores e não reinicia a história. **SAIR / Esc** permite interromper; uma tentativa incompleta começa do zero ao entrar novamente.
+- Ao perder foco, o marcador pausa e exige **RETOMAR**. O restante do mundo permanece parado durante a atividade; diário, combate e deslocamento ficam bloqueados.
+- A conclusão registra `visited.chakra_drill` no diário e tenta salvar imediatamente. Há um aviso se a gravação falhar. Esse campo é opcional nos saves v1 e assume `false` nos antigos. Repetir ou cancelar uma aula posterior preserva a conclusão anterior.
+- A aula é opcional e não libera poderes extras, não restaura recursos e não muda a etapa do prólogo. O encontro com Naruto e o final na cama continuam acessíveis sem fazê-la.
+
+```sh
+godot --headless --path . --script res://tests/practice_smoke.gd
+NARUTO_LOW_MEMORY=1 godot --headless --path . --script res://tests/practice_smoke.gd
+NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests/capture_practice.gd
+```
+
+O teste verifica acesso pela sala, pré-requisitos, piso livre, acerto/erro, toque com clique de mouse emulado, bloqueio de repetição, pausa ao sair do foco, registro imediato, repetição/cancelamento, carregamento antigo e continuação até Naruto. As capturas percorrem o treino inicial e a entrada na Academia, e completam a atividade usando o marcador em movimento. Toque físico, áudio, legibilidade, desempenho e suspensão/retomada ainda precisam de Android real.

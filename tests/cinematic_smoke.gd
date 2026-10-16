@@ -17,7 +17,7 @@ func run_checks() -> void:
 	assert(game.cinematic.camera.offset == Vector2.ZERO, "Motion option must disable camera shake")
 	var grade: ShaderMaterial = game.cinematic.material
 	assert(grade.shader != null)
-	for kind in ["kunai", "katon", "impact"]:
+	for kind in ["kunai", "katon", "impact", "focus"]:
 		var stream: AudioStreamWAV = game.audio.sounds[kind]
 		assert(stream.data.size() > 3000 and stream.mix_rate == 11025)
 	game.audio.set_enabled(false)

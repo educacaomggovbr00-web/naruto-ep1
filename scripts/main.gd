@@ -5,7 +5,7 @@ var player := Vector2(140, 270)
 var stage := 0
 var room := "outside"
 var return_position := Vector2(170,270)
-var visited := {"academy":false,"home":false,"class_intro":false,"board":false,"notes":false}
+var visited := {"academy":false,"home":false,"class_intro":false,"board":false,"notes":false,"chakra_drill":false}
 var travelling := false
 var hits := 0
 var chakra := 100.0
@@ -127,6 +127,10 @@ func interior_action() -> void:
 		"Iruka":
 			visited["class_intro"]=true
 			say(["Iruka: Henrique, o treino de hoje é controle de chakra e precisão. Não basta fazer força: concentre-se.","Iruka: Amanhã continuaremos as avaliações. Por hoje, revise suas anotações e converse com seus colegas."])
+		"practice":
+			if not visited["class_intro"]: say(["Henrique: Vou conversar com Iruka, à frente da sala, antes de começar o exercício."])
+			elif not visited["board"]: say(["Henrique: A revisão está no quadro à esquerda de Iruka. Vou ler antes de praticar."])
+			else: ui.practice.start()
 		"Sasuke": say(["Sasuke: Já terminei meus exercícios. Vou revisar os movimentos mais uma vez."])
 		"Sakura": say(["Sakura: O Iruka deixou a revisão no quadro. Quero estar preparada para a próxima aula."])
 		"board":
@@ -169,9 +173,12 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			KEY_ENTER:
 				if ui.resume_overlay.visible: ui.continue_game()
 			KEY_ESCAPE:
-				if ui.journal.visible: ui.journal.close()
+				if ui.practice.visible: ui.practice.close()
+				elif ui.journal.visible: ui.journal.close()
 				elif ui.settings_panel.visible: ui.toggle_settings()
-			KEY_E, KEY_SPACE: act("interact")
+			KEY_E, KEY_SPACE:
+				if ui.practice.visible: ui.practice.confirm()
+				else: act("interact")
 			KEY_J: act("kunai")
 			KEY_K: act("katon")
 
@@ -233,7 +240,10 @@ func _process(delta: float) -> void:
 					say(["Henrique: Ele sumiu entre as árvores...", "Há uma kunai no chão. Será que ele deixou cair?"])
 	hud.text = "HENRIQUE UCHIHA  /  12 ANOS"
 	objective.text = OBJECTIVES[stage]
-	if room == "academy" and stage < 6: objective.text = "ACADEMIA • " + ("Explore a sala. E / AÇÃO para conversar e ler." if visited["class_intro"] else "Converse com Iruka, à frente da sala.")
+	if room == "academy" and stage < 6:
+		objective.text="ACADEMIA • Converse com Iruka, à frente da sala."
+		if visited["class_intro"]: objective.text="ACADEMIA • Leia o quadro e pratique chakra no centro da sala (E / AÇÃO)."
+		if visited["chakra_drill"]: objective.text="ACADEMIA • Treino concluído. Explore a sala ou volte à praça para encontrar Naruto."
 	elif room == "home" and stage < 6: objective.text = "CASA • " + ("Aproxime-se da cama e use AÇÃO para descansar." if stage == 5 else "Explore sua casa. A saída fica na parte de baixo.")
 	if stage == 3:
 		objective.text += "  %d%%" % int(trail_progress / 12 * 100)

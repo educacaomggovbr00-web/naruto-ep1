@@ -24,6 +24,8 @@ var hud_canvas: Node2D
 var settings_button: Button
 var opacity_slider: HSlider
 var transition_overlay: ColorRect
+var practice: Control
+var suppressed_menu_touch:=Vector2(INF,INF)
 var journal: Control
 var journal_button: Button
 
@@ -151,6 +153,9 @@ func _ready() -> void:
 	journal=preload("res://scripts/journal.gd").new()
 	journal.game=game
 	add_child(journal)
+	practice=preload("res://scripts/chakra_practice.gd").new()
+	practice.game=game
+	add_child(practice)
 	build_resume_menu()
 	set_touch_opacity(touch_opacity)
 	transition_overlay=ColorRect.new()
@@ -211,6 +216,7 @@ func save_preferences() -> void:
 	settings_file.save("user://interface.cfg")
 
 func toggle_settings() -> void:
+	if practice.visible: return
 	if journal.visible: journal.close()
 	settings_panel.visible = not settings_panel.visible
 	release_touches()
@@ -220,6 +226,7 @@ func toggle_settings() -> void:
 
 func show_line(text: String) -> void:
 	if journal!=null: journal.hide()
+	if practice!=null: practice.hide()
 	settings_panel.hide()
 	var speaker := "NARRADOR"
 	var body := text
@@ -268,7 +275,7 @@ func _process(delta: float) -> void:
 	game.objective.visible = not resume_overlay.visible
 	settings_button.visible = not resume_overlay.visible
 	journal_button.visible=not resume_overlay.visible and game.lines.is_empty() and not game.travelling
-	journal_button.disabled=journal.visible
+	journal_button.disabled=journal.visible or practice.visible
 	toast_time = maxf(0, toast_time - delta)
 	toast_panel.visible = toast_time > 0 and game.lines.is_empty() and not modal_open()
 	refresh_controls()
@@ -317,20 +324,26 @@ func release_pointer(index: int) -> void:
 			return
 	game.held.erase(action)
 
+func menu_target(at: Vector2) -> Button:
+	var candidates:Array[Button]=[]
+	if practice.visible: candidates=[practice.confirm_button,practice.close_button]
+	elif journal.visible: candidates=[journal.close_button]
+	elif not modal_open() and journal_button.visible: candidates=[journal_button]
+	for button in candidates:
+		if button.get_global_rect().has_point(at): return button
+	return null
+
 func _input(event: InputEvent) -> void:
-	# Menu touches use the same direct path as gameplay, without a mouse dependency.
-	var over_journal:bool=journal_button.get_global_rect().has_point(event.position) if event is InputEventMouse or event is InputEventScreenTouch else false
-	var over_close:bool=journal.close_button.get_global_rect().has_point(event.position) if event is InputEventMouse or event is InputEventScreenTouch else false
-	if event is InputEventMouse and event.device==InputEvent.DEVICE_ID_EMULATION and (over_journal or over_close):
+	# Suppress only the emulated mouse copy of a touch we dispatched ourselves.
+	if event is InputEventMouse and event.device==InputEvent.DEVICE_ID_EMULATION and event.position.distance_to(suppressed_menu_touch)<5:
 		get_viewport().set_input_as_handled()
 		return
 	if event is InputEventScreenTouch and event.pressed:
-		if journal.visible and over_close:
-			journal.close()
-			get_viewport().set_input_as_handled()
-			return
-		if journal_button.visible and over_journal:
-			journal.toggle()
+		suppressed_menu_touch=Vector2(INF,INF)
+		var menu_button:Button=menu_target(event.position)
+		if menu_button!=null:
+			suppressed_menu_touch=event.position
+			menu_button.pressed.emit()
 			get_viewport().set_input_as_handled()
 			return
 	# Touch buttons are dispatched above GUI; suppress their emulated mouse copy.
@@ -379,7 +392,7 @@ func toast(text: String) -> void:
 	toast_time = 2.2
 
 func modal_open() -> bool:
-	return settings_panel.visible or resume_overlay.visible or (journal!=null and journal.visible) or game.travelling
+	return settings_panel.visible or resume_overlay.visible or (journal!=null and journal.visible) or (practice!=null and practice.visible) or game.travelling
 
 func build_resume_menu() -> void:
 	resume_overlay = Control.new()

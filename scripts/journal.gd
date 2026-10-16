@@ -4,7 +4,7 @@ const CHAPTERS := ["Precisão com kunai", "Controle de chakra", "Encontro na vil
 const DISCOVERIES := [
 	["academy", "Conhecer a Academia"], ["class_intro", "Conversar com Iruka"],
 	["board", "Ler a revisão no quadro"], ["home", "Visitar sua casa"],
-	["notes", "Examinar seus cadernos"]
+	["notes", "Examinar seus cadernos"], ["chakra_drill", "Praticar controle de chakra"]
 ]
 
 var game: Node2D
@@ -70,7 +70,7 @@ func _ready() -> void:
 	text(panel,"EXPLORAÇÃO OPCIONAL",Vector2(501,96),Vector2(269,20),11,Color("d4b87f"))
 	discovery_label=text(panel,"",Vector2(501,123),Vector2(269,26),17,Color("f5e7c7"))
 	for i in range(DISCOVERIES.size()):
-		var row:=text(panel,"",Vector2(501,164+i*34),Vector2(269,29),14,Color.WHITE)
+		var row:=text(panel,"",Vector2(501,164+i*29),Vector2(269,29),14,Color.WHITE)
 		discovery_rows.append(row)
 	var note:=text(panel,"Estas visitas não bloqueiam a história.\nAs anotações acompanham o save local.",Vector2(501,349),Vector2(267,48),12,Color("aebfb9"))
 	note.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART

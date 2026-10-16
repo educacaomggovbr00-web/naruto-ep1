@@ -22,6 +22,11 @@ func marker(host: Node2D, at: Vector2, clock: float) -> void:
 func render(host: Node2D) -> void:
 	if host.room != "outside":
 		var data: Dictionary = host.layout.interiors.config(host.room)
+		if host.room=="academy":
+			var circle:=Vector2(480,349)
+			host.draw_circle(circle,23,Color(0.85,0.72,0.44,0.1))
+			host.draw_arc(circle,23,0,TAU,32,Color("bda568"),1.5,true)
+			host.draw_string(ThemeDB.fallback_font,circle+Vector2(-27,43),"TREINO",HORIZONTAL_ALIGNMENT_LEFT,-1,11,Color("ead3a4"))
 		var actors: Array[Dictionary] = [{"name":"player","at":host.player}]
 		for name_text in data["actors"]:
 			actors.append({"name":name_text,"at":data["actors"][name_text]})

@@ -9,7 +9,8 @@ const ROOMS := {
 		"actors": {"Iruka":Vector2(480,220),"Sasuke":Vector2(250,212),"Sakura":Vector2(735,212)},
 		"points": [
 			{"id":"exit","at":Vector2(480,462),"radius":55.0,"label":"Sair da Academia"},
-			{"id":"board","at":Vector2(365,207),"radius":56.0,"label":"Ler o quadro"}
+			{"id":"board","at":Vector2(365,207),"radius":56.0,"label":"Ler o quadro"},
+			{"id":"practice","at":Vector2(480,335),"radius":42.0,"label":"Treinar controle de chakra"}
 		]
 	},
 	"home": {

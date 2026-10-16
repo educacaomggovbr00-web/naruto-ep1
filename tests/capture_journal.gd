@@ -58,7 +58,7 @@ func capture() -> void:
 	game.act("interact")
 	close_dialogue(game)
 	game.ui.journal.toggle()
-	assert(game.ui.journal.discovery_label.text=="5 de 5 anotações")
+	assert(game.ui.journal.discovery_label.text=="5 de 6 anotações")
 	await save_frame("diario-descobertas-academia-casa.png")
 	game.ui.journal.close()
 	game.player=Vector2(690,310)
