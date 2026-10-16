@@ -42,7 +42,7 @@ func render(game: Node2D) -> void:
 		var radius := 15.0 + (0.35 - hit_timer) * 80
 		game.draw_arc(game.target, radius, 0, TAU, 32, Color(1, 0.83, 0.43, hit_timer * 2), 2, true)
 		game.draw_string(ThemeDB.fallback_font, game.target + Vector2(-28, -48 - radius * 0.25), "ACERTO!", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("ffda83"))
-	if not game.lines.is_empty() or game.stage >= 6 or game.ui.settings_panel.visible:
+	if not game.lines.is_empty() or game.stage >= 6 or game.ui.modal_open():
 		return
 	if game.room != "outside":
 		var point: Dictionary = game.layout.interiors.nearby(game.player,game.room)

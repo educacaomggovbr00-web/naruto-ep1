@@ -5,7 +5,7 @@ var player := Vector2(140, 270)
 var stage := 0
 var room := "outside"
 var return_position := Vector2(170,270)
-var visited := {"academy":false,"home":false,"class_intro":false,"board":false}
+var visited := {"academy":false,"home":false,"class_intro":false,"board":false,"notes":false}
 var travelling := false
 var hits := 0
 var chakra := 100.0
@@ -132,7 +132,9 @@ func interior_action() -> void:
 		"board":
 			visited["board"]=true
 			say(["No quadro: controle de chakra, transformação e clonagem básica. O treinamento com armas deve acontecer no campo de treino.","Henrique: Vou revisar com calma. Primeiro, preciso dominar os fundamentos."])
-		"desk": say(["Henrique: Meus cadernos e materiais de treino. Ainda há anotações que preciso revisar."])
+		"desk":
+			visited["notes"]=true
+			say(["Henrique: Meus cadernos e materiais de treino. Ainda há anotações que preciso revisar."])
 		"kitchen": say(["Uma cozinha simples, com água, frutas e os utensílios do dia a dia. A casa está em ordem."])
 		"bed":
 			if stage == 5: finish_prologue()
@@ -162,11 +164,13 @@ func next_line() -> void:
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:
+			KEY_M: ui.journal.toggle()
 			KEY_Q: act("dodge")
 			KEY_ENTER:
 				if ui.resume_overlay.visible: ui.continue_game()
 			KEY_ESCAPE:
-				if ui.settings_panel.visible: ui.toggle_settings()
+				if ui.journal.visible: ui.journal.close()
+				elif ui.settings_panel.visible: ui.toggle_settings()
 			KEY_E, KEY_SPACE: act("interact")
 			KEY_J: act("kunai")
 			KEY_K: act("katon")

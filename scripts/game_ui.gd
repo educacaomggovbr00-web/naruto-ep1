@@ -24,6 +24,8 @@ var hud_canvas: Node2D
 var settings_button: Button
 var opacity_slider: HSlider
 var transition_overlay: ColorRect
+var journal: Control
+var journal_button: Button
 
 func _ready() -> void:
 	layer = 3
@@ -78,6 +80,9 @@ func _ready() -> void:
 			button.add_theme_stylebox_override(state, style)
 		if action == "dodge": button.tooltip_text = "Q · Esquiva (30 de fôlego)"
 		touch_buttons.append(button)
+	journal_button=button_at("DIÁRIO · M",Vector2(716,66),Vector2(112,44))
+	journal_button.add_theme_font_size_override("font_size",11)
+	journal_button.pressed.connect(func(): journal.toggle())
 	settings_button = button_at("AJUSTES", Vector2(838, 72), Vector2(106, 30))
 	settings_button.add_theme_font_size_override("font_size", 10)
 	settings_button.pressed.connect(toggle_settings)
@@ -143,6 +148,9 @@ func _ready() -> void:
 	toast_label = child_label(toast_panel, "", Vector2(8, 6), Vector2(384, 25), 13, Color("f0d79d"))
 	toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	toast_panel.hide()
+	journal=preload("res://scripts/journal.gd").new()
+	journal.game=game
+	add_child(journal)
 	build_resume_menu()
 	set_touch_opacity(touch_opacity)
 	transition_overlay=ColorRect.new()
@@ -203,6 +211,7 @@ func save_preferences() -> void:
 	settings_file.save("user://interface.cfg")
 
 func toggle_settings() -> void:
+	if journal.visible: journal.close()
 	settings_panel.visible = not settings_panel.visible
 	release_touches()
 	game.movement = Vector2.ZERO
@@ -210,6 +219,7 @@ func toggle_settings() -> void:
 		save_preferences()
 
 func show_line(text: String) -> void:
+	if journal!=null: journal.hide()
 	settings_panel.hide()
 	var speaker := "NARRADOR"
 	var body := text
@@ -257,8 +267,18 @@ func _process(delta: float) -> void:
 	game.hud.visible = not resume_overlay.visible
 	game.objective.visible = not resume_overlay.visible
 	settings_button.visible = not resume_overlay.visible
+	journal_button.visible=not resume_overlay.visible and game.lines.is_empty() and not game.travelling
+	journal_button.disabled=journal.visible
 	toast_time = maxf(0, toast_time - delta)
-	toast_panel.visible = toast_time > 0 and game.lines.is_empty() and not resume_overlay.visible
+	toast_panel.visible = toast_time > 0 and game.lines.is_empty() and not modal_open()
+	refresh_controls()
+	if game.dialogue.visible and body_label.visible_characters >= 0:
+		typing += delta * 42
+		body_label.visible_characters = mini(int(typing), body_label.text.length())
+		if body_label.visible_characters >= body_label.text.length():
+			continue_label.text = "E / TOQUE · Continuar  ›"
+
+func refresh_controls() -> void:
 	for button in touch_buttons:
 		var action: String = button.get_meta("action")
 		if action in ["kunai","katon"]:
@@ -268,14 +288,9 @@ func _process(delta: float) -> void:
 			button.text=caption
 		if button.get_meta("latched", false):
 			button.set_pressed_no_signal(bool(game.held.get(button.get_meta("action"), false)))
-		button.visible = not resume_overlay.visible and (game.lines.is_empty() or button.get_meta("action") == "interact")
+		button.visible = not modal_open() and (game.lines.is_empty() or button.get_meta("action") == "interact")
 		if game.room != "outside" and action in ["kunai","katon","dodge"]: button.visible=false
 		if game.stage == 6 and (game.lines.is_empty() or action != "interact"): button.visible=false
-	if game.dialogue.visible and body_label.visible_characters >= 0:
-		typing += delta * 42
-		body_label.visible_characters = mini(int(typing), body_label.text.length())
-		if body_label.visible_characters >= body_label.text.length():
-			continue_label.text = "E / TOQUE · Continuar  ›"
 
 func release_touches() -> void:
 	game.motion_velocity=Vector2.ZERO
@@ -303,6 +318,21 @@ func release_pointer(index: int) -> void:
 	game.held.erase(action)
 
 func _input(event: InputEvent) -> void:
+	# Menu touches use the same direct path as gameplay, without a mouse dependency.
+	var over_journal:bool=journal_button.get_global_rect().has_point(event.position) if event is InputEventMouse or event is InputEventScreenTouch else false
+	var over_close:bool=journal.close_button.get_global_rect().has_point(event.position) if event is InputEventMouse or event is InputEventScreenTouch else false
+	if event is InputEventMouse and event.device==InputEvent.DEVICE_ID_EMULATION and (over_journal or over_close):
+		get_viewport().set_input_as_handled()
+		return
+	if event is InputEventScreenTouch and event.pressed:
+		if journal.visible and over_close:
+			journal.close()
+			get_viewport().set_input_as_handled()
+			return
+		if journal_button.visible and over_journal:
+			journal.toggle()
+			get_viewport().set_input_as_handled()
+			return
 	# Touch buttons are dispatched above GUI; suppress their emulated mouse copy.
 	if event is InputEventMouse and event.device == InputEvent.DEVICE_ID_EMULATION and touch_target(event.position) != null:
 		get_viewport().set_input_as_handled()
@@ -349,7 +379,7 @@ func toast(text: String) -> void:
 	toast_time = 2.2
 
 func modal_open() -> bool:
-	return settings_panel.visible or resume_overlay.visible or game.travelling
+	return settings_panel.visible or resume_overlay.visible or (journal!=null and journal.visible) or game.travelling
 
 func build_resume_menu() -> void:
 	resume_overlay = Control.new()
