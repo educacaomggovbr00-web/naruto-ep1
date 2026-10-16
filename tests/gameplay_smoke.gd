@@ -14,15 +14,25 @@ func run_checks() -> void:
 	await process_frame
 	close_dialogue(game)
 	game.stage = 2
-	game.player = Vector2(440, 215)
+	game.player = Vector2(440, 245)
 	game.move_with_collisions(Vector2(100, -70))
-	assert(game.player.y < 230 and game.player.x <= 452, "Diagonal movement must slide along the wall")
+	assert(is_equal_approx(game.player.y, 232) and game.player.x > 440, "Diagonal movement must slide along the wall")
+	game.player = Vector2(210, 320)
+	game.move_with_collisions(Vector2(100, 0))
+	assert(game.player.x < 223, "The painted bench must block the same spot in gameplay")
 	game.player = Vector2(450, 330)
 	game.move_with_collisions(Vector2(0, 60))
 	assert(game.player.y < 341, "Water must block walking outside the bridge")
 	game.player = Vector2(580, 330)
 	game.move_with_collisions(Vector2(0, 45))
 	assert(game.player.y == 375, "The bridge must remain traversable")
+	game.move_with_collisions(Vector2(0, 60))
+	assert(game.player.y == 414, "The player must be able to reach the south bank")
+	game.stage = 3
+	game.player = Vector2(400, 250)
+	game.move_with_collisions(Vector2(0, -200))
+	assert(game.player.y == 228, "Painted forest vegetation must not be walkable")
+	game.stage = 2
 	game.player = Vector2(600, 260)
 	game.move_with_collisions(Vector2(100, 0))
 	assert(game.player.x <= 618, "The player must not walk through Naruto")

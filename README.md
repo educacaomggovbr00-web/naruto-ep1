@@ -100,3 +100,13 @@ NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests
 ```
 
 Esses testes usam arquivos próprios e não alteram o progresso normal do jogador. A captura mostra esquiva, ajustes e a tela de continuar.
+
+## Conforto dos controles e coerência do cenário
+
+- Direcional em cruz com alvos de 58×58 e margem na borda; ações de 78×78, separadas em duas colunas. Durante diálogos, só AÇÃO permanece visível.
+- CORRER e FURTIVO no toque funcionam por alternância: toque para ativar, toque novamente para desligar. Um modo desliga o outro. Teclado mantém R e Shift pressionados como antes.
+- O dedo pode deslizar entre setas, atravessar o espaço entre botões e voltar ao direcional sem precisar levantar. Sair do direcional interrompe o movimento.
+- `scripts/world_layout.gd` centraliza chão transitável, ponte, água, bancos e posições dos NPCs. O personagem pode cruzar a ponte inteira até a margem sul, sem caminhar pelos telhados ou pela vegetação pintada.
+- A trajetória de Mizuki permanece na clareira; posições de saves antigos são ajustadas aos limites atuais. A escala de Henrique foi aproximada da dos NPCs e das portas.
+
+A ergonomia foi verificada com eventos de toque no Godot. Ainda é necessário conferir o alcance dos polegares em um Android real.

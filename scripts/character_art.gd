@@ -1,7 +1,7 @@
 extends RefCounted
 
 const COMPACT_HENRIQUE = preload("res://assets/art/henrique.svg")
-const HENRIQUE_SCALE := 0.36
+const HENRIQUE_SCALE := 0.32
 # Keep the reference appearance on every platform. Compact art is opt-in.
 var compact_mode: bool = OS.get_environment("NARUTO_LOW_MEMORY") == "1"
 var henrique_texture: Texture2D = null
@@ -46,7 +46,7 @@ func draw_henrique(host: Node2D) -> void:
 		var size := region.size * HENRIQUE_SCALE
 		host.draw_texture_rect_region(henrique_texture, Rect2(Vector2(-size.x / 2, -size.y), size), region, Color("b7c1d8") if host.stage >= 3 else Color.WHITE)
 	host.draw_set_transform(Vector2.ZERO)
-	host.draw_string(ThemeDB.fallback_font, host.player + Vector2(-28, -90), "Henrique", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
+	host.draw_string(ThemeDB.fallback_font, host.player + Vector2(-25, -82), "Henrique", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
 
 func draw_naruto(host: Node2D, at: Vector2) -> void:
 	var frames: Array = mugen_actions["idle"]

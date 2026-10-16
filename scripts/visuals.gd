@@ -24,19 +24,19 @@ func render(host: Node2D) -> void:
 	var night: bool = host.stage >= 3
 	if host.stage <= 1:
 		host.draw_texture_rect(TARGET, Rect2(host.target - Vector2(28, 37), Vector2(56, 64)), false)
-		marker(host, host.target, host.visual_clock)
+		marker(host, host.target + Vector2(0, 55), host.visual_clock)
 		host.draw_string(ThemeDB.fallback_font, host.target + Vector2(-16, 45), "%d / 3" % host.hits, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("fcdfa2"))
 	elif host.stage == 2:
-		character_art.draw_naruto(host, Vector2(640, 260))
-		actor(host, Vector2(730, 260), IRUKA, Vector2.DOWN, false, host.visual_clock, "Iruka", false)
-		marker(host, Vector2(640, 260), host.visual_clock)
+		character_art.draw_naruto(host, host.layout.NARUTO)
+		actor(host, host.layout.IRUKA, IRUKA, Vector2.DOWN, false, host.visual_clock, "Iruka", false)
+		marker(host, host.layout.NARUTO, host.visual_clock)
 	elif host.stage == 3:
 		actor(host, host.mizuki, MIZUKI, Vector2.RIGHT, host.lines.is_empty(), host.visual_clock, "Mizuki", true)
 	elif host.stage == 4:
 		host.draw_texture_rect(KUNAI, Rect2(host.target - Vector2(16, 8), Vector2(32, 16)), false)
-		marker(host, host.target + Vector2(0, 36), host.visual_clock)
+		marker(host, host.target + Vector2(0, 70), host.visual_clock)
 	if host.stage == 5:
-		marker(host, Vector2(110, 240), host.visual_clock)
+		marker(host, host.layout.HOME + Vector2(0, 80), host.visual_clock)
 	character_art.draw_henrique(host)
 	if host.attack_flash > 0:
 		var progress: float = 1.0 - host.attack_flash / (0.5 if host.effect_kind == "katon" else 0.2)

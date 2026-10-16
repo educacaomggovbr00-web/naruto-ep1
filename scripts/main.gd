@@ -9,6 +9,7 @@ var stamina := 100.0
 var dash_time := 0.0
 var dash_direction := Vector2.RIGHT
 var save_clock := 0.0
+var layout = preload("res://scripts/world_layout.gd").new()
 var savegame = preload("res://scripts/save_game.gd").new()
 var cooldown := 0.0
 var facing := Vector2.RIGHT
@@ -149,7 +150,7 @@ func _process(delta: float) -> void:
 			elif distance <= 230:
 				trail_progress += delta
 				mizuki.x = 660 + sin(trail_progress * 0.35) * 140
-				mizuki.y = 260 + sin(trail_progress * 0.5) * 65
+				mizuki.y = 280 + sin(trail_progress * 0.5) * 35
 				if trail_progress >= 12:
 					stage = 4
 					target = mizuki
@@ -214,13 +215,13 @@ func act(action: String) -> void:
 			player = Vector2(170, 270)
 			say(["Henrique: Katon!", "As chamas escapam por um instante. Seus olhos ficam vermelhos: Sharingan de um tomoe.", "Henrique: O que foi isso...? Melhor voltar para a vila."])
 	elif action == "interact":
-		if stage == 2 and player.distance_to(Vector2(640, 260)) < 95:
+		if stage == 2 and player.distance_to(layout.NARUTO) < 95:
 			pending_forest_transition = true
 			say(["Naruto: Ei! Por que você está sempre com essa cara séria?", "Henrique: E você, por que está sempre arrumando confusão?", "Iruka: Naruto! Volte para a Academia!", "Mais tarde, ao anoitecer...", "Henrique: Mizuki? O que um instrutor está fazendo perto da floresta a esta hora?"])
 		elif stage == 4 and player.distance_to(target) < 85:
 			stage = 5
 			say(["Henrique: Uma kunai... Não consigo descobrir o que ele estava planejando.", "Está tarde. Vou para casa."])
-		elif stage == 5 and player.distance_to(Vector2(110, 230)) < 95:
+		elif stage == 5 and player.distance_to(layout.HOME) < 58:
 			stage = 6
 			say(["Henrique adormece. No sonho: fogo, o símbolo Uchiha e uma silhueta com olhos vermelhos.", "Sinos de emergência rompem o silêncio da madrugada.", "Ninja no telhado: O Pergaminho dos Selos foi roubado!", "Henrique corre até a janela. Uma figura de roupa laranja desaparece em direção à floresta.", "Henrique: Naruto...?", "FIM DO EP -1 — A Noite Antes do Começo. Prólogo original de fã. O episódio 1 ainda não está implementado."])
 			restart.show()
@@ -258,22 +259,15 @@ func _notification(what: int) -> void:
 		sprinting = false
 
 func blocked(at: Vector2) -> bool:
-	if stage == 2 or stage >= 5:
-		for house in [Rect2(36, 91, 152, 130), Rect2(268, 85, 152, 130), Rect2(460, 91, 152, 130), Rect2(714, 82, 152, 130)]:
-			if house.grow(8).has_point(at): return true
-		if Rect2(428, 341, 296, 46).has_point(at) and not Rect2(532, 330, 98, 65).has_point(at): return true
-	if stage == 2:
-		for npc in [Vector2(640, 260), Vector2(730, 260)]:
-			if at.distance_to(npc) < 22: return true
-	return false
+	return layout.blocked(at, stage)
 
 func move_with_collisions(displacement: Vector2) -> void:
 	var steps := maxi(1, int(ceil(displacement.length() / 6.0)))
 	var step := displacement / steps
 	for i in range(steps):
-		var next := (player + Vector2(step.x, 0)).clamp(Vector2(35, 110), Vector2(925, 375))
+		var next := layout.clamp_position(player + Vector2(step.x, 0), stage)
 		if not blocked(next): player = next
-		next = (player + Vector2(0, step.y)).clamp(Vector2(35, 110), Vector2(925, 375))
+		next = layout.clamp_position(player + Vector2(0, step.y), stage)
 		if not blocked(next): player = next
 
 func save_checkpoint(notify: bool = true) -> bool:

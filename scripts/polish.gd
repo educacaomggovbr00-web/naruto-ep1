@@ -46,13 +46,13 @@ func render(game: Node2D) -> void:
 	var destination: Vector2 = game.target
 	var can_talk := false
 	if game.stage == 2:
-		destination = Vector2(640, 260)
+		destination = game.layout.NARUTO
 		can_talk = game.player.distance_to(destination) < 95
 	elif game.stage == 4:
 		can_talk = game.player.distance_to(destination) < 85
 	elif game.stage == 5:
-		destination = Vector2(110, 230)
-		can_talk = game.player.distance_to(destination) < 95
+		destination = game.layout.HOME
+		can_talk = game.player.distance_to(destination) < 58
 	game.draw_arc(game.player + Vector2(0, 13), 20, 0, TAU, 32, Color(0.95, 0.76, 0.4, 0.6), 1, true)
 	if game.stage != 3:
 		var offset: Vector2 = destination - game.player

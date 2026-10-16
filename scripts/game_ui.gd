@@ -11,6 +11,7 @@ var portrait: TextureRect
 var typing := 0.0
 var settings_file := ConfigFile.new()
 var touch_pointers: Dictionary = {}
+var direction_fingers: Dictionary = {}
 var resume_overlay: Control
 var toast_panel: Panel
 var toast_label: Label
@@ -48,22 +49,32 @@ func _ready() -> void:
 	body_label = child_label(game.dialogue, "", Vector2(113, 42), Vector2(477, 80), 16, Color("f3e6ca"))
 	body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	continue_label = child_label(game.dialogue, "", Vector2(113, 130), Vector2(470, 18), 11, Color("a9b9b5"))
-	# A 48px directional pad leaves the center of the screen clear.
-	for info in [["↑", Vector2(66, 380), "up"], ["←", Vector2(16, 430), "left"], ["↓", Vector2(66, 430), "down"], ["→", Vector2(116, 430), "right"], ["CORRER", Vector2(16, 491), "run"], ["FURTIVO", Vector2(100, 491), "sneak"]]:
-		var size := Vector2(80, 32) if info[2] in ["run", "sneak"] else Vector2(48, 48)
-		var button := button_at(info[0], info[1], size)
-		button.add_theme_font_size_override("font_size", 11 if size.x == 80 else 20)
+	# Larger thumb targets, safe margins and a separated two-by-two action cluster.
+	for info in [["↑", Vector2(82, 350), "up"], ["←", Vector2(22, 410), "left"], ["↓", Vector2(82, 470), "down"], ["→", Vector2(142, 410), "right"], ["CORRER", Vector2(22, 300), "run"], ["FURTIVO", Vector2(118, 300), "sneak"]]:
 		var action: String = info[2]
-		button.button_down.connect(func(): game.held[action] = true)
-		button.button_up.connect(func(): game.held[action] = false)
+		var latched: bool = action in ["run", "sneak"]
+		var button := button_at(info[0], info[1], Vector2(86, 40) if latched else Vector2(58, 58))
+		button.add_theme_font_size_override("font_size", 11 if latched else 23)
 		button.set_meta("action", action)
+		button.set_meta("latched", latched)
+		if latched:
+			button.toggle_mode = true
+			button.pressed.connect(func(): toggle_mode(action))
+			button.tooltip_text = "Toque para ativar ou desligar"
+		else:
+			button.button_down.connect(func(): game.held[action] = true)
+			button.button_up.connect(func(): game.held[action] = false)
 		touch_buttons.append(button)
-	for info in [["ESQUIVA", Vector2(680, 450), "dodge"], ["KUNAI", Vector2(754, 450), "kunai"], ["KATON", Vector2(821, 389), "katon"], ["AÇÃO", Vector2(881, 450), "interact"]]:
-		var button := button_at(info[0], info[1], Vector2(62, 62))
+	for info in [["ESQUIVA", Vector2(760, 354), "dodge"], ["KATON", Vector2(850, 354), "katon"], ["KUNAI", Vector2(760, 446), "kunai"], ["AÇÃO", Vector2(850, 446), "interact"]]:
 		var action: String = info[2]
-		button.add_theme_font_size_override("font_size", 11 if action == "dodge" else 12)
+		var button := button_at(info[0], info[1], Vector2(78, 78))
+		button.add_theme_font_size_override("font_size", 12)
 		button.pressed.connect(func(): game.act(action))
 		button.set_meta("action", action)
+		for state in ["normal", "hover", "pressed"]:
+			var style: StyleBoxFlat = button.get_theme_stylebox(state).duplicate()
+			style.set_corner_radius_all(32)
+			button.add_theme_stylebox_override(state, style)
 		if action == "dodge": button.tooltip_text = "Q · Esquiva (30 de fôlego)"
 		touch_buttons.append(button)
 	settings_button = button_at("AJUSTES", Vector2(838, 72), Vector2(106, 30))
@@ -232,6 +243,8 @@ func _process(delta: float) -> void:
 	toast_time = maxf(0, toast_time - delta)
 	toast_panel.visible = toast_time > 0 and game.lines.is_empty() and not resume_overlay.visible
 	for button in touch_buttons:
+		if button.get_meta("latched", false):
+			button.set_pressed_no_signal(bool(game.held.get(button.get_meta("action"), false)))
 		button.visible = not resume_overlay.visible and (game.lines.is_empty() or button.get_meta("action") == "interact")
 	if game.dialogue.visible and body_label.visible_characters >= 0:
 		typing += delta * 42
@@ -241,6 +254,7 @@ func _process(delta: float) -> void:
 
 func release_touches() -> void:
 	touch_pointers.clear()
+	direction_fingers.clear()
 	game.held.clear()
 
 func touch_target(at: Vector2) -> Button:
@@ -253,7 +267,9 @@ func release_pointer(index: int) -> void:
 	if not touch_pointers.has(index):
 		return
 	var action: String = touch_pointers[index].get_meta("action")
+	var latched: bool = touch_pointers[index].get_meta("latched", false)
 	touch_pointers.erase(index)
+	if latched: return
 	for other in touch_pointers.values():
 		if other.get_meta("action") == action:
 			return
@@ -266,7 +282,8 @@ func _input(event: InputEvent) -> void:
 		return
 	if event is InputEventScreenTouch:
 		if not event.pressed:
-			if touch_pointers.has(event.index):
+			if touch_pointers.has(event.index) or direction_fingers.has(event.index):
+				direction_fingers.erase(event.index)
 				release_pointer(event.index)
 				get_viewport().set_input_as_handled()
 		elif not modal_open():
@@ -274,16 +291,31 @@ func _input(event: InputEvent) -> void:
 			if button != null:
 				touch_pointers[event.index] = button
 				var action: String = button.get_meta("action")
-				if action in ["kunai", "katon", "interact", "dodge"]:
+				if button.get_meta("latched", false):
+					toggle_mode(action)
+				elif action in ["kunai", "katon", "interact", "dodge"]:
 					game.act(action)
 				else:
+					direction_fingers[event.index] = true
 					game.held[action] = true
 				get_viewport().set_input_as_handled()
-	elif event is InputEventScreenDrag and touch_pointers.has(event.index):
-		var button: Button = touch_pointers[event.index]
-		if not button.get_global_rect().has_point(event.position):
+	elif event is InputEventScreenDrag and (touch_pointers.has(event.index) or direction_fingers.has(event.index)):
+		if direction_fingers.has(event.index):
+			var target := touch_target(event.position)
 			release_pointer(event.index)
+			if target != null and target.get_meta("action") in ["left", "right", "up", "down"]:
+				touch_pointers[event.index] = target
+				game.held[target.get_meta("action")] = true
+		elif touch_pointers.has(event.index):
+			var button: Button = touch_pointers[event.index]
+			if not button.get_global_rect().has_point(event.position): release_pointer(event.index)
 		get_viewport().set_input_as_handled()
+
+func toggle_mode(action: String) -> void:
+	var active: bool = not bool(game.held.get(action, false))
+	if active: game.held[action] = true
+	else: game.held.erase(action)
+	if active: game.held.erase("sneak" if action == "run" else "run")
 
 func toast(text: String) -> void:
 	toast_label.text = text
