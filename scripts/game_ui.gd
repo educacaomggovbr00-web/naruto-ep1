@@ -36,24 +36,27 @@ func _ready() -> void:
 	add_child(hud_canvas)
 	settings_file.load("user://interface.cfg")
 	touch_opacity = clampf(float(settings_file.get_value("touch", "opacity", 0.8)), 0.3, 1.0)
-	game.hud = label_at("", Vector2(70, 7), Vector2(425, 24), 17, Color("f8e8c6"))
-	game.objective = label_at("", Vector2(70, 33), Vector2(860, 24), 13, Color("cad4c7"))
-	game.dialogue = button_at("", Vector2(175, 369), Vector2(610, 155))
+	game.hud = label_at("", Vector2(82, 10), Vector2(480, 24), 17, Color("f8e8c6"))
+	game.objective = label_at("", Vector2(82, 44), Vector2(850, 24), 12, Color("cad4c7"))
+	game.dialogue = button_at("", Vector2(175, 360), Vector2(610, 164))
 	game.dialogue.pressed.connect(game.next_line)
 	game.dialogue.z_index = 10
 	game.dialogue.hide()
+	game.style_button(game.dialogue,true)
+	var chrome=preload("res://scripts/dialogue_chrome.gd").new()
+	game.dialogue.add_child(chrome)
 	# Children ignore mouse input so the whole panel remains a large advance target.
 	portrait = TextureRect.new()
-	portrait.position = Vector2(15, 29)
-	portrait.size = Vector2(83, 98)
+	portrait.position = Vector2(18, 32)
+	portrait.size = Vector2(79, 106)
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	game.dialogue.add_child(portrait)
-	speaker_label = child_label(game.dialogue, "", Vector2(113, 12), Vector2(470, 23), 18, Color("efbc6e"))
-	body_label = child_label(game.dialogue, "", Vector2(113, 42), Vector2(477, 80), 16, Color("f3e6ca"))
+	speaker_label = child_label(game.dialogue, "", Vector2(120, 9), Vector2(464, 23), 17, Color("efbc6e"))
+	body_label = child_label(game.dialogue, "", Vector2(120, 42), Vector2(464, 92), 16, Color("f3e6ca"))
 	body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	continue_label = child_label(game.dialogue, "", Vector2(113, 130), Vector2(470, 18), 11, Color("a9b9b5"))
+	continue_label = child_label(game.dialogue, "", Vector2(120, 144), Vector2(452, 17), 10, Color("a9b9b5"))
 	# Larger thumb targets, safe margins and a separated two-by-two action cluster.
 	for info in [["↑", Vector2(82, 350), "up"], ["←", Vector2(22, 410), "left"], ["↓", Vector2(82, 470), "down"], ["→", Vector2(142, 410), "right"], ["CORRER", Vector2(22, 300), "run"], ["FURTIVO", Vector2(118, 300), "sneak"]]:
 		var action: String = info[2]
@@ -72,8 +75,11 @@ func _ready() -> void:
 		touch_buttons.append(button)
 	for info in [["ESQUIVA", Vector2(760, 354), "dodge"], ["KATON", Vector2(850, 354), "katon"], ["KUNAI", Vector2(760, 446), "kunai"], ["AÇÃO", Vector2(850, 446), "interact"]]:
 		var action: String = info[2]
-		var button := button_at(info[0], info[1], Vector2(78, 78))
-		button.add_theme_font_size_override("font_size", 12)
+		var button := button_at("\n"+info[0], info[1], Vector2(78, 78))
+		button.add_theme_font_size_override("font_size", 10)
+		var emblem=preload("res://scripts/action_emblem.gd").new()
+		emblem.kind=action
+		button.add_child(emblem)
 		button.pressed.connect(func(): game.act(action))
 		button.set_meta("action", action)
 		for state in ["normal", "hover", "pressed"]:
@@ -82,14 +88,14 @@ func _ready() -> void:
 			button.add_theme_stylebox_override(state, style)
 		if action == "dodge": button.tooltip_text = "Q · Esquiva (30 de fôlego)"
 		touch_buttons.append(button)
-	journal_button=button_at("DIÁRIO · M",Vector2(716,66),Vector2(112,44))
+	journal_button=button_at("DIÁRIO · M",Vector2(716,82),Vector2(112,44))
 	journal_button.add_theme_font_size_override("font_size",11)
 	journal_button.pressed.connect(func(): journal.toggle())
-	settings_button = button_at("AJUSTES", Vector2(838, 72), Vector2(106, 30))
+	settings_button = button_at("AJUSTES", Vector2(838, 82), Vector2(106, 44))
 	settings_button.add_theme_font_size_override("font_size", 10)
 	settings_button.pressed.connect(toggle_settings)
 	settings_panel = Panel.new()
-	settings_panel.position = Vector2(648, 111)
+	settings_panel.position = Vector2(648, 136)
 	settings_panel.size = Vector2(296, 236)
 	settings_panel.add_theme_stylebox_override("panel", panel_style())
 	settings_panel.z_index = 20
@@ -174,14 +180,7 @@ func fade_to(alpha: float) -> Tween:
 	return tween
 
 func panel_style() -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color("172c35")
-	style.border_color = Color("ad8a52")
-	style.set_border_width_all(1)
-	style.set_corner_radius_all(12)
-	style.shadow_color = Color(0, 0, 0, 0.25)
-	style.shadow_size = 6
-	return style
+	return preload("res://scripts/ui_palette.gd").panel()
 
 func button_at(text: String, at: Vector2, size: Vector2) -> Button:
 	var button := Button.new()
@@ -289,7 +288,7 @@ func refresh_controls() -> void:
 	for button in touch_buttons:
 		var action: String = button.get_meta("action")
 		if action in ["kunai","katon"]:
-			var caption:=action.to_upper()
+			var caption:="\n"+action.to_upper()
 			if game.cooldown>0: caption+="\n%.1f s" % game.cooldown
 			elif action=="katon" and game.chakra<25: caption+="\n25 chakra"
 			button.text=caption

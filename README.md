@@ -203,3 +203,21 @@ NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests
 ```
 
 O teste verifica acesso pela sala, pré-requisitos, piso livre, acerto/erro, toque com clique de mouse emulado, bloqueio de repetição, pausa ao sair do foco, registro imediato, repetição/cancelamento, carregamento antigo e continuação até Naruto. As capturas percorrem o treino inicial e a entrada na Academia, e completam a atividade usando o marcador em movimento. Toque físico, áudio, legibilidade, desempenho e suspensão/retomada ainda precisam de Android real.
+
+## Acabamento visual da interface
+
+A interface usa tinta escura, vermelho discreto e detalhes dourados. O HUD separa identidade, objetivo e recursos, com chakra segmentado e indicação de progresso em sete pontos. Diário e ajustes ficam alinhados com o nome da área; o centro continua reservado para o jogo.
+
+- Os botões de ação ganharam símbolos de kunai, fogo, esquiva e conversa. A kunai e a chama usam os recursos já existentes; rótulos, áreas de toque, opacidade, recarga e comportamento dos dedos foram preservados.
+- Diálogos têm moldura própria, retratos emoldurados e divisórias leves. O texto progressivo e o avanço por toque permanecem iguais. Painéis do diário, aula e ajustes compartilham a mesma paleta.
+- Nomes de NPCs e placas das portas receberam fundo escuro para leitura sobre as pinturas. Henrique é identificado no HUD, liberando a área acima do sprite.
+- Sombras dos personagens usam três elipses suaves. O dia recebeu pequenos pontos de luz no lugar dos antigos fachos poligonais. O tratamento de cor ficou mais contido; a floresta mantém sua iluminação azul.
+- O alvo tem uma nova versão SVG com madeira, anéis pintados, corda e suporte. A marca fica na altura visual da trajetória dos projéteis. O SVG anterior foi preservado, assim como todos os sprites e cenários enviados.
+
+O acabamento usa recursos locais e desenho 2D; não adiciona downloads, partículas com física ou imagens maiores dos personagens. Não muda a progressão, colisões ou formato do save.
+
+```sh
+NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests/capture_beauty.gd
+```
+
+A captura percorre campo de treino, praça, Academia, casa, diálogos e floresta no próprio jogo. Validado em Godot 4.4.1 Compatibility com controles por toque simulado, treino de chakra, diário, combate, salvamento e prólogo. Legibilidade, ergonomia e desempenho em Android físico continuam pendentes.

@@ -1,5 +1,8 @@
 extends RefCounted
 
+const PALETTE = preload("res://scripts/ui_palette.gd")
+var name_style:StyleBoxFlat=PALETTE.name_box()
+
 const COMPACT_HENRIQUE = preload("res://assets/art/henrique.svg")
 const HENRIQUE_SCALE := 0.32
 # Keep the reference appearance on every platform. Compact art is opt-in.
@@ -59,7 +62,6 @@ func draw_attached_player(host: Node2D) -> void:
 		Rect2(-Vector2(origin[0],origin[1])*factor,Vector2(rect[2],rect[3])*factor),
 		Rect2(rect[0],rect[1],rect[2],rect[3]),Color("b7c1d8") if host.stage >= 3 and host.room == "outside" else Color.WHITE)
 	host.draw_set_transform(Vector2.ZERO)
-	host.draw_string(ThemeDB.fallback_font, host.player + Vector2(-25,-92), "Henrique", HORIZONTAL_ALIGNMENT_LEFT,-1,13,Color("f6e9c8"))
 
 func draw_cast_actor(host: Node2D, name_text: String, at: Vector2, moving: bool = false, night: bool = false) -> void:
 	var actor: Dictionary = attached_cast["actors"][name_text]
@@ -74,7 +76,7 @@ func draw_cast_actor(host: Node2D, name_text: String, at: Vector2, moving: bool 
 	host.draw_texture_rect_region(get_cast_texture(),
 		Rect2(at + Vector2(0,14) - Vector2(origin[0],origin[1])*factor, Vector2(rect[2],rect[3])*factor),
 		Rect2(rect[0],rect[1],rect[2],rect[3]),Color("b7c1d8") if night else Color.WHITE)
-	host.draw_string(ThemeDB.fallback_font,at+Vector2(-23,-90),"Terceiro Hokage" if name_text == "Hiruzen" else name_text,HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("f6e9c8"))
+	PALETTE.name_tag(host,at+Vector2(0,-90),"Terceiro Hokage" if name_text=="Hiruzen" else name_text,name_style)
 
 func gallery_dodge_frame(host: Node2D) -> int:
 	var progress := clampf(1.0 - host.dash_time / float(dodge_manifest["duration"]), 0.0, 0.999)
@@ -82,7 +84,8 @@ func gallery_dodge_frame(host: Node2D) -> int:
 
 func shadow(host: Node2D, at: Vector2) -> void:
 	host.draw_set_transform(at + Vector2(0, 14), 0, Vector2(1, 0.27))
-	host.draw_circle(Vector2.ZERO, 23, Color(0.06, 0.10, 0.14, 0.38))
+	for layer in [[23,0.06],[17,0.11],[11,0.20]]:
+		host.draw_circle(Vector2.ZERO,layer[0],Color(0.04,0.065,0.08,layer[1]))
 	host.draw_set_transform(Vector2.ZERO)
 
 func henrique_frame(host: Node2D) -> int:
@@ -124,7 +127,6 @@ func draw_henrique(host: Node2D) -> void:
 		var size := region.size * HENRIQUE_SCALE
 		host.draw_texture_rect_region(henrique_texture, Rect2(Vector2(-size.x / 2, -size.y), size), region, Color("b7c1d8") if host.stage >= 3 and host.room == "outside" else Color.WHITE)
 	host.draw_set_transform(Vector2.ZERO)
-	host.draw_string(ThemeDB.fallback_font, host.player + Vector2(-25, -82), "Henrique", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
 
 func get_naruto_gallery_texture() -> Texture2D:
 	if naruto_gallery_texture == null:
@@ -142,7 +144,7 @@ func draw_naruto(host: Node2D, at: Vector2) -> void:
 		Rect2(at + Vector2(0, 14) - Vector2(origin[0], origin[1]) * factor,
 			Vector2(bounds[2], bounds[3]) * factor),
 		Rect2(bounds[0], bounds[1], bounds[2], bounds[3]))
-	host.draw_string(ThemeDB.fallback_font, at + Vector2(-23, -90), "Naruto", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
+	PALETTE.name_tag(host,at+Vector2(0,-90),"Naruto",name_style)
 
 # Original AIR playback retained together with every MUGEN source frame.
 func draw_naruto_mugen(host: Node2D, at: Vector2) -> void:
@@ -170,11 +172,11 @@ func draw_naruto_mugen(host: Node2D, at: Vector2) -> void:
 	var scale_factor := 0.7
 	shadow(host, at)
 	host.draw_texture_rect(texture, Rect2(at + Vector2((offset[0] - axis[0]) * scale_factor, (offset[1] - axis[1]) * scale_factor + 14), texture.get_size() * scale_factor), false)
-	host.draw_string(ThemeDB.fallback_font, at + Vector2(-23, -90), "Naruto", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
+	PALETTE.name_tag(host,at+Vector2(0,-90),"Naruto",name_style)
 
 func portrait(host: Node2D) -> void:
 	if compact_mode:
-		host.draw_texture_rect_region(COMPACT_HENRIQUE, Rect2(16, 7, 40, 48), Rect2(0, 0, 24, 28))
+		host.draw_texture_rect_region(COMPACT_HENRIQUE, Rect2(18,14,46,52), Rect2(0, 0, 24, 28))
 		return
 	var crop: Array = attached_player["portrait"]
-	host.draw_texture_rect_region(player_texture, Rect2(12,4,46,51),Rect2(crop[0],crop[1],crop[2],crop[3]))
+	host.draw_texture_rect_region(player_texture, Rect2(18,14,46,52),Rect2(crop[0],crop[1],crop[2],crop[3]))

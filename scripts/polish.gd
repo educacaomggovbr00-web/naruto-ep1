@@ -24,9 +24,9 @@ func update(game: Node2D, delta: float) -> void:
 
 func render(game: Node2D) -> void:
 	if game.stage < 3 and game.room == "outside":
-		for i in range(3):
-			var x := 80.0 + i * 320.0
-			game.draw_colored_polygon(PackedVector2Array([Vector2(x, 130), Vector2(x + 45, 130), Vector2(x + 230, 445), Vector2(x + 130, 445)]), Color(1.0, 0.84, 0.54, 0.045))
+		for i in range(9):
+			var mote:=Vector2(fposmod(73.0+i*103+game.visual_clock*(3+i%3),940),170+(i%4)*55+sin(game.visual_clock*0.7+i)*13)
+			game.draw_circle(mote,1.0+(i%2)*0.5,Color(1,0.87,0.58,0.24))
 	if game.dash_time > 0:
 		for i in range(4):
 			var at: Vector2 = game.player - game.dash_direction * (20 + i * 12) + game.dash_direction.orthogonal() * (i % 2 * 14 - 7)
@@ -86,8 +86,8 @@ func panel() -> StyleBoxFlat:
 	if cached_panel != null:
 		return cached_panel
 	var box := StyleBoxFlat.new()
-	box.bg_color = Color("172d38")
-	box.border_color = Color("8b805d")
+	box.bg_color = Color(0.04,0.075,0.095,0.92)
+	box.border_color = Color("75674d")
 	box.set_border_width_all(1)
 	box.set_corner_radius_all(6)
 	cached_panel = box

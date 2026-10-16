@@ -334,19 +334,7 @@ func style_button(button: Button, is_dialogue: bool = false) -> void:
 	button.add_theme_font_size_override("font_size", 18 if is_dialogue else 15)
 	button.add_theme_color_override("font_color", Color("f3dfb4"))
 	for state in ["normal", "hover", "pressed", "focus"]:
-		var style := StyleBoxFlat.new()
-		style.bg_color = Color("203b48") if state == "normal" else Color("3f5b62") if state == "hover" else Color("786344")
-		style.border_color = Color("b29a6c") if is_dialogue else Color("6d8788")
-		style.set_border_width_all(2)
-		style.set_corner_radius_all(9)
-		style.shadow_color = Color(0, 0, 0, 0.3)
-		style.shadow_size = 3
-		style.shadow_offset = Vector2(0, 3)
-		style.content_margin_left = 18 if is_dialogue else 6
-		style.content_margin_right = 18 if is_dialogue else 6
-		style.content_margin_top = 10
-		style.content_margin_bottom = 10
-		button.add_theme_stylebox_override(state, style)
+		button.add_theme_stylebox_override(state,preload("res://scripts/ui_palette.gd").button(state,is_dialogue))
 
 func _draw() -> void:
 	if is_instance_valid(ui) and ui.resume_overlay.visible: return
