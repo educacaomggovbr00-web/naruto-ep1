@@ -81,6 +81,9 @@ func set_enabled(value: bool) -> void:
 			for voice in voices:
 				voice.stop()
 
+func set_indoor(value: bool) -> void:
+	if ambient != null: ambient.volume_db=-40 if value else -28
+
 func shutdown() -> void:
 	shutting_down = true
 	enabled = false

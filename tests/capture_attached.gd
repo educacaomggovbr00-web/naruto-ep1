@@ -35,11 +35,14 @@ func capture() -> void:
 	for i in range(15): await process_frame
 	await create_timer(2.1).timeout
 	await save_frame("personagens-anexados-konoha.png")
-	game.player=game.layout.VILLAGE_CAST["Sasuke"]+Vector2(0,35)
+	game.player=game.layout.interiors.ACADEMY_DOOR
+	await game.travel_to("academy")
+	game.player=Vector2(300,207)
 	game.act("interact")
 	game.ui.finish_typing()
 	await save_frame("sasuke-dialogo-anexo.png")
 	close_dialogue(game)
+	await game.travel_to("outside")
 	game.player=Vector2(560,280)
 	game.act("interact")
 	while game.line_index<2:game.next_line()

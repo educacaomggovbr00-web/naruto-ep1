@@ -8,7 +8,7 @@ Abra `project.godot` e execute com F5. Renderizador Compatibility, interface em 
 
 - Cenários 2.5D detalhados para Konoha, campo de treino e floresta noturna, com luz, materiais, vegetação e profundidade pintados. Apenas a imagem da área atual fica carregada.
 - Casa com floreira, Academia com faixas, armazém com chaminé e Ichiraku com toldo; o layout mantém as posições das construções e a clareira de movimentação do protótipo.
-- Henrique usa a folha preta/vermelha enviada, com 27 quadros e retrato. Naruto usa quatro recortes originais da galeria. Iruka e Mizuki usam os sprites e retratos enviados; Sasuke, Sakura, Hiruzen e Teuchi estão na praça com conversas opcionais. Atlas anteriores e código MUGEN preservados.
+- Henrique usa a folha preta/vermelha enviada, com 27 quadros e retrato. Naruto usa quatro recortes originais da galeria. Iruka e Mizuki usam os sprites e retratos enviados; Sasuke, Sakura e Iruka estão na Academia; Hiruzen e Teuchi ficam na praça. Todos têm conversas opcionais. Atlas anteriores e código MUGEN preservados.
 - HUD compacto com retrato, missão e barra de chakra ampliada. Controles sobrepostos nas laterais deixam o centro livre.
 - Direcional compacto, botões de ação e suporte a dedos independentes para andar e correr juntos. Arrastar para fora do botão libera o comando.
 - **AJUSTES** ajusta a opacidade entre 30% e 100%, gravada em `user://interface.cfg`.
@@ -32,7 +32,7 @@ Os personagens ativos usam recortes dos arquivos enviados, com proporções e p�
 
 Os botões de toque oferecem as mesmas ações. Durante diálogos, apenas AÇÃO permanece visível. Diálogos, ajustes e perda de foco liberam os comandos para evitar movimento preso.
 
-Para chegar à praça das capturas: acerte o alvo três vezes com kunai, mirando a menos de 150 passos, e use Katon perto dele. Katon consome 25 de chakra. Na perseguição, mantenha 70–230 passos de distância de Mizuki e use FURTIVO; complete 12 segundos, investigue a kunai e volte para a casa à esquerda.
+Para chegar à praça das capturas: acerte o alvo três vezes com kunai, mirando a menos de 150 passos, e use Katon perto dele. Katon consome 25 de chakra. Na perseguição, mantenha 70–230 passos de distância de Mizuki e use FURTIVO; complete 12 segundos, investigue a kunai, entre na casa à esquerda e use AÇÃO perto da cama.
 
 ## Android e modo leve
 
@@ -122,9 +122,28 @@ A ergonomia foi verificada com eventos de toque no Godot. Ainda é necessário c
 
 ## Personagens dos anexos
 
-Na praça, use E/AÇÃO perto de Sasuke, Sakura, Hiruzen ou Teuchi para conversas opcionais. A missão com Naruto e a perseguição de Mizuki mantêm a progressão original. Posições antigas dentro de um novo NPC são ajustadas ao carregar.
+Use E/AÇÃO perto de Hiruzen e Teuchi na praça, ou de Iruka, Sasuke e Sakura dentro da Academia, para conversar. A missão com Naruto e a perseguição de Mizuki mantêm a progressão original. Posições antigas dentro de um novo NPC são ajustadas ao carregar.
 
 ```sh
 godot --headless --path . --script res://tests/attached_cast_smoke.gd
 NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests/capture_attached.gd
 ```
+
+## Academia e casa exploráveis
+
+Depois do treino, aproxime-se das portas sinalizadas **ACADEMIA** e **SUA CASA** e use E/AÇÃO. A saída dos interiores fica no centro da parte de baixo. As transições têm fade e liberam entradas de toque para evitar comandos presos.
+
+- **Academia:** sala de aula com corredor central, carteiras sólidas, Iruka, Sasuke e Sakura. Converse com Iruka e leia o quadro. As conversas são de fã e não iniciam o exame do episódio 1.
+- **Casa:** mesa, cozinha, cadernos e cama interativos. De dia, Henrique pode explorar; depois da perseguição noturna, usar a cama conclui o prólogo. Há arte diurna e noturna com o mesmo layout.
+- **Ambiente:** os NPCs foram distribuídos entre sala de aula e praça. Ações de combate ficam ocultas nos interiores; o som externo fica mais baixo. Mobília e atores bloqueiam passagem sem fechar o corredor de circulação.
+- **Progresso:** o save guarda interior, posição de retorno e visitas/revisão. Arquivos antigos da versão 1 continuam válidos e retomam do lado de fora. Entrar e sair não reinicia o treino, chakra ou etapa da história.
+
+```sh
+godot --headless --path . --script res://tests/interiors_smoke.gd
+NARUTO_LOW_MEMORY=1 godot --headless --path . --script res://tests/interiors_smoke.gd
+NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests/capture_interiors.gd
+```
+
+Verificado em Godot 4.4.1: portas, bloqueio de entrada durante transição, circulação entre os móveis, diálogos/objetos, salvamento dentro das duas salas, compatibilidade dos saves antigos e conclusão pela cama. Capturas são do próprio jogo após as ações do treino. Android físico ainda precisa validar ergonomia, memória, áudio e retomada do app.
+
+Origem e prompts dos novos fundos: [assets/environments/INTERIORS.md](assets/environments/INTERIORS.md).

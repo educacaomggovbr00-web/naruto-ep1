@@ -23,6 +23,7 @@ var continue_button: Button
 var hud_canvas: Node2D
 var settings_button: Button
 var opacity_slider: HSlider
+var transition_overlay: ColorRect
 
 func _ready() -> void:
 	layer = 3
@@ -144,6 +145,20 @@ func _ready() -> void:
 	toast_panel.hide()
 	build_resume_menu()
 	set_touch_opacity(touch_opacity)
+	transition_overlay=ColorRect.new()
+	transition_overlay.size=Vector2(960,540)
+	transition_overlay.color=Color(0.025,0.04,0.06,0)
+	transition_overlay.mouse_filter=Control.MOUSE_FILTER_STOP
+	transition_overlay.z_index=1000
+	add_child(transition_overlay)
+	transition_overlay.hide()
+
+func fade_to(alpha: float) -> Tween:
+	transition_overlay.show()
+	var tween := create_tween()
+	tween.tween_property(transition_overlay,"color:a",alpha,0.13)
+	if alpha == 0: tween.finished.connect(transition_overlay.hide)
+	return tween
 
 func panel_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
@@ -245,9 +260,12 @@ func _process(delta: float) -> void:
 	toast_time = maxf(0, toast_time - delta)
 	toast_panel.visible = toast_time > 0 and game.lines.is_empty() and not resume_overlay.visible
 	for button in touch_buttons:
+		var action: String = button.get_meta("action")
 		if button.get_meta("latched", false):
 			button.set_pressed_no_signal(bool(game.held.get(button.get_meta("action"), false)))
 		button.visible = not resume_overlay.visible and (game.lines.is_empty() or button.get_meta("action") == "interact")
+		if game.room != "outside" and action in ["kunai","katon","dodge"]: button.visible=false
+		if game.stage == 6 and (game.lines.is_empty() or action != "interact"): button.visible=false
 	if game.dialogue.visible and body_label.visible_characters >= 0:
 		typing += delta * 42
 		body_label.visible_characters = mini(int(typing), body_label.text.length())
@@ -324,7 +342,7 @@ func toast(text: String) -> void:
 	toast_time = 2.2
 
 func modal_open() -> bool:
-	return settings_panel.visible or resume_overlay.visible
+	return settings_panel.visible or resume_overlay.visible or game.travelling
 
 func build_resume_menu() -> void:
 	resume_overlay = Control.new()
@@ -370,7 +388,7 @@ func offer_resume(data: Dictionary) -> void:
 			resume_overlay.show()
 		return
 	resume_data = data
-	game.background.set_area(int(data.stage))
+	game.background.set_area(int(data.stage),str(data.get("room","outside")))
 	resume_subtitle.text = "%s · Etapa %d de 7" % [game.OBJECTIVES[int(data.stage)].split(" • ")[0], int(data.stage) + 1]
 	game.dialogue.hide()
 	resume_overlay.show()

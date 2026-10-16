@@ -55,8 +55,13 @@ func run_checks() -> void:
 	close_dialogue(game)
 	game.player = Vector2(110, 240)
 	game.act("interact")
-	assert(game.stage == 6, "Resting at home must complete the prologue")
+	while game.travelling: await process_frame
+	assert(game.stage == 5 and game.room == "home", "The house door must lead inside before resting")
+	game.player = Vector2(730,282)
+	game.act("interact")
+	assert(game.stage == 6, "Resting in the bed must complete the prologue")
 	close_dialogue(game)
+	game.room = "outside"
 	# Exercise every graphical branch and load every imported resource.
 	for area in range(7):
 		game.stage = area

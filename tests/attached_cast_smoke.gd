@@ -29,10 +29,10 @@ func run_checks() -> void:
 		close_dialogue(game)
 		assert(game.stage == 2 and not game.pending_forest_transition)
 	# Existing valid positions remain exact; only collisions require relocation.
-	game.player = game.layout.VILLAGE_CAST["Sakura"]
+	game.player = game.layout.VILLAGE_CAST["Hiruzen"]
 	var old_save: Dictionary = game.savegame.snapshot(game)
 	assert(game.savegame.apply(game,old_save))
-	assert(not game.blocked(game.player) and game.player.distance_to(game.layout.VILLAGE_CAST["Sakura"]) <= 32)
+	assert(not game.blocked(game.player) and game.player.distance_to(game.layout.VILLAGE_CAST["Hiruzen"]) <= 32)
 	if not art.compact_mode:
 		assert(art.player_texture.get_size() == Vector2(1024,672))
 		for action in art.attached_player["actions"]:
@@ -47,7 +47,7 @@ func run_checks() -> void:
 		game.attack_flash = 0.5
 		game.effect_kind = "katon"
 		assert(art.attached_action(game) == "katon")
-	print("PASS: six uploaded cast sprites/portraits, four optional conversations, NPC collisions, old-save relocation and Henrique actions")
+	print("PASS: uploaded cast sprites/portraits, village conversations, NPC collisions, old-save relocation and Henrique actions")
 	game.audio.shutdown()
 	game.queue_free()
 	await create_timer(0.1).timeout

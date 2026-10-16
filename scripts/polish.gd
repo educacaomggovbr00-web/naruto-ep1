@@ -22,7 +22,7 @@ func update(game: Node2D, delta: float) -> void:
 	dust = dust.filter(func(p): return p.life > 0.0)
 
 func render(game: Node2D) -> void:
-	if game.stage < 3:
+	if game.stage < 3 and game.room == "outside":
 		for i in range(3):
 			var x := 80.0 + i * 320.0
 			game.draw_colored_polygon(PackedVector2Array([Vector2(x, 130), Vector2(x + 45, 130), Vector2(x + 230, 445), Vector2(x + 130, 445)]), Color(1.0, 0.84, 0.54, 0.045))
@@ -42,6 +42,16 @@ func render(game: Node2D) -> void:
 		game.draw_arc(game.target, radius, 0, TAU, 32, Color(1, 0.83, 0.43, hit_timer * 2), 2, true)
 		game.draw_string(ThemeDB.fallback_font, game.target + Vector2(-28, -48 - radius * 0.25), "ACERTO!", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("ffda83"))
 	if not game.lines.is_empty() or game.stage >= 6 or game.ui.settings_panel.visible:
+		return
+	if game.room != "outside":
+		var point: Dictionary = game.layout.interiors.nearby(game.player,game.room)
+		if not point.is_empty(): interaction_prompt(game,point["label"])
+		return
+	if game.stage in [2,5] and game.player.distance_to(game.layout.HOME)<48:
+		interaction_prompt(game,"Entrar em casa")
+		return
+	if game.stage == 2 and game.player.distance_to(game.layout.interiors.ACADEMY_DOOR)<48:
+		interaction_prompt(game,"Entrar na Academia")
 		return
 	var destination: Vector2 = game.target
 	var can_talk := false
@@ -81,3 +91,8 @@ func panel() -> StyleBoxFlat:
 	box.set_corner_radius_all(6)
 	cached_panel = box
 	return box
+
+func interaction_prompt(game: Node2D, text: String) -> void:
+	var at := Vector2(clampf(game.player.x-123,16,698),minf(game.player.y+30,468))
+	game.draw_style_box(panel(),Rect2(at,Vector2(246,28)))
+	game.draw_string(ThemeDB.fallback_font,at+Vector2(9,19),"E / AÇÃO · "+text,HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("ffe4aa"))

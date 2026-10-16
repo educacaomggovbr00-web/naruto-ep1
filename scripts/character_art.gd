@@ -57,7 +57,7 @@ func draw_attached_player(host: Node2D) -> void:
 	host.draw_set_transform(host.player + Vector2(0, 14), 0, Vector2(-1 if mirror else 1, 1))
 	host.draw_texture_rect_region(player_texture,
 		Rect2(-Vector2(origin[0],origin[1])*factor,Vector2(rect[2],rect[3])*factor),
-		Rect2(rect[0],rect[1],rect[2],rect[3]),Color("b7c1d8") if host.stage >= 3 else Color.WHITE)
+		Rect2(rect[0],rect[1],rect[2],rect[3]),Color("b7c1d8") if host.stage >= 3 and host.room == "outside" else Color.WHITE)
 	host.draw_set_transform(Vector2.ZERO)
 	host.draw_string(ThemeDB.fallback_font, host.player + Vector2(-25,-92), "Henrique", HORIZONTAL_ALIGNMENT_LEFT,-1,13,Color("f6e9c8"))
 
@@ -107,7 +107,7 @@ func draw_henrique(host: Node2D) -> void:
 		var direction_row := 2 if absf(host.facing.x) > 0.4 else 1 if host.facing.y < -0.4 else 0
 		var step := int(host.visual_clock * (13.0 if host.sprinting else 9.0)) % 3 if host.movement != Vector2.ZERO and host.lines.is_empty() else 0
 		var region := Rect2((direction_row * 3 + step) * 24, 0, 24, 28)
-		host.draw_texture_rect_region(COMPACT_HENRIQUE, Rect2(-36, -70, 72, 84), region, Color("b7c1d8") if host.stage >= 3 else Color.WHITE)
+		host.draw_texture_rect_region(COMPACT_HENRIQUE, Rect2(-36, -70, 72, 84), region, Color("b7c1d8") if host.stage >= 3 and host.room == "outside" else Color.WHITE)
 	elif dodging:
 		var frame: Dictionary = dodge_manifest["frames"][gallery_dodge_frame(host)]
 		var bounds: Array = frame["rect"]
@@ -116,13 +116,13 @@ func draw_henrique(host: Node2D) -> void:
 		host.draw_texture_rect_region(dodge_texture,
 			Rect2(Vector2(-origin[0], -origin[1]) * factor, Vector2(bounds[2], bounds[3]) * factor),
 			Rect2(bounds[0], bounds[1], bounds[2], bounds[3]),
-			Color("b7c1d8") if host.stage >= 3 else Color.WHITE)
+			Color("b7c1d8") if host.stage >= 3 and host.room == "outside" else Color.WHITE)
 	else:
 		var frame: Dictionary = henrique_frames[henrique_frame(host)]
 		var bounds: Array = frame["rect"]
 		var region := Rect2(bounds[0], bounds[1], bounds[2], bounds[3])
 		var size := region.size * HENRIQUE_SCALE
-		host.draw_texture_rect_region(henrique_texture, Rect2(Vector2(-size.x / 2, -size.y), size), region, Color("b7c1d8") if host.stage >= 3 else Color.WHITE)
+		host.draw_texture_rect_region(henrique_texture, Rect2(Vector2(-size.x / 2, -size.y), size), region, Color("b7c1d8") if host.stage >= 3 and host.room == "outside" else Color.WHITE)
 	host.draw_set_transform(Vector2.ZERO)
 	host.draw_string(ThemeDB.fallback_font, host.player + Vector2(-25, -82), "Henrique", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
 

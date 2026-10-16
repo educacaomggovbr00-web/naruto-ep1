@@ -27,8 +27,8 @@ para completar os ciclos. O conjunto ativo de Henrique tem 27 quadros.
 
 ## Gameplay
 
-- Iruka e Mizuki usam os recortes e retratos da folha enviada. Os grupos rotulados quatro direções não são tratados como ciclos de idle: NPCs mantêm a pose frontal, e Mizuki se desloca pela trajetória existente sem uma marcha inventada.
-- Sasuke, Sakura, Hiruzen e Teuchi aparecem na praça durante a etapa de Konoha.
+- Iruka e Mizuki usam os recortes e retratos da folha enviada. Iruka recebe Henrique na sala de aula; Mizuki mantém a perseguição da floresta. Os grupos rotulados quatro direções não são tratados como ciclos de idle: NPCs mantêm a pose frontal, e Mizuki se desloca pela trajetória existente sem uma marcha inventada.
+- Sasuke, Sakura e Iruka aparecem dentro da Academia; Hiruzen e Teuchi ficam na praça durante a etapa de Konoha.
   Aproxime-se e pressione AÇÃO/E para conversas opcionais de fã, sem avançar a
   missão principal. A conversa existente com Naruto mantém o fluxo original.
 - Todos os NPCs da praça bloqueiam a posição dos pés. Saves antigos que caiam

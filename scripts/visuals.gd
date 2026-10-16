@@ -20,6 +20,18 @@ func marker(host: Node2D, at: Vector2, clock: float) -> void:
 	host.draw_colored_polygon(PackedVector2Array([Vector2(at.x - 6, y), Vector2(at.x + 6, y), Vector2(at.x, y + 7)]), Color("f4d085"))
 
 func render(host: Node2D) -> void:
+	if host.room != "outside":
+		var data: Dictionary = host.layout.interiors.config(host.room)
+		var actors: Array[Dictionary] = [{"name":"player","at":host.player}]
+		for name_text in data["actors"]:
+			actors.append({"name":name_text,"at":data["actors"][name_text]})
+		actors.sort_custom(func(a,b):return a["at"].y < b["at"].y)
+		for person in actors:
+			if person["name"] == "player": character_art.draw_henrique(host)
+			else: character_art.draw_cast_actor(host,person["name"],person["at"])
+		host.draw_string(ThemeDB.fallback_font,Vector2(413,495),"PORTA · E / AÇÃO",HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("ead3a4"))
+		host.polish.render(host)
+		return
 	var night: bool = host.stage >= 3
 	if host.stage <= 1:
 		host.draw_texture_rect(TARGET, Rect2(host.target - Vector2(28, 37), Vector2(56, 64)), false)
@@ -29,9 +41,11 @@ func render(host: Node2D) -> void:
 		for name_text in host.layout.VILLAGE_CAST:
 			character_art.draw_cast_actor(host,name_text,host.layout.VILLAGE_CAST[name_text])
 		character_art.draw_naruto(host, host.layout.NARUTO)
-		actor(host, host.layout.IRUKA, IRUKA, Vector2.DOWN, false, host.visual_clock, "Iruka", false)
 		marker(host, host.layout.NARUTO, host.visual_clock)
-	elif host.stage == 3:
+		host.draw_string(ThemeDB.fallback_font,Vector2(304,221),"ACADEMIA",HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("ffe4aa"))
+	if host.stage in [2,5]:
+		host.draw_string(ThemeDB.fallback_font,Vector2(77,221),"SUA CASA",HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("ffe4aa"))
+	if host.stage == 3:
 		actor(host, host.mizuki, MIZUKI, Vector2.RIGHT, host.lines.is_empty(), host.visual_clock, "Mizuki", true)
 	elif host.stage == 4:
 		host.draw_texture_rect(KUNAI, Rect2(host.target - Vector2(16, 8), Vector2(32, 16)), false)
@@ -78,6 +92,7 @@ func draw_hud(canvas: Node2D, host: Node2D) -> void:
 	canvas.draw_rect(Rect2(640, 26, 218 * host.stamina / 100.0, 3), Color("d8b879"))
 	canvas.draw_string(ThemeDB.fallback_font, Vector2(869, 21), "%d / 100" % int(host.chakra), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("e3dcc0"))
 	var place := "CAMPO DE TREINO" if host.stage <= 1 else "KONOHA · PRAÇA" if host.stage == 2 else "FLORESTA · NOITE" if host.stage <= 4 else "KONOHA · CASA"
+	if host.room != "outside": place=host.layout.interiors.config(host.room)["title"]
 	canvas.draw_style_box(host.polish.panel(), Rect2(16, 74, 205, 26))
 	canvas.draw_string(ThemeDB.fallback_font, Vector2(29, 92), place, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("ead3a4"))
 	if host.lines.is_empty():

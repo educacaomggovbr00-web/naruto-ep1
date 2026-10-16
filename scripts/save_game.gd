@@ -6,7 +6,8 @@ var path := "user://prologue_save.json"
 var last_error := ""
 
 func snapshot(game: Node2D) -> Dictionary:
-	return {"version": VERSION, "stage": game.stage, "hits": game.hits,
+	return {"version": VERSION, "stage": game.stage, "room":game.room,
+		"return_position":[game.return_position.x,game.return_position.y],"visited":game.visited.duplicate(),"hits": game.hits,
 		"chakra": game.chakra, "stamina": game.stamina,
 		"player": [game.player.x, game.player.y], "facing": [game.facing.x, game.facing.y],
 		"target": [game.target.x, game.target.y], "mizuki": [game.mizuki.x, game.mizuki.y],
@@ -24,6 +25,15 @@ func validate(data: Variant) -> bool:
 		return false
 	if not data.get("stage") is int or not valid_number(data.stage, 0, 6):
 		return false
+	var room: Variant = data.get("room","outside")
+	if not room is String or not room in ["outside","academy","home"]: return false
+	if room != "outside" and not data.stage in [2,5,6]: return false
+	if room == "academy" and data.stage != 2: return false
+	if data.has("return_position") and not valid_vector(data.return_position,0,960): return false
+	if data.has("visited"):
+		if not data.visited is Dictionary: return false
+		for key in ["academy","home","class_intro","board"]:
+			if data.visited.has(key) and not data.visited[key] is bool: return false
 	if not valid_number(data.get("hits"), 0, 3) or not valid_number(data.get("chakra"), 0, 100) or not valid_number(data.get("stamina"), 0, 100):
 		return false
 	for key in ["player", "target", "mizuki"]:
@@ -78,10 +88,15 @@ func write_save(game: Node2D) -> bool:
 func apply(game: Node2D, data: Dictionary) -> bool:
 	if not validate(data): return false
 	game.stage = int(data.stage)
+	game.room = str(data.get("room","outside"))
+	var return_at: Array = data.get("return_position",[170,270])
+	game.return_position=game.layout.restore_position(Vector2(return_at[0],return_at[1]),game.stage)
+	for key in game.visited:
+		game.visited[key]=bool(data.get("visited",{}).get(key,false))
 	game.hits = int(data.hits)
 	game.chakra = float(data.chakra)
 	game.stamina = float(data.stamina)
-	game.player = game.layout.restore_position(Vector2(data.player[0], data.player[1]), game.stage)
+	game.player = game.layout.restore_position(Vector2(data.player[0], data.player[1]), game.stage,game.room)
 	game.target = game.layout.clamp_position(Vector2(data.target[0], data.target[1]), game.stage)
 	game.mizuki = game.layout.clamp_position(Vector2(data.mizuki[0], data.mizuki[1]), 3)
 	game.facing = Vector2(data.facing[0], data.facing[1]).normalized()
@@ -97,7 +112,8 @@ func apply(game: Node2D, data: Dictionary) -> bool:
 	game.sprinting = false
 	game.save_clock = 0
 	game.ui.release_touches()
-	game.background.set_area(game.stage)
+	game.background.set_area(game.stage,game.room)
+	game.audio.set_indoor(game.room != "outside")
 	game.restart.visible = game.stage == 6
 	if game.lines.is_empty(): game.dialogue.hide()
 	else: game.ui.show_line(game.lines[game.line_index])

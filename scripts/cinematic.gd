@@ -51,10 +51,10 @@ func _process(delta: float) -> void:
 		focus += Vector2(clampf((game.player.x - 480) * 0.035, -12, 12), clampf((game.player.y - 270) * 0.035, -4, 4))
 	camera.position = camera.position.lerp(focus, 1.0 - exp(-delta * 4.0))
 	camera.offset = Vector2(sin(clock * 83), cos(clock * 97)) * trauma * trauma * 6 if motion_enabled else Vector2.ZERO
-	material.set_shader_parameter("night_amount", 1.0 if game.stage >= 3 else 0.0)
+	material.set_shader_parameter("night_amount", (0.12 if game.room != "outside" else 1.0) if game.stage >= 3 else 0.0)
 	if game.background.area != previous_area:
 		previous_area = game.background.area
 		title_timer = 2.5
-		area_title.text = ["CAMPO DE TREINO", "VILA OCULTA DA FOLHA", "FLORESTA DE KONOHA"][maxi(previous_area, 0)]
+		area_title.text = ["CAMPO DE TREINO", "VILA OCULTA DA FOLHA", "FLORESTA DE KONOHA","ACADEMIA NINJA","CASA DO HENRIQUE"][maxi(previous_area, 0)]
 	title_timer = maxf(0, title_timer - delta)
 	area_title.modulate.a = minf(1, title_timer) * (0.0 if not game.lines.is_empty() else 1.0)

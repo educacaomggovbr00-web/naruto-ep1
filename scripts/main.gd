@@ -3,6 +3,10 @@ extends Node2D
 # Original playable fan-game prologue, before the events of episode 1.
 var player := Vector2(140, 270)
 var stage := 0
+var room := "outside"
+var return_position := Vector2(170,270)
+var visited := {"academy":false,"home":false,"class_intro":false,"board":false}
+var travelling := false
 var hits := 0
 var chakra := 100.0
 var stamina := 100.0
@@ -75,6 +79,67 @@ func say(texts: Array[String]) -> void:
 	line_index = 0
 	ui.show_line(lines[0])
 
+func travel_to(destination: String) -> void:
+	if travelling or not lines.is_empty(): return
+	if room != "outside" and destination != "outside": return
+	if destination == "outside" and room == "outside": return
+	if destination == "academy" and stage != 2: return
+	if destination == "home" and not stage in [2,5]: return
+	if destination != "outside" and not layout.interiors.ROOMS.has(destination): return
+	travelling=true
+	ui.release_touches()
+	movement=Vector2.ZERO
+	dash_time=0
+	attack_flash=0
+	var tween: Tween = ui.fade_to(1.0)
+	await tween.finished
+	if destination == "outside":
+		room="outside"
+		player=layout.restore_position(return_position,stage)
+	else:
+		return_position=layout.restore_position(player+Vector2(0,24),stage)
+		room=destination
+		player=layout.interiors.config(room)["spawn"]
+		visited[room]=true
+	facing=Vector2.UP if room != "outside" else Vector2.DOWN
+	polish.dust.clear()
+	background.set_area(stage,room)
+	audio.set_indoor(room != "outside")
+	cinematic.camera.position=Vector2(480,270)
+	cinematic.camera.offset=Vector2.ZERO
+	save_checkpoint(false)
+	queue_redraw()
+	tween=ui.fade_to(0.0)
+	await tween.finished
+	ui.release_touches()
+	travelling=false
+
+func interior_action() -> void:
+	var point: Dictionary = layout.interiors.nearby(player,room)
+	if point.is_empty():
+		ui.toast("Aproxime-se de uma pessoa ou objeto para interagir.")
+		return
+	match str(point["id"]):
+		"exit": travel_to("outside")
+		"Iruka":
+			visited["class_intro"]=true
+			say(["Iruka: Henrique, o treino de hoje é controle de chakra e precisão. Não basta fazer força: concentre-se.","Iruka: Amanhã continuaremos as avaliações. Por hoje, revise suas anotações e converse com seus colegas."])
+		"Sasuke": say(["Sasuke: Já terminei meus exercícios. Vou revisar os movimentos mais uma vez."])
+		"Sakura": say(["Sakura: O Iruka deixou a revisão no quadro. Quero estar preparada para a próxima aula."])
+		"board":
+			visited["board"]=true
+			say(["No quadro: controle de chakra, transformação e clonagem básica. O treinamento com armas deve acontecer no campo de treino.","Henrique: Vou revisar com calma. Primeiro, preciso dominar os fundamentos."])
+		"desk": say(["Henrique: Meus cadernos e materiais de treino. Ainda há anotações que preciso revisar."])
+		"kitchen": say(["Uma cozinha simples, com água, frutas e os utensílios do dia a dia. A casa está em ordem."])
+		"bed":
+			if stage == 5: finish_prologue()
+			else: say(["Henrique: Ainda é cedo para dormir. Vou terminar o que tenho para fazer na vila."])
+
+func finish_prologue() -> void:
+	stage=6
+	say(["Henrique se deita em sua cama. No sonho: fogo, o símbolo Uchiha e uma silhueta com olhos vermelhos.","Sinos de emergência rompem o silêncio da madrugada.","Ninja no telhado: O Pergaminho dos Selos foi roubado!","Henrique corre até a janela. Uma figura de roupa laranja desaparece em direção à floresta.","Henrique: Naruto...?","FIM DO EP -1 — A Noite Antes do Começo. Prólogo original de fã. O episódio 1 ainda não está implementado."])
+	restart.show()
+
 func next_line() -> void:
 	if ui.finish_typing():
 		return
@@ -82,6 +147,7 @@ func next_line() -> void:
 	if pending_forest_transition and line_index >= 3:
 		pending_forest_transition = false
 		stage = 3
+		room = "outside"
 		player = Vector2(450, 270)
 	if line_index >= lines.size():
 		lines.clear()
@@ -116,7 +182,7 @@ func _process(delta: float) -> void:
 	save_clock += delta
 	if save_clock >= 8 and lines.is_empty():
 		save_checkpoint(false)
-	background.set_area(stage)
+	background.set_area(stage,room)
 	cooldown = maxf(0.0, cooldown - delta)
 	attack_flash = maxf(0.0, attack_flash - delta)
 	chakra = minf(100.0, chakra + delta * 5.0)
@@ -157,6 +223,8 @@ func _process(delta: float) -> void:
 					say(["Henrique: Ele sumiu entre as árvores...", "Há uma kunai no chão. Será que ele deixou cair?"])
 	hud.text = "HENRIQUE UCHIHA  /  12 ANOS"
 	objective.text = OBJECTIVES[stage]
+	if room == "academy" and stage < 6: objective.text = "ACADEMIA • " + ("Explore a sala. E / AÇÃO para conversar e ler." if visited["class_intro"] else "Converse com Iruka, à frente da sala.")
+	elif room == "home" and stage < 6: objective.text = "CASA • " + ("Aproxime-se da cama e use AÇÃO para descansar." if stage == 5 else "Explore sua casa. A saída fica na parte de baixo.")
 	if stage == 3:
 		objective.text += "  %d%%" % int(trail_progress / 12 * 100)
 	polish.update(self, delta)
@@ -169,6 +237,22 @@ func act(action: String) -> void:
 		if action == "interact": next_line()
 		return
 	if stage == 6: return
+	if room != "outside" and action in ["kunai","katon","dodge"]:
+		ui.toast("Guarde as técnicas para o campo de treino.")
+		return
+	if action == "interact":
+		if room != "outside":
+			interior_action()
+			return
+		if stage in [2,5] and player.distance_to(layout.HOME) < 48:
+			travel_to("home")
+			return
+		if stage == 2 and player.distance_to(layout.interiors.ACADEMY_DOOR) < 48:
+			travel_to("academy")
+			return
+		if stage == 5 and player.distance_to(layout.interiors.ACADEMY_DOOR) < 48:
+			ui.toast("A Academia está fechada à noite. Volte de manhã.")
+			return
 	if action == "dodge":
 		if dash_time > 0: return
 		if stamina < 30:
@@ -236,10 +320,6 @@ func act(action: String) -> void:
 		elif stage == 4 and player.distance_to(target) < 85:
 			stage = 5
 			say(["Henrique: Uma kunai... Não consigo descobrir o que ele estava planejando.", "Está tarde. Vou para casa."])
-		elif stage == 5 and player.distance_to(layout.HOME) < 58:
-			stage = 6
-			say(["Henrique adormece. No sonho: fogo, o símbolo Uchiha e uma silhueta com olhos vermelhos.", "Sinos de emergência rompem o silêncio da madrugada.", "Ninja no telhado: O Pergaminho dos Selos foi roubado!", "Henrique corre até a janela. Uma figura de roupa laranja desaparece em direção à floresta.", "Henrique: Naruto...?", "FIM DO EP -1 — A Noite Antes do Começo. Prólogo original de fã. O episódio 1 ainda não está implementado."])
-			restart.show()
 
 func style_button(button: Button, is_dialogue: bool = false) -> void:
 	button.focus_mode = Control.FOCUS_NONE
@@ -274,15 +354,15 @@ func _notification(what: int) -> void:
 		sprinting = false
 
 func blocked(at: Vector2) -> bool:
-	return layout.blocked(at, stage)
+	return layout.blocked(at, stage,room)
 
 func move_with_collisions(displacement: Vector2) -> void:
 	var steps := maxi(1, int(ceil(displacement.length() / 6.0)))
 	var step := displacement / steps
 	for i in range(steps):
-		var next := layout.clamp_position(player + Vector2(step.x, 0), stage)
+		var next := layout.clamp_position(player + Vector2(step.x, 0), stage,room)
 		if not blocked(next): player = next
-		next = layout.clamp_position(player + Vector2(0, step.y), stage)
+		next = layout.clamp_position(player + Vector2(0, step.y), stage,room)
 		if not blocked(next): player = next
 
 func save_checkpoint(notify: bool = true) -> bool:
