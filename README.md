@@ -61,10 +61,19 @@ O script percorre as ações do treino antes de capturar a praça. Não usa uma 
 
 ## Recursos e créditos
 
+- Integração da galeria: quatro poses transparentes de esquiva de Henrique, com pés alinhados e ciclo de 0,16 s. Atlas principal e Naruto MUGEN preservados. Inventário das três folhas e detalhes em [assets/characters/GALLERY.md](assets/characters/GALLERY.md).
+
 - `assets/characters/henrique-detailed.png`: atlas RGBA original de 24 poses; recortes em `henrique-frames.json`.
 - `assets/mugen/naruto/`: 14 quadros decodificados do pack Real Naruto, preservando tempos e eixos AIR. Origem e créditos em [assets/mugen/CREDITS.md](assets/mugen/CREDITS.md).
 - `assets/environments/`: pinturas geradas para o projeto, com procedência em [CREDITS.md](assets/environments/CREDITS.md). `scripts/npc_art.gd` desenha os NPCs por código.
 - `tools/build_art.py`: gerador dos SVGs originais, ainda usados em alvos, kunai e modo leve.
+
+Validação dos sprites e capturas reais dos quatro quadros:
+
+```sh
+godot --headless --path . --script res://tests/gallery_smoke.gd
+NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests/capture_gallery.gd
+```
 
 Referências originais: [Pixel Shippuden](https://www.narutostorm.com/games/english), [The Fight of Konoha](https://timyfreak.itch.io/the-fight-of-konoha) e [Village Tiles / OpenGameArt](https://opengameart.org/content/simple-nes-like-village-tiles).
 

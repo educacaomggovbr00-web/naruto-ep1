@@ -8,12 +8,19 @@ var henrique_texture: Texture2D = null
 var henrique_frames: Array = JSON.parse_string(FileAccess.get_file_as_string("res://assets/characters/henrique-frames.json"))["frames"]
 var mugen_actions: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/mugen/naruto/animations.json"))
 var texture_cache := {}
+var dodge_manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/characters/gallery-dodge.json"))
+var dodge_texture: Texture2D = null
 
 func _init() -> void:
 	# Use the original detailed atlas by default, including on Android.
 	# Naruto MUGEN frames remain lazy-loaded.
 	if not compact_mode:
 		henrique_texture = load("res://assets/characters/henrique-detailed.png") as Texture2D
+		dodge_texture = load("res://assets/characters/henrique-gallery-dodge.png") as Texture2D
+
+func gallery_dodge_frame(host: Node2D) -> int:
+	var progress := clampf(1.0 - host.dash_time / float(dodge_manifest["duration"]), 0.0, 0.999)
+	return int(progress * dodge_manifest["frames"].size())
 
 func shadow(host: Node2D, at: Vector2) -> void:
 	host.draw_set_transform(at + Vector2(0, 14), 0, Vector2(1, 0.27))
@@ -30,7 +37,8 @@ func henrique_frame(host: Node2D) -> int:
 	return (3 if host.facing.y < -0.4 else 0) + int(host.visual_clock * 2) % 3
 
 func draw_henrique(host: Node2D) -> void:
-	var mirror: bool = host.facing.x < 0
+	var dodging: bool = host.dash_time > 0 and host.lines.is_empty()
+	var mirror: bool = (host.dash_direction.x if dodging else host.facing.x) < 0
 	shadow(host, host.player)
 	host.draw_set_transform(host.player + Vector2(0, 14), 0, Vector2(-1 if mirror else 1, 1))
 	if compact_mode:
@@ -39,6 +47,15 @@ func draw_henrique(host: Node2D) -> void:
 		var step := int(host.visual_clock * (13.0 if host.sprinting else 9.0)) % 3 if host.movement != Vector2.ZERO and host.lines.is_empty() else 0
 		var region := Rect2((direction_row * 3 + step) * 24, 0, 24, 28)
 		host.draw_texture_rect_region(COMPACT_HENRIQUE, Rect2(-36, -70, 72, 84), region, Color("b7c1d8") if host.stage >= 3 else Color.WHITE)
+	elif dodging:
+		var frame: Dictionary = dodge_manifest["frames"][gallery_dodge_frame(host)]
+		var bounds: Array = frame["rect"]
+		var origin: Array = frame["origin"]
+		var factor := float(dodge_manifest["scale"])
+		host.draw_texture_rect_region(dodge_texture,
+			Rect2(Vector2(-origin[0], -origin[1]) * factor, Vector2(bounds[2], bounds[3]) * factor),
+			Rect2(bounds[0], bounds[1], bounds[2], bounds[3]),
+			Color("b7c1d8") if host.stage >= 3 else Color.WHITE)
 	else:
 		var frame: Dictionary = henrique_frames[henrique_frame(host)]
 		var bounds: Array = frame["rect"]
