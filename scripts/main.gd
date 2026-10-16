@@ -36,6 +36,8 @@ var cinematic: Node
 var audio: Node
 var ui: CanvasLayer
 var visual_clock := 0.0
+var gait_distance := 0.0
+var day_cycle=preload("res://scripts/day_cycle.gd").new()
 var sprinting := false
 var effect_kind := "kunai"
 var effect_origin := Vector2.ZERO
@@ -106,7 +108,7 @@ func travel_to(destination: String) -> void:
 		visited[room]=true
 	facing=Vector2.UP if room != "outside" else Vector2.DOWN
 	polish.dust.clear()
-	background.set_area(stage,room)
+	background.set_area(stage,room,day_cycle.is_night(stage))
 	audio.set_indoor(room != "outside")
 	cinematic.camera.position=Vector2(480,270)
 	cinematic.camera.offset=Vector2.ZERO
@@ -192,11 +194,14 @@ func _process(delta: float) -> void:
 	if ui.modal_open():
 		queue_redraw()
 		return
+	day_cycle.update(self,delta)
+	background.animate(day_cycle.elapsed)
+	audio.set_night(day_cycle.is_night(stage))
 	stamina = minf(100, stamina + delta * 18)
 	save_clock += delta
 	if save_clock >= 8 and lines.is_empty():
 		save_checkpoint(false)
-	background.set_area(stage,room)
+	background.set_area(stage,room,day_cycle.is_night(stage))
 	cooldown = maxf(0.0, cooldown - delta)
 	attack_flash = maxf(0.0, attack_flash - delta)
 	chakra = minf(100.0, chakra + delta * 5.0)
@@ -219,6 +224,7 @@ func _process(delta: float) -> void:
 		else:
 			motion_velocity=Vector2.ZERO if movement==Vector2.ZERO else motion_velocity.move_toward(movement*speed,2800.0*delta)
 			move_with_collisions(motion_velocity * delta)
+		gait_distance+=player.distance_to(previous)
 		if player.is_equal_approx(previous):
 			movement = Vector2.ZERO
 			sprinting = false

@@ -28,6 +28,8 @@ var practice: Control
 var suppressed_menu_touch:=Vector2(INF,INF)
 var journal: Control
 var journal_button: Button
+var light_selector:OptionButton
+var light_note:Label
 
 func _ready() -> void:
 	layer = 3
@@ -96,7 +98,7 @@ func _ready() -> void:
 	settings_button.pressed.connect(toggle_settings)
 	settings_panel = Panel.new()
 	settings_panel.position = Vector2(648, 136)
-	settings_panel.size = Vector2(296, 236)
+	settings_panel.size = Vector2(296, 326)
 	settings_panel.add_theme_stylebox_override("panel", panel_style())
 	settings_panel.z_index = 20
 	add_child(settings_panel)
@@ -129,16 +131,26 @@ func _ready() -> void:
 	game.audio.set_enabled(audio_toggle.button_pressed)
 	audio_toggle.toggled.connect(func(value: bool): game.audio.set_enabled(value); settings_file.set_value("cinema", "audio", value); save_preferences())
 	settings_panel.add_child(audio_toggle)
+	child_label(settings_panel,"CICLO DE LUZ",Vector2(16,187),Vector2(264,20),11,Color("edc787"))
+	light_selector=OptionButton.new()
+	light_selector.position=Vector2(16,211)
+	light_selector.size=Vector2(264,34)
+	game.style_button(light_selector)
+	light_selector.add_theme_font_size_override("font_size",13)
+	for caption in ["Ciclo automático","Manhã","Tarde","Noite"]: light_selector.add_item(caption)
+	light_selector.item_selected.connect(change_light)
+	settings_panel.add_child(light_selector)
+	light_note=child_label(settings_panel,"",Vector2(16,250),Vector2(264,22),10,Color("aebeb7"))
 	var save_button := Button.new()
 	save_button.text = "SALVAR"
-	save_button.position = Vector2(12, 195)
+	save_button.position = Vector2(12, 282)
 	save_button.size = Vector2(129, 30)
 	game.style_button(save_button)
 	save_button.pressed.connect(func(): game.save_checkpoint())
 	settings_panel.add_child(save_button)
 	var load_button := Button.new()
 	load_button.text = "CARREGAR"
-	load_button.position = Vector2(151, 195)
+	load_button.position = Vector2(151, 282)
 	load_button.size = Vector2(129, 30)
 	game.style_button(load_button)
 	load_button.pressed.connect(load_checkpoint)
@@ -214,6 +226,13 @@ func save_preferences() -> void:
 	settings_file.set_value("touch", "opacity", touch_opacity)
 	settings_file.save("user://interface.cfg")
 
+func change_light(index: int) -> void:
+	if game.stage>=3: return
+	game.day_cycle.set_mode(index)
+	game.background.set_area(game.stage,game.room,game.day_cycle.is_night(game.stage))
+	game.audio.set_night(game.day_cycle.is_night(game.stage))
+	game.save_checkpoint(false)
+
 func toggle_settings() -> void:
 	if practice.visible: return
 	if journal.visible: journal.close()
@@ -275,6 +294,9 @@ func _process(delta: float) -> void:
 	settings_button.visible = not resume_overlay.visible
 	journal_button.visible=not resume_overlay.visible and game.lines.is_empty() and not game.travelling
 	journal_button.disabled=journal.visible or practice.visible
+	light_selector.disabled=game.stage>=3
+	light_selector.select(game.day_cycle.mode)
+	light_note.text="A história mantém a noite nesta etapa." if game.stage>=3 else "Dia completo: 8 min de exploração."
 	toast_time = maxf(0, toast_time - delta)
 	toast_panel.visible = toast_time > 0 and game.lines.is_empty() and not modal_open()
 	refresh_controls()

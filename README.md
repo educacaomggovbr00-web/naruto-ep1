@@ -6,7 +6,7 @@ Abra `project.godot` e execute com F5. Renderizador Compatibility, interface em 
 
 ## Visual e interface
 
-- Cenários 2.5D detalhados para Konoha, campo de treino e floresta noturna, com luz, materiais, vegetação e profundidade pintados. Apenas a imagem da área atual fica carregada.
+- Cenários 2.5D detalhados para Konoha, campo de treino e floresta noturna, com luz, materiais, vegetação e profundidade pintados. A imagem da área atual fica carregada; a casa mantém duas imagens brevemente durante a transição de luz.
 - Casa com floreira, Academia com faixas, armazém com chaminé e Ichiraku com toldo; o layout mantém as posições das construções e a clareira de movimentação do protótipo.
 - Henrique usa a folha preta/vermelha enviada, com 27 quadros e retrato. Naruto usa quatro recortes originais da galeria. Iruka e Mizuki usam os sprites e retratos enviados; Sasuke, Sakura e Iruka estão na Academia; Hiruzen e Teuchi ficam na praça. Todos têm conversas opcionais. Atlas anteriores e código MUGEN preservados.
 - HUD compacto com retrato, missão e barra de chakra ampliada. Controles sobrepostos nas laterais deixam o centro livre.
@@ -221,3 +221,23 @@ NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests
 ```
 
 A captura percorre campo de treino, praça, Academia, casa, diálogos e floresta no próprio jogo. Validado em Godot 4.4.1 Compatibility com controles por toque simulado, treino de chakra, diário, combate, salvamento e prólogo. Legibilidade, ergonomia e desempenho em Android físico continuam pendentes.
+
+## Mundo vivo, sprites e ciclo de luz
+
+O relógio aparece ao lado do nome da área. No modo automático, um dia completo leva **8 minutos de exploração**, começando às 16h. **AJUSTES → CICLO DE LUZ** permite escolher automático, manhã, tarde ou noite. Diálogos pausam o avanço do horário; diário, aula e ajustes também pausam o tempo ambiental. Entrar em um interior conserva o horário.
+
+- A luz passa gradualmente entre dia, entardecer e noite. São variações de iluminação sobre as pinturas existentes, mantendo seus detalhes e a área transitável. A casa troca entre as duas artes reais de dia/noite com um fade curto.
+- A perseguição e o final do prólogo continuam à noite, às 21h. Nessas etapas, a seleção de luz fica bloqueada. O ciclo livre não pula cenas nem muda missões, NPCs ou colisões.
+- O vento anima somente regiões superiores de vegetação e bordas de primeiro plano. O piso transitável fica imóvel, e o shader não movimenta prédios da vila nem móveis dos interiores.
+- Pássaros cruzam os exteriores durante o dia, com asas animadas. Folhas variam de posição e rotação; a floresta tem vagalumes pulsantes. O ambiente de áudio alterna vento/pássaros e um loop noturno sintetizado de insetos, respeitando o botão de som e o volume menor dos interiores.
+- Henrique conserva seus quadros originais de parado, andar, correr, esquiva, kunai e Katon. O ciclo de passos agora acompanha a distância efetivamente percorrida, evitando avançar enquanto fica preso em uma parede. Naruto mantém seus quatro quadros originais de idle.
+- Os seis NPCs têm respiração sutil ancorada nos pés; Mizuki ganha balanço durante a perseguição. Suas folhas atuais são grupos de poses direcionais, e não ciclos completos de caminhada. Para passos quadro a quadro de Iruka, Mizuki, Sasuke, Sakura, Hiruzen e Teuchi, ainda são necessárias folhas de caminhada correspondentes. Nenhum quadro foi redesenhado para fingir essas sequências.
+- O save v1 aceita o campo opcional `day_cycle`, com horário e modo. Saves antigos retomam com o fim de tarde original. Valores inválidos são rejeitados; detalhes transitórios do vento e dos pássaros não entram no save.
+
+```sh
+godot --headless --path . --script res://tests/living_world_smoke.gd
+NARUTO_LOW_MEMORY=1 godot --headless --path . --script res://tests/living_world_smoke.gd
+NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests/capture_living_world.gd
+```
+
+O teste cobre horários fixos/automático, pausa, pássaros, iluminação da casa, animação por distância, compatibilidade de saves e noite protegida pela história. A captura grava 180 quadros reais do jogo com passos fixos de 1/15 s: caminhada de manhã, à tarde e à noite, seguida da perseguição na floresta. O vídeo é uma demonstração visual sem captura do áudio do sistema. Desempenho, áudio, legibilidade e retomada em Android físico continuam pendentes.

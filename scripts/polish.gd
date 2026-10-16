@@ -23,7 +23,7 @@ func update(game: Node2D, delta: float) -> void:
 	dust = dust.filter(func(p): return p.life > 0.0)
 
 func render(game: Node2D) -> void:
-	if game.stage < 3 and game.room == "outside":
+	if game.day_cycle.night_amount(game.stage)<0.5 and game.room == "outside":
 		for i in range(9):
 			var mote:=Vector2(fposmod(73.0+i*103+game.visual_clock*(3+i%3),940),170+(i%4)*55+sin(game.visual_clock*0.7+i)*13)
 			game.draw_circle(mote,1.0+(i%2)*0.5,Color(1,0.87,0.58,0.24))

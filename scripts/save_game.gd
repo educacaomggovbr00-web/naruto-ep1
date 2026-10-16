@@ -7,6 +7,7 @@ var last_error := ""
 
 func snapshot(game: Node2D) -> Dictionary:
 	return {"version": VERSION, "stage": game.stage, "room":game.room,
+		"day_cycle":{"phase":game.day_cycle.phase,"mode":game.day_cycle.mode},
 		"return_position":[game.return_position.x,game.return_position.y],"visited":game.visited.duplicate(),"hits": game.hits,
 		"chakra": game.chakra, "stamina": game.stamina,
 		"player": [game.player.x, game.player.y], "facing": [game.facing.x, game.facing.y],
@@ -23,6 +24,11 @@ func valid_vector(value: Variant, low: float, high: float) -> bool:
 func validate(data: Variant) -> bool:
 	if not data is Dictionary or data.get("version") != VERSION:
 		return false
+	if data.has("day_cycle"):
+		var clock:Variant=data.day_cycle
+		if not clock is Dictionary: return false
+		if not valid_number(clock.get("phase"),0,1) or not valid_number(clock.get("mode"),0,3): return false
+		if floor(float(clock.mode))!=float(clock.mode): return false
 	if not data.get("stage") is int or not valid_number(data.stage, 0, 6):
 		return false
 	var room: Variant = data.get("room","outside")
@@ -87,6 +93,8 @@ func write_save(game: Node2D) -> bool:
 
 func apply(game: Node2D, data: Dictionary) -> bool:
 	if not validate(data): return false
+	game.day_cycle.restore(data.get("day_cycle",{}))
+	game.gait_distance=0
 	game.stage = int(data.stage)
 	game.room = str(data.get("room","outside"))
 	var return_at: Array = data.get("return_position",[170,270])
@@ -116,7 +124,8 @@ func apply(game: Node2D, data: Dictionary) -> bool:
 	game.ui.practice.close()
 	game.ui.journal.hide()
 	game.ui.release_touches()
-	game.background.set_area(game.stage,game.room)
+	game.background.set_area(game.stage,game.room,game.day_cycle.is_night(game.stage))
+	game.audio.set_night(game.day_cycle.is_night(game.stage))
 	game.audio.set_indoor(game.room != "outside")
 	game.restart.visible = game.stage == 6
 	if game.lines.is_empty(): game.dialogue.hide()

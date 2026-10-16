@@ -2,6 +2,9 @@ extends Node
 
 var enabled := true
 var indoors := false
+var night := false
+var day_stream:AudioStreamWAV
+var night_stream:AudioStreamWAV
 var voices: Array[AudioStreamPlayer] = []
 var ambient: AudioStreamPlayer
 var sounds: Dictionary = {}
@@ -19,7 +22,9 @@ func _ready() -> void:
 		add_child(voice)
 		voices.append(voice)
 	ambient = AudioStreamPlayer.new()
-	ambient.stream = synth("wind")
+	day_stream=synth("wind")
+	night_stream=synth("night")
+	ambient.stream = day_stream
 	ambient.volume_db = -28
 	add_child(ambient)
 
@@ -33,7 +38,7 @@ func _process(delta: float) -> void:
 
 func synth(kind: String) -> AudioStreamWAV:
 	const RATE := 11025
-	var duration := 6.0 if kind == "wind" else 0.55 if kind == "katon" else 0.075 if kind=="step" else 0.18
+	var duration := 6.0 if kind in ["wind","night"] else 0.55 if kind == "katon" else 0.075 if kind=="step" else 0.18
 	var count := int(duration * RATE)
 	var bytes := PackedByteArray()
 	bytes.resize(count * 2)
@@ -52,6 +57,9 @@ func synth(kind: String) -> AudioStreamWAV:
 			"impact": value = (noise * 0.5 + sin(TAU * 320 * t) * 0.25) * exp(-t * 26)
 			"focus": value=(sin(TAU*660*t)*0.25+sin(TAU*990*t)*0.1)*envelope
 			"step": value=(low*0.6+sin(TAU*105*t)*0.12)*envelope
+			"night":
+				var pulse:=pow(maxf(0,sin(t*TAU*7)),8)*maxf(0,sin(t*2.4))
+				value=(low*0.25+sin(TAU*3100*t)*pulse*0.06)*pow(sin(PI*t/duration),2)
 			"wind":
 				var loop_envelope := pow(sin(PI * t / duration), 2)
 				var chirp := maxf(0, sin(t * 2.2)) * maxf(0, sin(t * 8.7))
@@ -61,7 +69,7 @@ func synth(kind: String) -> AudioStreamWAV:
 	stream.format = AudioStreamWAV.FORMAT_16_BITS
 	stream.mix_rate = RATE
 	stream.data = bytes
-	if kind == "wind":
+	if kind in ["wind","night"]:
 		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
 		stream.loop_end = count
 	return stream
@@ -87,7 +95,15 @@ func set_enabled(value: bool) -> void:
 
 func set_indoor(value: bool) -> void:
 	indoors=value
-	if ambient != null: ambient.volume_db=-40 if value else -28
+	if ambient != null: ambient.volume_db=-40 if value else -32 if night else -28
+
+func set_night(value: bool) -> void:
+	if night==value: return
+	night=value
+	ambient.stop()
+	ambient.stream=night_stream if night else day_stream
+	set_indoor(indoors)
+	if enabled and ready_for_audio: ambient.play()
 
 func shutdown() -> void:
 	shutting_down = true

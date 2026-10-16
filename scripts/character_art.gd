@@ -47,7 +47,7 @@ func attached_frame(host: Node2D, action: String) -> Dictionary:
 		var remaining: float = host.dash_time if action == "dodge" else host.attack_flash
 		index = int(clampf(1.0 - remaining / duration, 0, 0.999) * frames.size())
 	else:
-		index = int(host.visual_clock * float(attached_player["fps"][action])) % frames.size()
+		index = (int(host.gait_distance/(18.0 if action=="run" else 30.0)) if action in ["walk","run"] else int(host.visual_clock*float(attached_player["fps"][action]))) % frames.size()
 	return frames[index]
 
 func draw_attached_player(host: Node2D) -> void:
@@ -73,9 +73,13 @@ func draw_cast_actor(host: Node2D, name_text: String, at: Vector2, moving: bool 
 	var origin: Array = frame["origin"]
 	var factor := float(actor["scale"])
 	shadow(host, at)
+	var breathing:=1.0+sin(host.day_cycle.elapsed*2.0+float(name_text.hash()%17))*0.007
+	var bob:=absf(sin(host.day_cycle.elapsed*9.0))*1.2 if moving else 0.0
+	host.draw_set_transform(at+Vector2(0,14-bob),sin(host.day_cycle.elapsed*9.0)*0.014 if moving else 0.0,Vector2(1,breathing))
 	host.draw_texture_rect_region(get_cast_texture(),
-		Rect2(at + Vector2(0,14) - Vector2(origin[0],origin[1])*factor, Vector2(rect[2],rect[3])*factor),
+		Rect2(-Vector2(origin[0],origin[1])*factor,Vector2(rect[2],rect[3])*factor),
 		Rect2(rect[0],rect[1],rect[2],rect[3]),Color("b7c1d8") if night else Color.WHITE)
+	host.draw_set_transform(Vector2.ZERO)
 	PALETTE.name_tag(host,at+Vector2(0,-90),"Terceiro Hokage" if name_text=="Hiruzen" else name_text,name_style)
 
 func gallery_dodge_frame(host: Node2D) -> int:

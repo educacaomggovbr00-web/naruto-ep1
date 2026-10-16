@@ -37,7 +37,8 @@ func render(host: Node2D) -> void:
 		host.draw_string(ThemeDB.fallback_font,Vector2(413,495),"PORTA · E / AÇÃO",HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("ead3a4"))
 		host.polish.render(host)
 		return
-	var night: bool = host.stage >= 3
+	host.day_cycle.draw_sky(host)
+	var night: bool = host.day_cycle.is_night(host.stage)
 	if host.stage <= 1:
 		var shake:float=sin(host.visual_clock*65.0)*host.combat.target_flash*10.0
 		host.draw_set_transform(host.target+Vector2(shake,0),shake*0.008)
@@ -62,11 +63,7 @@ func render(host: Node2D) -> void:
 		marker(host, host.layout.HOME + Vector2(0, 80), host.visual_clock)
 	character_art.draw_henrique(host)
 	host.combat.draw(host)
-	# Sparse ambient leaves/fireflies. No particle nodes or heavy post-processing.
-	for i in range(12):
-		var x := fmod(i * 89.0 + host.visual_clock * (5 if night else 11), 940.0)
-		var y := 216 + (i % 5) * 33 + sin(host.visual_clock + i) * 13
-		host.draw_rect(Rect2(x, y, 3 if night else 5, 2), Color(0.85, 0.9, 0.54, 0.5) if night else Color(0.72, 0.76, 0.43, 0.6))
+	host.day_cycle.draw_leaves(host)
 	host.polish.render(host)
 
 func draw_hud(canvas: Node2D, host: Node2D) -> void:
@@ -93,6 +90,8 @@ func draw_hud(canvas: Node2D, host: Node2D) -> void:
 	canvas.draw_style_box(host.polish.panel(),Rect2(16,90,205,29))
 	canvas.draw_colored_polygon(PackedVector2Array([Vector2(29,100),Vector2(33,104),Vector2(29,108),Vector2(25,104)]),palette.GOLD)
 	canvas.draw_string(ThemeDB.fallback_font,Vector2(42,108),place,HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("e4d1aa"))
+	canvas.draw_style_box(host.polish.panel(),Rect2(235,90,153,29))
+	canvas.draw_string(ThemeDB.fallback_font,Vector2(248,108),host.day_cycle.caption(host.stage),HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("e4d1aa"))
 	if host.lines.is_empty():
 		canvas.draw_style_box(host.polish.panel(),Rect2(350,502,260,27))
 		canvas.draw_rect(Rect2(350,507,2,17),palette.RED)
