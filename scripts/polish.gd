@@ -13,9 +13,10 @@ func update(game: Node2D, delta: float) -> void:
 	if game.hits > last_hits:
 		hit_timer = 0.35
 	last_hits = game.hits
-	if game.movement != Vector2.ZERO and step_timer > (0.09 if game.sprinting else 0.16):
+	if game.movement != Vector2.ZERO and step_timer > (0.16 if game.sprinting else 0.36 if game.down("sneak",KEY_SHIFT) else 0.25):
 		step_timer = 0.0
-		dust.append({"at": game.player + Vector2(0, 13), "life": 0.4})
+		game.audio.play("step")
+		if game.room=="outside": dust.append({"at": game.player + Vector2(0, 13), "life": 0.4})
 	for particle in dust:
 		particle.life -= delta
 		particle.at += Vector2(-8, -10) * delta

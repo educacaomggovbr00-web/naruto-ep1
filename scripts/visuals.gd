@@ -34,7 +34,10 @@ func render(host: Node2D) -> void:
 		return
 	var night: bool = host.stage >= 3
 	if host.stage <= 1:
-		host.draw_texture_rect(TARGET, Rect2(host.target - Vector2(28, 37), Vector2(56, 64)), false)
+		var shake:float=sin(host.visual_clock*65.0)*host.combat.target_flash*10.0
+		host.draw_set_transform(host.target+Vector2(shake,0),shake*0.008)
+		host.draw_texture_rect(TARGET,Rect2(-28,-37,56,64),false,Color(1.0,1.0-host.combat.target_flash,1.0-host.combat.target_flash))
+		host.draw_set_transform(Vector2.ZERO)
 		marker(host, host.target + Vector2(0, 55), host.visual_clock)
 		host.draw_string(ThemeDB.fallback_font, host.target + Vector2(-16, 45), "%d / 3" % host.hits, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("fcdfa2"))
 	elif host.stage == 2:
@@ -53,25 +56,7 @@ func render(host: Node2D) -> void:
 	if host.stage == 5:
 		marker(host, host.layout.HOME + Vector2(0, 80), host.visual_clock)
 	character_art.draw_henrique(host)
-	if host.attack_flash > 0:
-		var progress: float = 1.0 - host.attack_flash / (0.5 if host.effect_kind == "katon" else 0.2)
-		var at: Vector2 = host.effect_origin + host.effect_direction * progress * 125
-		if host.effect_kind == "katon":
-			for radius in [24, 18, 11]:
-				host.draw_circle(at, radius, Color(1, 0.38, 0.12, 0.11), true)
-			for i in range(18):
-				var shift := Vector2(-host.effect_direction.x * i * 2, sin(i * 2.3 + host.visual_clock * 23) * 12)
-				var size := 6 + (i % 3) * 4
-				host.draw_circle(at + shift, size * 0.65, Color("e47735"), true)
-			for i in range(9):
-				var shift := Vector2(cos(i * 1.7) * 12, sin(i * 2.8) * 10)
-				host.draw_circle(at + shift, 4, Color("ffcf69"), true)
-			host.draw_circle(at, 7, Color("fff1b0"), true)
-		else:
-			host.draw_set_transform(at, host.effect_direction.angle())
-			host.draw_texture_rect(KUNAI, Rect2(-16, -8, 32, 16), false)
-			host.draw_line(Vector2(-28, 0), Vector2(-48, 0), Color(0.85, 0.92, 0.95, 0.55), 2)
-			host.draw_set_transform(Vector2.ZERO)
+	host.combat.draw(host)
 	# Sparse ambient leaves/fireflies. No particle nodes or heavy post-processing.
 	for i in range(12):
 		var x := fmod(i * 89.0 + host.visual_clock * (5 if night else 11), 940.0)

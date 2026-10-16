@@ -107,6 +107,8 @@ func apply(game: Node2D, data: Dictionary) -> bool:
 	game.pending_forest_transition = data.pending_forest_transition
 	game.cooldown = 0
 	game.attack_flash = 0
+	game.motion_velocity=Vector2.ZERO
+	game.combat.reset()
 	game.dash_time = 0
 	game.movement = Vector2.ZERO
 	game.sprinting = false

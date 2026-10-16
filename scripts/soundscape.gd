@@ -1,6 +1,7 @@
 extends Node
 
 var enabled := true
+var indoors := false
 var voices: Array[AudioStreamPlayer] = []
 var ambient: AudioStreamPlayer
 var sounds: Dictionary = {}
@@ -10,7 +11,7 @@ var ready_for_audio := false
 var shutting_down := false
 
 func _ready() -> void:
-	for kind in ["kunai", "katon", "impact"]:
+	for kind in ["kunai", "katon", "impact", "step"]:
 		sounds[kind] = synth(kind)
 	for i in range(4):
 		var voice := AudioStreamPlayer.new()
@@ -32,7 +33,7 @@ func _process(delta: float) -> void:
 
 func synth(kind: String) -> AudioStreamWAV:
 	const RATE := 11025
-	var duration := 6.0 if kind == "wind" else 0.55 if kind == "katon" else 0.18
+	var duration := 6.0 if kind == "wind" else 0.55 if kind == "katon" else 0.075 if kind=="step" else 0.18
 	var count := int(duration * RATE)
 	var bytes := PackedByteArray()
 	bytes.resize(count * 2)
@@ -49,6 +50,7 @@ func synth(kind: String) -> AudioStreamWAV:
 			"kunai": value = (noise * 0.35 + sin(TAU * (1700 * t - 2800 * t * t)) * 0.2) * envelope
 			"katon": value = (low * 2.0 + noise * 0.16 + sin(TAU * 68 * t) * 0.12) * envelope
 			"impact": value = (noise * 0.5 + sin(TAU * 320 * t) * 0.25) * exp(-t * 26)
+			"step": value=(low*0.6+sin(TAU*105*t)*0.12)*envelope
 			"wind":
 				var loop_envelope := pow(sin(PI * t / duration), 2)
 				var chirp := maxf(0, sin(t * 2.2)) * maxf(0, sin(t * 8.7))
@@ -68,6 +70,7 @@ func play(kind: String) -> void:
 		return
 	var voice := voices[voice_index % voices.size()]
 	voice_index += 1
+	voice.volume_db=(-34 if indoors else -30) if kind=="step" else -15
 	voice.stream = sounds[kind]
 	voice.play()
 
@@ -82,6 +85,7 @@ func set_enabled(value: bool) -> void:
 				voice.stop()
 
 func set_indoor(value: bool) -> void:
+	indoors=value
 	if ambient != null: ambient.volume_db=-40 if value else -28
 
 func shutdown() -> void:

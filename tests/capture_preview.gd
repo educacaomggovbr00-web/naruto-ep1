@@ -29,18 +29,19 @@ func capture() -> void:
 	for i in range(3):
 		game.cooldown = 0
 		game.act("kunai")
+		settle_attack(game)
 	close_dialogue(game)
 	game.cooldown = 0
 	game.act("katon")
+	settle_attack(game)
 	close_dialogue(game)
 	assert(game.stage == 2, "Capture must reach Konoha through playable actions")
 	game.attack_flash = 0
 	game.player = Vector2(520, 300)
 	await save_frame("original-konoha.png")
-	game.effect_kind = "katon"
-	game.effect_origin = game.player
-	game.effect_direction = Vector2.RIGHT
-	game.attack_flash = 0.45
+	game.cooldown=0
+	game.act("katon")
+	await create_timer(0.25).timeout
 	await save_frame("novo-katon.png")
 	game.attack_flash = 0
 	game.player = Vector2(560, 280)
@@ -56,3 +57,9 @@ func capture() -> void:
 	game.queue_free()
 	await create_timer(0.1).timeout
 	quit()
+
+func settle_attack(game: Node) -> void:
+	for i in range(60):
+		if game.combat.shots.is_empty(): return
+		game._process(0.02)
+	assert(false,"Attack must resolve within its maximum flight time")

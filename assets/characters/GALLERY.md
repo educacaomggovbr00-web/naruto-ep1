@@ -16,7 +16,7 @@ roupas ou efeitos. A escala de exibição é ajustada no Godot, com filtro neare
 | 1000214535.png | Fonte ativa dos sprites e retratos de Iruka, Mizuki, Sasuke, Sakura, Hiruzen e Teuchi |
 | 1000214536.png | Fonte ativa de Henrique com roupa preta/vermelha: 6 idle, 2 andar, 6 correr, 7 esquiva, 3 kunai e 3 Katon, mais o retrato |
 | 1000214537.png | Folha dedicada do Naruto, disponível para futuras ações; o NPC atual mantém os recortes transparentes de 1000214531.png |
-| 1000214538.png | Tiles, mapas, itens e efeitos; cenários 2.5D existentes preservados |
+| 1000214538.png | Chama ativa do Katon; tiles, mapas e itens disponíveis como referência; cenários 2.5D existentes preservados |
 
 Os arquivos 1000214535.png e 1000214536.png são folhas ilustradas RGB, sem alpha
 real. Seus nomes internos no upload têm prefixos 07- e 08-. Os hashes SHA256,
@@ -77,3 +77,11 @@ chegar à praça por ações de treino, incluindo a transição para a persegui�
 
 Android físico ainda precisa validar desempenho, memória, áudio, toque real,
 alcance dos polegares, suspensão/retomada e persistência após reabrir o app.
+
+## Efeito de fogo do anexo
+
+`katon-fire.png` recorta uma bola de fogo da folha `10-1000214538.png`. O manifesto
+`katon-fire.json` registra SHA256 da fonte, retângulo e limites da máscara.
+`tools/import_katon_fire.py` copia os canais RGB e remove o fundo azul somente
+pelo alpha, incluindo azul preso entre as pontas da chama. A arte anterior não
+foi apagada. O efeito gira com a direção do ataque e acompanha o projétil real.

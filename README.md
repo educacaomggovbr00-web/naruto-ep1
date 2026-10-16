@@ -13,7 +13,7 @@ Abra `project.godot` e execute com F5. Renderizador Compatibility, interface em 
 - Direcional compacto, botões de ação e suporte a dedos independentes para andar e correr juntos. Arrastar para fora do botão libera o comando.
 - **AJUSTES** ajusta a opacidade entre 30% e 100%, gravada em `user://interface.cfg`.
 - Diálogos com nome, retrato e texto progressivo. O primeiro toque revela a fala; o seguinte avança. A mudança para a floresta acontece no momento do anoitecer durante a conversa.
-- Folhas, vagalumes, poeira, anel de acerto, partículas de chakra e Katon com brilho e núcleo luminoso. Cenários estáticos são redesenhados apenas ao mudar de área.
+- Folhas, vagalumes, poeira, anel de acerto, partículas de chakra e Katon recortado do efeito enviado, com brilho discreto. Cenários estáticos são redesenhados apenas ao mudar de área.
 
 Os personagens ativos usam recortes dos arquivos enviados, com proporções e pés ajustados ao cenário. As fontes anteriores foram preservadas. O jogo continua sendo um protótipo.
 
@@ -32,7 +32,7 @@ Os personagens ativos usam recortes dos arquivos enviados, com proporções e p�
 
 Os botões de toque oferecem as mesmas ações. Durante diálogos, apenas AÇÃO permanece visível. Diálogos, ajustes e perda de foco liberam os comandos para evitar movimento preso.
 
-Para chegar à praça das capturas: acerte o alvo três vezes com kunai, mirando a menos de 150 passos, e use Katon perto dele. Katon consome 25 de chakra. Na perseguição, mantenha 70–230 passos de distância de Mizuki e use FURTIVO; complete 12 segundos, investigue a kunai, entre na casa à esquerda e use AÇÃO perto da cama.
+Para chegar à praça das capturas: acerte o alvo três vezes com kunai, olhando na direção dele e dentro do alcance da kunai (280 passos), e acerte-o com Katon (220 passos). Katon consome 25 de chakra. Na perseguição, mantenha 70–230 passos de distância de Mizuki e use FURTIVO; complete 12 segundos, investigue a kunai, entre na casa à esquerda e use AÇÃO perto da cama.
 
 ## Android e modo leve
 
@@ -147,3 +147,23 @@ NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests
 Verificado em Godot 4.4.1: portas, bloqueio de entrada durante transição, circulação entre os móveis, diálogos/objetos, salvamento dentro das duas salas, compatibilidade dos saves antigos e conclusão pela cama. Capturas são do próprio jogo após as ações do treino. Android físico ainda precisa validar ergonomia, memória, áudio e retomada do app.
 
 Origem e prompts dos novos fundos: [assets/environments/INTERIORS.md](assets/environments/INTERIORS.md).
+
+## Precisão das técnicas e resposta do movimento
+
+Kunai e Katon agora têm preparação, trajetória e contato real com o alvo; apertar o botão não conta um acerto. A kunai prepara em 0,06 s, viaja a 640 passos/s e alcança 280 passos. O Katon prepara em 0,18 s, viaja a 420 passos/s e alcança 220 passos. A colisão verifica o segmento percorrido, incluindo quadros lentos. O raio de contato inclui o tamanho do alvo e do projétil.
+
+- Uma pequena assistência corrige a direção quando Henrique já está olhando quase para o alvo (produto escalar ≥ 0,96). Olhar para o lado oposto ou lançar de longe continua resultando em erro.
+- Os três contatos de kunai liberam a lição de Katon. O Katon deve atingir o alvo para concluir o treino. Chakra, diálogos e restante da história mantêm o fluxo anterior.
+- O alvo reage com tremor, cor, faíscas e som no contato. A chama de `katon-fire.png` usa RGB original da folha `10-1000214538.png`; somente a transparência foi tratada. Fonte e recorte estão em `katon-fire.json`.
+- Os botões mostram a recarga compartilhada de 0,4 s para kunai ou 1 s para Katon. Um toque nos últimos 0,12 s fica reservado para executar uma única técnica ao terminar a recarga. Diálogos, ajustes, perda de foco, entrada em cômodos e carregamento descartam comandos pendentes.
+- O movimento acelera brevemente ao partir ou trocar de direção e para imediatamente ao soltar o direcional. Passos discretos acompanham caminhada, corrida e furtividade; ficam mais baixos nos interiores, sem poeira dentro de casa ou da Academia.
+- A atualização melhora o treino. Os NPCs continuam sendo personagens de conversa; combate contra inimigos e episódio 1 permanecem pendentes.
+
+```sh
+python3 tools/import_katon_fire.py /caminho/para/10-1000214538.png
+godot --headless --path . --script res://tests/combat_smoke.gd
+NARUTO_LOW_MEMORY=1 godot --headless --path . --script res://tests/combat_smoke.gd
+NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests/capture_combat.gd
+```
+
+O teste cobre preparação, voo, alcance, erro de mira, assistência, contato em quadro lento, repetição de toque, cancelamento, gasto de chakra, progressão e parada sem deslizamento. As capturas registram o jogo executando com renderizador Compatibility, sem uma cena visual separada. Toque físico, desempenho, áudio e retomada no Android ainda precisam de aparelho real.

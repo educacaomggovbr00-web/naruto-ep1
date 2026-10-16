@@ -25,6 +25,8 @@ var lines: Array[String] = []
 var line_index := 0
 var pending_forest_transition := false
 var movement := Vector2.ZERO
+var motion_velocity := Vector2.ZERO
+var combat = preload("res://scripts/combat.gd").new()
 var held := {}
 var hud: Label
 var objective: Label
@@ -43,7 +45,7 @@ var polish = preload("res://scripts/polish.gd").new()
 var background = preload("res://scripts/background.gd").new()
 const OBJECTIVES := [
 	"TREINO • Acerte 3 vezes o alvo com kunai (J / botão KUNAI).",
-	"CHAKRA • Use Katon perto do alvo (K / botão KATON).",
+	"CHAKRA • Acerte o alvo com Katon (K / botão KATON).",
 	"KONOHA • Encontre Naruto na praça e converse (E / AÇÃO).",
 	"NOITE • Siga Mizuki a 70–230 passos. Segure FURTIVO para não ser visto.",
 	"VOLTA • Investigue a kunai caída (E / AÇÃO).",
@@ -91,6 +93,7 @@ func travel_to(destination: String) -> void:
 	movement=Vector2.ZERO
 	dash_time=0
 	attack_flash=0
+	combat.reset()
 	var tween: Tween = ui.fade_to(1.0)
 	await tween.finished
 	if destination == "outside":
@@ -186,22 +189,25 @@ func _process(delta: float) -> void:
 	cooldown = maxf(0.0, cooldown - delta)
 	attack_flash = maxf(0.0, attack_flash - delta)
 	chakra = minf(100.0, chakra + delta * 5.0)
+	combat.update(self,delta)
 	if lines.is_empty() and stage < 6 and not ui.settings_panel.visible:
 		movement = Vector2(float(down("right", KEY_D, KEY_RIGHT)) - float(down("left", KEY_A, KEY_LEFT)), float(down("down", KEY_S, KEY_DOWN)) - float(down("up", KEY_W, KEY_UP))).normalized()
-		if movement != Vector2.ZERO:
+		if movement != Vector2.ZERO and attack_flash<=0:
 			facing = movement
 		var sneaking := down("sneak", KEY_SHIFT)
 		sprinting = down("run", KEY_R) and not sneaking
 		var previous := player
 		var speed := 95.0 if sneaking else 240.0 if sprinting else 180.0
 		if dash_time > 0:
+			motion_velocity=Vector2.ZERO
 			movement = dash_direction
 			sprinting = true
 			speed = 440.0
 			move_with_collisions(movement * speed * minf(delta, dash_time))
 			dash_time = maxf(0, dash_time - delta)
 		else:
-			move_with_collisions(movement * speed * delta)
+			motion_velocity=Vector2.ZERO if movement==Vector2.ZERO else motion_velocity.move_toward(movement*speed,2800.0*delta)
+			move_with_collisions(motion_velocity * delta)
 		if player.is_equal_approx(previous):
 			movement = Vector2.ZERO
 			sprinting = false
@@ -263,41 +269,16 @@ func act(action: String) -> void:
 		dash_time = 0.16
 		return
 	if action in ["kunai", "katon"] and cooldown > 0:
-		ui.toast("Aguarde a técnica ficar pronta.")
+		if cooldown<=0.12: combat.buffered=action
+		else: ui.toast("Aguarde a técnica ficar pronta.")
 		return
 	if action == "katon" and chakra < 25:
 		ui.toast("Katon precisa de 25 de chakra.")
 		return
 	if action == "kunai" and cooldown <= 0:
-		cooldown = 0.4
-		audio.play("kunai")
-		attack_flash = 0.2
-		effect_kind = "kunai"
-		effect_origin = player
-		effect_direction = facing
-		if stage == 0 and player.distance_to(target) < 150 and facing.dot((target - player).normalized()) > 0.35:
-			audio.play("impact")
-			cinematic.kick(0.55)
-			hits += 1
-			ui.toast("Acerto %d / 3" % hits)
-			if hits >= 3:
-				stage = 1
-				say(["Henrique: Três acertos! Agora vou tentar o Katon."])
-		elif stage == 0:
-			ui.toast("Aproxime-se do alvo." if player.distance_to(target) >= 150 else "Vire-se para o alvo antes de lançar.")
+		combat.begin(self,"kunai")
 	elif action == "katon" and cooldown <= 0 and chakra >= 25:
-		audio.play("katon")
-		cinematic.kick(0.85)
-		chakra -= 25
-		cooldown = 1.0
-		attack_flash = 0.5
-		effect_kind = "katon"
-		effect_origin = player
-		effect_direction = facing
-		if stage == 1 and player.distance_to(target) < 150:
-			stage = 2
-			player = Vector2(170, 270)
-			say(["Henrique: Katon!", "As chamas escapam por um instante. Seus olhos ficam vermelhos: Sharingan de um tomoe.", "Henrique: O que foi isso...? Melhor voltar para a vila."])
+		combat.begin(self,"katon")
 	elif action == "interact":
 		if stage == 2 and player.distance_to(layout.NARUTO) < 95:
 			pending_forest_transition = true
@@ -320,6 +301,19 @@ func act(action: String) -> void:
 		elif stage == 4 and player.distance_to(target) < 85:
 			stage = 5
 			say(["Henrique: Uma kunai... Não consigo descobrir o que ele estava planejando.", "Está tarde. Vou para casa."])
+
+func training_hit(kind: String) -> void:
+	if stage==0 and kind=="kunai":
+		hits=mini(3,hits+1)
+		ui.toast("Acerto %d / 3" % hits)
+		if hits>=3:
+			stage=1
+			say(["Henrique: Três acertos! Agora vou tentar o Katon."])
+	elif stage==1 and kind=="katon":
+		stage=2
+		player=Vector2(170,270)
+		combat.reset()
+		say(["Henrique: Katon!","As chamas escapam por um instante. Seus olhos ficam vermelhos: Sharingan de um tomoe.","Henrique: O que foi isso...? Melhor voltar para a vila."])
 
 func style_button(button: Button, is_dialogue: bool = false) -> void:
 	button.focus_mode = Control.FOCUS_NONE

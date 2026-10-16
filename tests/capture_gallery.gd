@@ -22,9 +22,11 @@ func capture() -> void:
 	for i in range(3):
 		game.cooldown = 0
 		game.act("kunai")
+		settle_attack(game)
 	while not game.lines.is_empty(): game.next_line()
 	game.cooldown = 0
 	game.act("katon")
+	settle_attack(game)
 	while not game.lines.is_empty(): game.next_line()
 	assert(game.stage == 2)
 	game.player = Vector2(500, 300)
@@ -56,3 +58,9 @@ func capture() -> void:
 	game.queue_free()
 	await create_timer(0.1).timeout
 	quit()
+
+func settle_attack(game: Node) -> void:
+	for i in range(60):
+		if game.combat.shots.is_empty(): return
+		game._process(0.02)
+	assert(false,"Attack must resolve within its maximum flight time")

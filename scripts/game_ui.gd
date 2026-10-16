@@ -261,6 +261,11 @@ func _process(delta: float) -> void:
 	toast_panel.visible = toast_time > 0 and game.lines.is_empty() and not resume_overlay.visible
 	for button in touch_buttons:
 		var action: String = button.get_meta("action")
+		if action in ["kunai","katon"]:
+			var caption:=action.to_upper()
+			if game.cooldown>0: caption+="\n%.1f s" % game.cooldown
+			elif action=="katon" and game.chakra<25: caption+="\n25 chakra"
+			button.text=caption
 		if button.get_meta("latched", false):
 			button.set_pressed_no_signal(bool(game.held.get(button.get_meta("action"), false)))
 		button.visible = not resume_overlay.visible and (game.lines.is_empty() or button.get_meta("action") == "interact")
@@ -273,6 +278,8 @@ func _process(delta: float) -> void:
 			continue_label.text = "E / TOQUE · Continuar  ›"
 
 func release_touches() -> void:
+	game.motion_velocity=Vector2.ZERO
+	game.combat.cancel_attacks()
 	touch_pointers.clear()
 	direction_fingers.clear()
 	game.held.clear()
