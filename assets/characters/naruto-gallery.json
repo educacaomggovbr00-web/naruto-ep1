@@ -1,0 +1,112 @@
+{
+  "source": "Sprite Sheet Pixelado do Naruto com Jutsus.png",
+  "source_sha256": "a6ca086f9db1cb7e8744833e3e7887c4127e7b0e12872e19543af76be455ecd6",
+  "texture": "naruto-gallery-idle.png",
+  "scale": 0.72,
+  "frames": [
+    {
+      "rect": [
+        0,
+        0,
+        96,
+        160
+      ],
+      "origin": [
+        48,
+        140
+      ],
+      "source_rect": [
+        14,
+        13,
+        61,
+        133
+      ],
+      "ticks": 12,
+      "rgba_sha256": "bb442794ca1c0acaa34f64d7c2e566616ea5877f7fc945eac947a08d54bb2ef7",
+      "copied_region": [
+        17,
+        10,
+        61,
+        133
+      ]
+    },
+    {
+      "rect": [
+        96,
+        0,
+        96,
+        160
+      ],
+      "origin": [
+        48,
+        140
+      ],
+      "source_rect": [
+        87,
+        13,
+        66,
+        133
+      ],
+      "ticks": 12,
+      "rgba_sha256": "450d27aec8494576ac55f6f2fcdf9911b6afcc2b5d81d69e5abda34f19e4d23d",
+      "copied_region": [
+        111,
+        11,
+        66,
+        133
+      ]
+    },
+    {
+      "rect": [
+        192,
+        0,
+        96,
+        160
+      ],
+      "origin": [
+        48,
+        140
+      ],
+      "source_rect": [
+        158,
+        13,
+        61,
+        133
+      ],
+      "ticks": 12,
+      "rgba_sha256": "5df9021a8c2e35e7c0e409e661c924ed8e5045e85eaf9346b31da6f097b32f2f",
+      "copied_region": [
+        209,
+        10,
+        61,
+        133
+      ]
+    },
+    {
+      "rect": [
+        288,
+        0,
+        96,
+        160
+      ],
+      "origin": [
+        48,
+        140
+      ],
+      "source_rect": [
+        226,
+        13,
+        64,
+        133
+      ],
+      "ticks": 12,
+      "rgba_sha256": "98344263137bd26a46397abe2163731ef160f8e3e3f976affe764cf62db0c508",
+      "copied_region": [
+        304,
+        11,
+        64,
+        133
+      ]
+    }
+  ]
+}

@@ -8,14 +8,14 @@ Abra `project.godot` e execute com F5. Renderizador Compatibility, interface em 
 
 - Cenários 2.5D detalhados para Konoha, campo de treino e floresta noturna, com luz, materiais, vegetação e profundidade pintados. Apenas a imagem da área atual fica carregada.
 - Casa com floreira, Academia com faixas, armazém com chaminé e Ichiraku com toldo; o layout mantém as posições das construções e a clareira de movimentação do protótipo.
-- Atlas detalhado original de Henrique e Naruto MUGEN preservados. Iruka e Mizuki usam desenho procedural com proporções próximas, roupa, protetor de testa, detalhes de rosto e movimentos sutis.
+- Henrique usa a folha preta/vermelha enviada, com 27 quadros e retrato. Naruto usa quatro recortes originais da galeria. Iruka e Mizuki usam os sprites e retratos enviados; Sasuke, Sakura, Hiruzen e Teuchi estão na praça com conversas opcionais. Atlas anteriores e código MUGEN preservados.
 - HUD compacto com retrato, missão e barra de chakra ampliada. Controles sobrepostos nas laterais deixam o centro livre.
 - Direcional compacto, botões de ação e suporte a dedos independentes para andar e correr juntos. Arrastar para fora do botão libera o comando.
 - **AJUSTES** ajusta a opacidade entre 30% e 100%, gravada em `user://interface.cfg`.
 - Diálogos com nome, retrato e texto progressivo. O primeiro toque revela a fala; o seguinte avança. A mudança para a floresta acontece no momento do anoitecer durante a conversa.
 - Folhas, vagalumes, poeira, anel de acerto, partículas de chakra e Katon com brilho e núcleo luminoso. Cenários estáticos são redesenhados apenas ao mudar de área.
 
-A arte dos personagens usa técnicas distintas: o atlas detalhado e os quadros MUGEN são mantidos, e o cenário/NPCs foram aproximados por proporção e paleta. O jogo continua sendo um protótipo.
+Os personagens ativos usam recortes dos arquivos enviados, com proporções e pés ajustados ao cenário. As fontes anteriores foram preservadas. O jogo continua sendo um protótipo.
 
 ## Controles
 
@@ -36,7 +36,7 @@ Para chegar à praça das capturas: acerte o alvo três vezes com kunai, mirando
 
 ## Android e modo leve
 
-Henrique usa o atlas detalhado por padrão também no Android. O Android limita a execução a 30 FPS. O modo simplificado é opcional: `NARUTO_LOW_MEMORY=1` usa o pequeno atlas SVG de Henrique e tem aparência diferente das capturas detalhadas. Os quadros MUGEN são carregados sob demanda.
+Henrique usa o novo atlas dos anexos por padrão também no Android. O Android limita a execução a 30 FPS. O modo simplificado é opcional: `NARUTO_LOW_MEMORY=1` usa o pequeno atlas SVG de Henrique e tem aparência diferente das capturas detalhadas. Os quadros MUGEN são carregados sob demanda.
 
 Toque e desempenho ainda precisam de validação em aparelho Android real. Esta atualização não inclui APK. Para exportar, instale os templates do Godot e configure um preset Android.
 
@@ -61,11 +61,11 @@ O script percorre as ações do treino antes de capturar a praça. Não usa uma 
 
 ## Recursos e créditos
 
-- Integração da galeria: quatro poses transparentes de esquiva de Henrique, com pés alinhados e ciclo de 0,16 s. Atlas principal e Naruto MUGEN preservados. Inventário das três folhas e detalhes em [assets/characters/GALLERY.md](assets/characters/GALLERY.md).
+- Integração da galeria: 27 quadros de Henrique, quatro poses de Naruto e seis personagens com sprites e retratos dos anexos. Sem redesenho; arte anterior preservada. Inventário, origem e validação em [assets/characters/GALLERY.md](assets/characters/GALLERY.md).
 
 - `assets/characters/henrique-detailed.png`: atlas RGBA original de 24 poses; recortes em `henrique-frames.json`.
 - `assets/mugen/naruto/`: 14 quadros decodificados do pack Real Naruto, preservando tempos e eixos AIR. Origem e créditos em [assets/mugen/CREDITS.md](assets/mugen/CREDITS.md).
-- `assets/environments/`: pinturas geradas para o projeto, com procedência em [CREDITS.md](assets/environments/CREDITS.md). `scripts/npc_art.gd` desenha os NPCs por código.
+- `assets/environments/`: pinturas geradas para o projeto, com procedência em [CREDITS.md](assets/environments/CREDITS.md). `scripts/npc_art.gd` preserva o desenho anterior; os NPCs ativos usam `assets/characters/attached-cast.png`.
 - `tools/build_art.py`: gerador dos SVGs originais, ainda usados em alvos, kunai e modo leve.
 
 Validação dos sprites e capturas reais dos quatro quadros:
@@ -119,3 +119,12 @@ Esses testes usam arquivos próprios e não alteram o progresso normal do jogado
 - A trajetória de Mizuki permanece na clareira; posições de saves antigos são ajustadas aos limites atuais. A escala de Henrique foi aproximada da dos NPCs e das portas.
 
 A ergonomia foi verificada com eventos de toque no Godot. Ainda é necessário conferir o alcance dos polegares em um Android real.
+
+## Personagens dos anexos
+
+Na praça, use E/AÇÃO perto de Sasuke, Sakura, Hiruzen ou Teuchi para conversas opcionais. A missão com Naruto e a perseguição de Mizuki mantêm a progressão original. Posições antigas dentro de um novo NPC são ajustadas ao carregar.
+
+```sh
+godot --headless --path . --script res://tests/attached_cast_smoke.gd
+NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests/capture_attached.gd
+```

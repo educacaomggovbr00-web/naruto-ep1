@@ -10,6 +10,11 @@ func run_checks() -> void:
 	await process_frame
 	while not game.lines.is_empty(): game.next_line()
 	var art = game.art.character_art
+	assert(art.naruto_gallery_texture == null, "Gallery NPC should load only when needed")
+	assert(art.get_naruto_gallery_texture().get_size() == Vector2(384, 160))
+	assert(art.naruto_gallery["frames"].size() == 4)
+	game.ui.update_portrait("Naruto")
+	assert(game.ui.portrait.texture.atlas == art.naruto_gallery_texture, "Dialogue must use the same original gallery art")
 	assert(art.dodge_manifest["frames"].size() == 4)
 	assert(art.dodge_texture == null if art.compact_mode else art.dodge_texture.get_size() == Vector2(384, 96))
 	game.player = Vector2(500, 300)

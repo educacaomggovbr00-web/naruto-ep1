@@ -13,8 +13,7 @@ func _init() -> void:
 	HENRIQUE = character_art.henrique_texture
 
 func actor(host: Node2D, at: Vector2, texture: Texture2D, direction: Vector2, moving: bool, clock: float, name_text: String, night: bool) -> void:
-	npc_art.draw(host, at, texture == MIZUKI, moving, clock, night)
-	host.draw_string(ThemeDB.fallback_font, at + Vector2(-22, -92), name_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("f6e9c8"))
+	character_art.draw_cast_actor(host,name_text,at,moving,night)
 
 func marker(host: Node2D, at: Vector2, clock: float) -> void:
 	var y := at.y - 100 + sin(clock * 3.5) * 3
@@ -27,6 +26,8 @@ func render(host: Node2D) -> void:
 		marker(host, host.target + Vector2(0, 55), host.visual_clock)
 		host.draw_string(ThemeDB.fallback_font, host.target + Vector2(-16, 45), "%d / 3" % host.hits, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("fcdfa2"))
 	elif host.stage == 2:
+		for name_text in host.layout.VILLAGE_CAST:
+			character_art.draw_cast_actor(host,name_text,host.layout.VILLAGE_CAST[name_text])
 		character_art.draw_naruto(host, host.layout.NARUTO)
 		actor(host, host.layout.IRUKA, IRUKA, Vector2.DOWN, false, host.visual_clock, "Iruka", false)
 		marker(host, host.layout.NARUTO, host.visual_clock)

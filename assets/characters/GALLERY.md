@@ -1,59 +1,79 @@
-# Sprites da galeria do ChatGPT
+# Arte original da galeria e dos anexos
 
-Arquivos originais examinados visualmente em 16/10/2026, todos com 1536×1024.
-São folhas ilustradas geradas anteriormente; as legendas não são regras do jogo.
-Henrique continua com 12 anos e com as habilidades do prólogo.
+Nenhum personagem desta atualização foi redesenhado ou baixado da internet.
+Os PNGs prontos usam os pixels RGB dos arquivos enviados. Nas folhas com fundo
+azul, somente a máscara de transparência é produzida; não são repintados rostos,
+roupas ou efeitos. A escala de exibição é ajustada no Godot, com filtro nearest.
 
-| Arquivo | Conteúdo identificado | Uso nesta atualização |
-| --- | --- | --- |
-| Sprite Sheet Pixel Art de Henrique Uchiha.png | Retratos, trajes, parado, andar, correr, pular, cair, agachar, esquiva, deslizar, socos, kunai, shuriken, Katon, clones, substituição, dano e levantar | Quatro poses da linha ESQUIVA; demais poses ficam como referências |
-| Ficha de Sprites Pixelados do Henrique Uchiha.png | Movimentos básicos, ataques, kunai, técnicas elementais, olhos, Susanoo, estados de dano e poses cotidianas | Referência; fundo, texto e efeitos sobrepostos, sem necessidade de substituir a arte atual |
-| Sprite Sheet Pixelado do Naruto com Jutsus.png | Parado, movimento, saltos, socos, chutes, armas, dano, selos, clones, fumaça e efeitos azuis | Referência; Naruto MUGEN mantém seus quadros, eixos e tempos originais |
+## Arquivos recebidos
 
-## Integração
+| Arquivos | Conteúdo e uso |
+| --- | --- |
+| 1000214529.jpg | Ficha geral do Henrique com trajes, movimentos e técnicas; referência |
+| 1000214530.jpg | Henrique de camiseta branca; atlas anterior preservado |
+| 1000214531.png | Naruto: quatro poses de parado e recorte do retrato ativos em Konoha |
+| 1000214532.jpg, 1000214533.jpg, 1000214534.jpg | Três cópias idênticas da ficha geral de personagens, cenários e efeitos; não duplicadas no jogo |
+| 1000214535.png | Fonte ativa dos sprites e retratos de Iruka, Mizuki, Sasuke, Sakura, Hiruzen e Teuchi |
+| 1000214536.png | Fonte ativa de Henrique com roupa preta/vermelha: 6 idle, 2 andar, 6 correr, 7 esquiva, 3 kunai e 3 Katon, mais o retrato |
+| 1000214537.png | Folha dedicada do Naruto, disponível para futuras ações; o NPC atual mantém os recortes transparentes de 1000214531.png |
+| 1000214538.png | Tiles, mapas, itens e efeitos; cenários 2.5D existentes preservados |
 
-`henrique-gallery-dodge.png` contém quatro células RGBA de 96×96. Não inclui
-legendas, painéis ou o fundo da folha. O leque/camiseta branca e a calça bege
-mantêm a roupa da versão existente. A esquiva substitui temporariamente a pose
-de corrida apenas durante os 0,16 s da ação, a 25 quadros/s, sem repetição.
+Os arquivos 1000214535.png e 1000214536.png são folhas ilustradas RGB, sem alpha
+real. Seus nomes internos no upload têm prefixos 07- e 08-. Os hashes SHA256,
+recortes e âncoras usados estão nos manifestos `attached-cast.json` e
+`attached-henrique.json`. Dois quadros independentes de andar foram selecionados;
+outras poses dessa linha se sobrepõem a partes dos vizinhos. Nada foi inventado
+para completar os ciclos. O conjunto ativo de Henrique tem 27 quadros.
 
-Todos os recortes compartilham origem (48,94), escala 0,96 e a linha dos pés do
-desenho existente. O personagem permanece baixo durante a esquiva; não há
-normalização da altura a cada quadro. A direção horizontal usa o vetor da
-esquiva e permite espelhamento para a esquerda. A cor noturna continua ativa.
+## Gameplay
 
-Colisões, distância de esquiva, fôlego, diálogo, controles e formato do save
-não foram alterados. O modo leve explícito mantém seu atlas SVG. Não foram
-introduzidos poderes, saltos ou combate que o prólogo não possui.
+- Iruka e Mizuki usam os recortes e retratos da folha enviada. Os grupos rotulados quatro direções não são tratados como ciclos de idle: NPCs mantêm a pose frontal, e Mizuki se desloca pela trajetória existente sem uma marcha inventada.
+- Sasuke, Sakura, Hiruzen e Teuchi aparecem na praça durante a etapa de Konoha.
+  Aproxime-se e pressione AÇÃO/E para conversas opcionais de fã, sem avançar a
+  missão principal. A conversa existente com Naruto mantém o fluxo original.
+- Todos os NPCs da praça bloqueiam a posição dos pés. Saves antigos que caiam
+  dentro de um novo NPC são deslocados para o chão livre mais próximo.
+- Henrique usa sua folha dedicada nas ações já existentes. Idle, andar e correr
+  têm 3, 6 e 13 quadros/s; kunai, Katon e esquiva acompanham as durações originais
+  de 0,20, 0,50 e 0,16 s. Esquiva e ataques não repetem o ciclo.
+- Cada recorte é colocado numa célula fixa, com pés alinhados e escala constante.
+  O desenho não é esticado quadro a quadro. A iluminação noturna continua ativa.
+- Não foram ativados Sharingan avançado, Susanoo, Rasengan, salto ou outros
+  poderes que não façam parte do gameplay existente. Kakashi, Konohamaru, Ebisu,
+  Ayame, ANBU e aldeões presentes nas folhas ficam disponíveis como referências.
+- História, etapas, controles e versão do arquivo salvo permanecem compatíveis.
+  O modo leve explícito mantém o SVG de Henrique.
 
-## Origem e reprodução
+## Fontes anteriores preservadas
 
-A fonte usada foi `Sprite Sheet Pixel Art de Henrique Uchiha.png`, da galeria
-do próprio usuário. SHA256 e os recortes originais estão em `gallery-dodge.json`.
-A folha original não precisa acompanhar o jogo; o pequeno atlas pronto é local.
+O atlas detalhado de camiseta branca, o atlas anterior de esquiva, os quadros
+Naruto MUGEN e seu código AIR continuam no projeto. O visual ativo agora segue
+os anexos acima. Henrique continua com 12 anos, independentemente das legendas
+das fichas ilustradas.
 
-Para reproduzir a extração com a mesma imagem original:
+`naruto-gallery-idle.png` copia quatro recortes RGBA da folha transparente sem
+alterar sequer os valores de alpha. O importador e o manifesto registram hashes
+dos pixels originais. A folha anexada 1000214531.png tem o mesmo SHA256 da folha
+“Sprite Sheet Pixelado do Naruto com Jutsus.png” já encontrada na galeria.
+
+## Reprodução e validação
 
 ```sh
-python3 tools/import_gallery_dodge.py '/caminho/Sprite Sheet Pixel Art de Henrique Uchiha.png'
+python3 tools/import_attached_sheets.py /caminho/para/upload
+python3 tools/import_gallery_naruto.py /caminho/para/1000214531.png
+godot --headless --path . --script res://tests/attached_cast_smoke.gd
+NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests/capture_attached.gd
 ```
 
-Dependências de desenvolvimento: Pillow, numpy e OpenCV (validado com 5.0.0).
-A ferramenta verifica a fonte e protege o cabelo escuro durante a remoção do
-fundo. O resultado foi inspecionado visualmente em fundo transparente e no jogo.
-Não há dependência de Python/OpenCV durante o gameplay.
+Importadores de desenvolvimento: Pillow, numpy e OpenCV 5.0.0. O jogo não usa
+Python, OpenCV ou downloads. Os importadores verificam hashes e copiam RGB dos
+originais; somente os fundos das folhas RGB recebem alpha.
 
-## Validação
+Verificado em Godot 4.4.1 Compatibility, Linux: importação, prólogo completo,
+conversas opcionais, retratos, posições dos NPCs, colisões, salvamento e retomada,
+toque simulado, câmera e controles de áudio. Prólogo e novos atores também
+verificados no modo leve. Capturas vêm do jogo executado com OpenGL/Mesa, após
+chegar à praça por ações de treino, incluindo a transição para a perseguição.
 
-Godot 4.4.1 Compatibility, Linux: importação, prólogo completo, interface,
-movimento/colisões/salvamento, câmera/áudio e `gallery_smoke.gd`. Prólogo e atlas
-também verificados com `NARUTO_LOW_MEMORY=1`.
-
-`gallery_smoke.gd` verifica os quatro tempos, direção esquerda/direita,
-deslocamento original e cancelamento em diálogo. `capture_gallery.gd` chega à
-praça com kunai/Katon, depois congela a simulação para capturar cada quadro
-real do renderer do jogo; não é uma montagem. Capturas com OpenGL Mesa/llvmpipe.
-
-Ainda depende de Android físico: desempenho/memória, áudio no aparelho, alcance
-dos polegares, toque real simultâneo, suspensão/retomada e persistência após
-fechar/reabrir o app. Esta atualização não gera APK.
+Android físico ainda precisa validar desempenho, memória, áudio, toque real,
+alcance dos polegares, suspensão/retomada e persistência após reabrir o app.

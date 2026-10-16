@@ -81,7 +81,7 @@ func apply(game: Node2D, data: Dictionary) -> bool:
 	game.hits = int(data.hits)
 	game.chakra = float(data.chakra)
 	game.stamina = float(data.stamina)
-	game.player = game.layout.clamp_position(Vector2(data.player[0], data.player[1]), game.stage)
+	game.player = game.layout.restore_position(Vector2(data.player[0], data.player[1]), game.stage)
 	game.target = game.layout.clamp_position(Vector2(data.target[0], data.target[1]), game.stage)
 	game.mizuki = game.layout.clamp_position(Vector2(data.mizuki[0], data.mizuki[1]), 3)
 	game.facing = Vector2(data.facing[0], data.facing[1]).normalized()

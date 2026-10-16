@@ -214,14 +214,16 @@ func update_portrait(speaker: String) -> void:
 	var atlas := AtlasTexture.new()
 	var art = game.art.character_art
 	if speaker == "Naruto":
-		atlas.atlas = load("res://assets/mugen/naruto/7322-34.png")
-		atlas.region = Rect2(18, 0, 58, 58)
-	elif speaker in ["Iruka", "Mizuki"]:
-		atlas.atlas = load("res://assets/art/%s.svg" % speaker.to_lower())
-		atlas.region = Rect2(3, 0, 18, 15)
+		atlas.atlas = art.get_naruto_gallery_texture()
+		atlas.region = Rect2(22, 18, 52, 60)
+	elif art.attached_cast["actors"].has(speaker):
+		atlas.atlas = art.get_cast_texture()
+		var crop: Array = art.attached_cast["actors"][speaker]["portrait"]
+		atlas.region = Rect2(crop[0],crop[1],crop[2],crop[3])
 	elif speaker in ["Henrique", "NARRADOR"] and not art.compact_mode:
-		atlas.atlas = art.henrique_texture
-		atlas.region = Rect2(85, 23, 109, 125)
+		atlas.atlas = art.player_texture
+		var crop: Array = art.attached_player["portrait"]
+		atlas.region = Rect2(crop[0],crop[1],crop[2],crop[3])
 	else:
 		atlas.atlas = load("res://assets/art/henrique.svg")
 		atlas.region = Rect2(3, 0, 18, 15)

@@ -10,6 +10,12 @@ var mugen_actions: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(
 var texture_cache := {}
 var dodge_manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/characters/gallery-dodge.json"))
 var dodge_texture: Texture2D = null
+var naruto_gallery: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/characters/naruto-gallery.json"))
+var naruto_gallery_texture: Texture2D = null
+var attached_cast: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/characters/attached-cast.json"))
+var attached_player: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/characters/attached-henrique.json"))
+var cast_texture: Texture2D = null
+var player_texture: Texture2D = null
 
 func _init() -> void:
 	# Use the original detailed atlas by default, including on Android.
@@ -17,6 +23,58 @@ func _init() -> void:
 	if not compact_mode:
 		henrique_texture = load("res://assets/characters/henrique-detailed.png") as Texture2D
 		dodge_texture = load("res://assets/characters/henrique-gallery-dodge.png") as Texture2D
+		player_texture = load("res://assets/characters/attached-henrique.png") as Texture2D
+
+func get_cast_texture() -> Texture2D:
+	if cast_texture == null:
+		cast_texture = load("res://assets/characters/attached-cast.png") as Texture2D
+	return cast_texture
+
+func attached_action(host: Node2D) -> String:
+	if host.dash_time > 0 and host.lines.is_empty(): return "dodge"
+	if host.attack_flash > 0: return "katon" if host.effect_kind == "katon" else "kunai"
+	if host.movement != Vector2.ZERO and host.lines.is_empty(): return "run" if host.sprinting else "walk"
+	return "idle"
+
+func attached_frame(host: Node2D, action: String) -> Dictionary:
+	var frames: Array = attached_player["actions"][action]
+	var index := 0
+	if action in ["dodge", "kunai", "katon"]:
+		var duration := 0.16 if action == "dodge" else 0.5 if action == "katon" else 0.2
+		var remaining: float = host.dash_time if action == "dodge" else host.attack_flash
+		index = int(clampf(1.0 - remaining / duration, 0, 0.999) * frames.size())
+	else:
+		index = int(host.visual_clock * float(attached_player["fps"][action])) % frames.size()
+	return frames[index]
+
+func draw_attached_player(host: Node2D) -> void:
+	var frame := attached_frame(host, attached_action(host))
+	var rect: Array = frame["rect"]
+	var origin: Array = frame["origin"]
+	var factor := float(attached_player["scale"])
+	var mirror: bool = (host.dash_direction.x if host.dash_time > 0 else host.facing.x) < 0
+	shadow(host, host.player)
+	host.draw_set_transform(host.player + Vector2(0, 14), 0, Vector2(-1 if mirror else 1, 1))
+	host.draw_texture_rect_region(player_texture,
+		Rect2(-Vector2(origin[0],origin[1])*factor,Vector2(rect[2],rect[3])*factor),
+		Rect2(rect[0],rect[1],rect[2],rect[3]),Color("b7c1d8") if host.stage >= 3 else Color.WHITE)
+	host.draw_set_transform(Vector2.ZERO)
+	host.draw_string(ThemeDB.fallback_font, host.player + Vector2(-25,-92), "Henrique", HORIZONTAL_ALIGNMENT_LEFT,-1,13,Color("f6e9c8"))
+
+func draw_cast_actor(host: Node2D, name_text: String, at: Vector2, moving: bool = false, night: bool = false) -> void:
+	var actor: Dictionary = attached_cast["actors"][name_text]
+	var frames: Array = actor["frames"]
+	# These source groups are labeled four directions, not an idle gait. Keep
+	# the reviewed frontal pose instead of rotating standing NPCs every tick.
+	var frame: Dictionary = frames[0]
+	var rect: Array = frame["rect"]
+	var origin: Array = frame["origin"]
+	var factor := float(actor["scale"])
+	shadow(host, at)
+	host.draw_texture_rect_region(get_cast_texture(),
+		Rect2(at + Vector2(0,14) - Vector2(origin[0],origin[1])*factor, Vector2(rect[2],rect[3])*factor),
+		Rect2(rect[0],rect[1],rect[2],rect[3]),Color("b7c1d8") if night else Color.WHITE)
+	host.draw_string(ThemeDB.fallback_font,at+Vector2(-23,-90),"Terceiro Hokage" if name_text == "Hiruzen" else name_text,HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("f6e9c8"))
 
 func gallery_dodge_frame(host: Node2D) -> int:
 	var progress := clampf(1.0 - host.dash_time / float(dodge_manifest["duration"]), 0.0, 0.999)
@@ -37,6 +95,9 @@ func henrique_frame(host: Node2D) -> int:
 	return (3 if host.facing.y < -0.4 else 0) + int(host.visual_clock * 2) % 3
 
 func draw_henrique(host: Node2D) -> void:
+	if not compact_mode:
+		draw_attached_player(host)
+		return
 	var dodging: bool = host.dash_time > 0 and host.lines.is_empty()
 	var mirror: bool = (host.dash_direction.x if dodging else host.facing.x) < 0
 	shadow(host, host.player)
@@ -65,7 +126,26 @@ func draw_henrique(host: Node2D) -> void:
 	host.draw_set_transform(Vector2.ZERO)
 	host.draw_string(ThemeDB.fallback_font, host.player + Vector2(-25, -82), "Henrique", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
 
+func get_naruto_gallery_texture() -> Texture2D:
+	if naruto_gallery_texture == null:
+		naruto_gallery_texture = load("res://assets/characters/naruto-gallery-idle.png") as Texture2D
+	return naruto_gallery_texture
+
 func draw_naruto(host: Node2D, at: Vector2) -> void:
+	var frames: Array = naruto_gallery["frames"]
+	var frame: Dictionary = frames[int(host.visual_clock * 5) % frames.size()]
+	var bounds: Array = frame["rect"]
+	var origin: Array = frame["origin"]
+	var factor := float(naruto_gallery["scale"])
+	shadow(host, at)
+	host.draw_texture_rect_region(get_naruto_gallery_texture(),
+		Rect2(at + Vector2(0, 14) - Vector2(origin[0], origin[1]) * factor,
+			Vector2(bounds[2], bounds[3]) * factor),
+		Rect2(bounds[0], bounds[1], bounds[2], bounds[3]))
+	host.draw_string(ThemeDB.fallback_font, at + Vector2(-23, -90), "Naruto", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f6e9c8"))
+
+# Original AIR playback retained together with every MUGEN source frame.
+func draw_naruto_mugen(host: Node2D, at: Vector2) -> void:
 	var frames: Array = mugen_actions["idle"]
 	var cycle := 0
 	for frame in frames:
@@ -96,6 +176,5 @@ func portrait(host: Node2D) -> void:
 	if compact_mode:
 		host.draw_texture_rect_region(COMPACT_HENRIQUE, Rect2(16, 7, 40, 48), Rect2(0, 0, 24, 28))
 		return
-	var bounds: Array = henrique_frames[0]["rect"]
-	# Region of the original texture; no baked crops or background removal.
-	host.draw_texture_rect_region(henrique_texture, Rect2(16, 7, 40, 48), Rect2(bounds[0] + 10, bounds[1], bounds[2] - 20, 135))
+	var crop: Array = attached_player["portrait"]
+	host.draw_texture_rect_region(player_texture, Rect2(12,4,46,51),Rect2(crop[0],crop[1],crop[2],crop[3]))

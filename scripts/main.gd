@@ -218,6 +218,21 @@ func act(action: String) -> void:
 		if stage == 2 and player.distance_to(layout.NARUTO) < 95:
 			pending_forest_transition = true
 			say(["Naruto: Ei! Por que você está sempre com essa cara séria?", "Henrique: E você, por que está sempre arrumando confusão?", "Iruka: Naruto! Volte para a Academia!", "Mais tarde, ao anoitecer...", "Henrique: Mizuki? O que um instrutor está fazendo perto da floresta a esta hora?"])
+		elif stage == 2:
+			var nearest := ""
+			var distance := 60.0
+			for person in layout.VILLAGE_CAST:
+				var candidate: float = player.distance_to(layout.VILLAGE_CAST[person])
+				if candidate < distance:
+					distance = candidate
+					nearest = person
+			var greetings := {"Sasuke": "Sasuke: Estou indo treinar. Até mais.",
+				"Sakura": "Sakura: Você já terminou seu treino de hoje, Henrique?",
+				"Hiruzen": "Hiruzen: Aproveite o tempo na Academia para aprender com seus colegas.",
+				"Teuchi": "Teuchi: Depois do treino, passe no Ichiraku. Um lámen quente cai bem!"}
+			if greetings.has(nearest):
+				var greeting_lines: Array[String] = [greetings[nearest]]
+				say(greeting_lines)
 		elif stage == 4 and player.distance_to(target) < 85:
 			stage = 5
 			say(["Henrique: Uma kunai... Não consigo descobrir o que ele estava planejando.", "Está tarde. Vou para casa."])

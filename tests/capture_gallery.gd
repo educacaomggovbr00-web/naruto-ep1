@@ -46,6 +46,12 @@ func capture() -> void:
 	game.dash_time = 0
 	game.queue_redraw()
 	await save_frame("galeria-base-preservada.png")
+	game.player = Vector2(560, 280)
+	game.act("interact")
+	assert(not game.lines.is_empty())
+	game.ui.finish_typing()
+	game.queue_redraw()
+	await save_frame("naruto-dialogo-galeria.png")
 	game.audio.shutdown()
 	game.queue_free()
 	await create_timer(0.1).timeout
