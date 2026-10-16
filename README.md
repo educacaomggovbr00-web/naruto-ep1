@@ -241,3 +241,16 @@ NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests
 ```
 
 O teste cobre horários fixos/automático, pausa, pássaros, iluminação da casa, animação por distância, compatibilidade de saves e noite protegida pela história. A captura grava 180 quadros reais do jogo com passos fixos de 1/15 s: caminhada de manhã, à tarde e à noite, seguida da perseguição na floresta. O vídeo é uma demonstração visual sem captura do áudio do sistema. Desempenho, áudio, legibilidade e retomada em Android físico continuam pendentes.
+
+
+### Vento e cenário interativo
+
+As copas do campo e da floresta e a vegetação em primeiro plano recebem rajadas de intensidade variável. O chão de circulação, as casas e os interiores permanecem estáveis. O movimento é um efeito sobre as pinturas existentes.
+
+Use **E / AÇÃO** junto ao galho na borda esquerda do campo (ou da floresta após a perseguição) para soltar folhas e sacudir a copa próxima. Na praça, toque a água pela margem a oeste da ponte para formar ondas; junto ao banco esquerdo, recupere o fôlego. Um aviso contextual indica o objeto alcançável. Estas ações são opcionais e não avançam a história.
+
+Iruka, Sasuke, Sakura, Hiruzen e Teuchi reagem à aproximação com um gesto breve e um sinal sobre a cabeça; o gesto também acompanha suas falas. Os sprites mantêm os pés e as colisões no mesmo lugar. A respiração, os gestos e a influência do vento são movimentos procedurais aplicados à arte original: as quatro poses de direção disponíveis não são tratadas como quadros de caminhada. Para passos completos destes personagens, ainda faltam folhas de animação de caminhada com quadros consecutivos.
+
+Os efeitos têm limite e intervalo entre ações, param nos menus e são descartados ao mudar de área ou carregar o progresso. Não mudam o formato do salvamento. A perseguição mantém a prioridade da história e não oferece as interações opcionais.
+
+Validação: `tests/ambient_world_smoke.gd` verifica acesso aos objetos, limites dos efeitos, pausa, água, recuperação de fôlego, reações, prioridade dos diálogos e limpeza ao carregar. `tests/capture_ambient.gd` grava a execução real em passos de 1/15 s. Multitoque, desempenho, aquecimento e retomada do aplicativo ainda precisam ser conferidos em Android físico.

@@ -74,12 +74,16 @@ func draw_cast_actor(host: Node2D, name_text: String, at: Vector2, moving: bool 
 	var factor := float(actor["scale"])
 	shadow(host, at)
 	var breathing:=1.0+sin(host.day_cycle.elapsed*2.0+float(name_text.hash()%17))*0.007
+	var reaction:float=host.ambient.reaction(name_text)
+	var greeting_lean:=sin((1.4-reaction)*TAU*1.5)*minf(reaction,0.4)*0.07 if reaction>0 else 0.0
+	var wind_lean:float=sin(host.day_cycle.elapsed*1.35+float(name_text.hash()%17))*host.day_cycle.wind_strength()*0.004 if host.room=="outside" else 0.0
 	var bob:=absf(sin(host.day_cycle.elapsed*9.0))*1.2 if moving else 0.0
-	host.draw_set_transform(at+Vector2(0,14-bob),sin(host.day_cycle.elapsed*9.0)*0.014 if moving else 0.0,Vector2(1,breathing))
+	host.draw_set_transform(at+Vector2(0,14-bob),greeting_lean+wind_lean+(sin(host.day_cycle.elapsed*9.0)*0.014 if moving else 0.0),Vector2(1,breathing))
 	host.draw_texture_rect_region(get_cast_texture(),
 		Rect2(-Vector2(origin[0],origin[1])*factor,Vector2(rect[2],rect[3])*factor),
 		Rect2(rect[0],rect[1],rect[2],rect[3]),Color("b7c1d8") if night else Color.WHITE)
 	host.draw_set_transform(Vector2.ZERO)
+	host.ambient.draw_reaction(host,name_text,at)
 	PALETTE.name_tag(host,at+Vector2(0,-90),"Terceiro Hokage" if name_text=="Hiruzen" else name_text,name_style)
 
 func gallery_dodge_frame(host: Node2D) -> int:

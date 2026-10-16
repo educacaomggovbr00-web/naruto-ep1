@@ -95,6 +95,7 @@ func apply(game: Node2D, data: Dictionary) -> bool:
 	if not validate(data): return false
 	game.day_cycle.restore(data.get("day_cycle",{}))
 	game.gait_distance=0
+	game.ambient.reset_effects()
 	game.stage = int(data.stage)
 	game.room = str(data.get("room","outside"))
 	var return_at: Array = data.get("return_position",[170,270])

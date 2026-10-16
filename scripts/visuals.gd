@@ -48,7 +48,7 @@ func render(host: Node2D) -> void:
 		host.draw_string(ThemeDB.fallback_font, host.target + Vector2(-16, 45), "%d / 3" % host.hits, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("fcdfa2"))
 	elif host.stage == 2:
 		for name_text in host.layout.VILLAGE_CAST:
-			character_art.draw_cast_actor(host,name_text,host.layout.VILLAGE_CAST[name_text])
+			character_art.draw_cast_actor(host,name_text,host.layout.VILLAGE_CAST[name_text],false,night)
 		character_art.draw_naruto(host, host.layout.NARUTO)
 		marker(host, host.layout.NARUTO, host.visual_clock)
 		preload("res://scripts/ui_palette.gd").name_tag(host,Vector2(344,221),"ACADEMIA",character_art.name_style,10)
@@ -64,6 +64,7 @@ func render(host: Node2D) -> void:
 	character_art.draw_henrique(host)
 	host.combat.draw(host)
 	host.day_cycle.draw_leaves(host)
+	host.ambient.draw(host)
 	host.polish.render(host)
 
 func draw_hud(canvas: Node2D, host: Node2D) -> void:

@@ -37,6 +37,7 @@ var audio: Node
 var ui: CanvasLayer
 var visual_clock := 0.0
 var gait_distance := 0.0
+var ambient=preload("res://scripts/ambient_world.gd").new()
 var day_cycle=preload("res://scripts/day_cycle.gd").new()
 var sprinting := false
 var effect_kind := "kunai"
@@ -82,6 +83,8 @@ func say(texts: Array[String]) -> void:
 	lines = texts
 	line_index = 0
 	ui.show_line(lines[0])
+	for actor_name in art.character_art.attached_cast["actors"]:
+		if lines[0].begins_with(actor_name+":"): ambient.react(actor_name)
 
 func travel_to(destination: String) -> void:
 	if travelling or not lines.is_empty(): return
@@ -195,7 +198,8 @@ func _process(delta: float) -> void:
 		queue_redraw()
 		return
 	day_cycle.update(self,delta)
-	background.animate(day_cycle.elapsed)
+	ambient.update(self,delta)
+	background.animate(day_cycle.elapsed,day_cycle.wind_strength(),ambient.shake_at,ambient.shake_life)
 	audio.set_night(day_cycle.is_night(stage))
 	stamina = minf(100, stamina + delta * 18)
 	save_clock += delta
@@ -318,9 +322,11 @@ func act(action: String) -> void:
 			if greetings.has(nearest):
 				var greeting_lines: Array[String] = [greetings[nearest]]
 				say(greeting_lines)
+			else: ambient.interact(self)
 		elif stage == 4 and player.distance_to(target) < 85:
 			stage = 5
 			say(["Henrique: Uma kunai... Não consigo descobrir o que ele estava planejando.", "Está tarde. Vou para casa."])
+		else: ambient.interact(self)
 
 func training_hit(kind: String) -> void:
 	if stage==0 and kind=="kunai":

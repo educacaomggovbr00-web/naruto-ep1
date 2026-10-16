@@ -40,6 +40,9 @@ func caption(stage: int) -> String:
 	var period: String="MANHÃ" if h>=5 and h<12 else "TARDE" if h>=12 and h<18 else "NOITE"
 	return "%02d:%02d · %s" % [minutes/60,minutes%60,period]
 
+func wind_strength() -> float:
+	return 0.6+pow(0.5+0.5*sin(elapsed*0.48),3)*1.1
+
 func bird_pose(index: int) -> Dictionary:
 	var t:=elapsed
 	return {"at":Vector2(fposmod(t*34+index*185.0,1190)-100,145+index*14+sin(t*0.8+index)*12),
@@ -64,7 +67,7 @@ func draw_leaves(game: Node2D) -> void:
 	if game.room!="outside": return
 	var night:=night_amount(game.stage)
 	for i in range(12):
-		var at:=Vector2(fposmod(i*89.0+elapsed*(10+i%4),990)-15,208+(i%5)*36+sin(elapsed*1.1+i)*15)
+		var at:=Vector2(fposmod(i*89.0+elapsed*(18+i%4)+sin(elapsed*0.48)*16,990)-15,208+(i%5)*36+sin(elapsed*1.1+i)*15)
 		game.draw_set_transform(at,sin(elapsed*1.4+i)*0.7+i)
 		game.draw_colored_polygon(PackedVector2Array([Vector2(-3,0),Vector2(0,-1.5),Vector2(4,0),Vector2(0,1.5)]),Color(0.7,0.73,0.4,0.55).lerp(Color(0.4,0.62,0.6,0.45),night))
 		game.draw_set_transform(Vector2.ZERO)

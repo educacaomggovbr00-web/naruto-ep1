@@ -43,8 +43,12 @@ func _draw() -> void:
 	if previous_environment!=null:
 		draw_texture_rect(previous_environment,Rect2(0,0,960,540),false,Color(1,1,1,1.0-fade))
 
-func animate(clock: float) -> void:
-	if foliage!=null: foliage.set_shader_parameter("wind_time",clock)
+func animate(clock: float, strength:float=1.0, shake_at:Vector2=Vector2.ZERO, shake_life:float=0.0) -> void:
+	if foliage==null: return
+	foliage.set_shader_parameter("wind_time",clock)
+	foliage.set_shader_parameter("wind_strength",strength)
+	foliage.set_shader_parameter("shake_at",shake_at/Vector2(960,540))
+	foliage.set_shader_parameter("shake_life",shake_life)
 
 func _process(delta: float) -> void:
 	if previous_environment!=null:

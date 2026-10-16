@@ -54,6 +54,21 @@ func render(game: Node2D) -> void:
 	if game.stage == 2 and game.player.distance_to(game.layout.interiors.ACADEMY_DOOR)<48:
 		interaction_prompt(game,"Entrar na Academia")
 		return
+	if game.stage==2 and game.player.distance_to(game.layout.NARUTO)>=95:
+		var nearest:=""
+		var distance:=60.0
+		for person in game.layout.VILLAGE_CAST:
+			var candidate:float=game.player.distance_to(game.layout.VILLAGE_CAST[person])
+			if candidate<distance:
+				distance=candidate
+				nearest=person
+		if not nearest.is_empty():
+			interaction_prompt(game,"Conversar com "+nearest)
+			return
+	var scenery:Dictionary=game.ambient.nearby(game)
+	if not scenery.is_empty() and not (game.stage==2 and game.player.distance_to(game.layout.NARUTO)<95) and not (game.stage==4 and game.player.distance_to(game.target)<85):
+		interaction_prompt(game,scenery.label)
+		return
 	var destination: Vector2 = game.target
 	var can_talk := false
 	if game.stage == 2:
@@ -95,5 +110,6 @@ func panel() -> StyleBoxFlat:
 
 func interaction_prompt(game: Node2D, text: String) -> void:
 	var at := Vector2(clampf(game.player.x-123,16,698),minf(game.player.y+30,468))
+	if game.ui.toast_time>0 and Rect2(at,Vector2(246,28)).intersects(Rect2(240,321,400,35)): at.y=364
 	game.draw_style_box(panel(),Rect2(at,Vector2(246,28)))
 	game.draw_string(ThemeDB.fallback_font,at+Vector2(9,19),"E / AÇÃO · "+text,HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("ffe4aa"))

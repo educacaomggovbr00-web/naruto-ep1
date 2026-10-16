@@ -1,6 +1,9 @@
 shader_type canvas_item;
 render_mode unshaded;
 uniform float wind_time = 0.0;
+uniform float wind_strength = 1.0;
+uniform vec2 shake_at = vec2(0.0);
+uniform float shake_life = 0.0;
 uniform int area_id = 0;
 varying vec4 vertex_tint;
 void vertex() { vertex_tint=COLOR; }
@@ -11,7 +14,8 @@ void fragment() {
  float foreground = smoothstep(0.82,0.98,uv.y);
  float mask = area_id < 3 ? max(canopy,foreground) : 0.0;
  float breeze = sin(wind_time*1.35+uv.y*17.0)+0.35*sin(wind_time*2.1+uv.x*29.0);
- uv.x += breeze*0.0017*mask;
- uv.y += sin(wind_time*1.1+uv.x*19.0)*0.00045*mask;
+ float local_shake = (1.0-smoothstep(0.0,0.19,distance(UV,shake_at)))*shake_life;
+ uv.x += breeze*0.0038*wind_strength*mask + sin(wind_time*24.0)*local_shake*0.004*canopy;
+ uv.y += sin(wind_time*1.1+uv.x*19.0)*0.0011*wind_strength*mask;
  COLOR=texture(TEXTURE,clamp(uv,vec2(0.0),vec2(1.0)))*vertex_tint;
 }
