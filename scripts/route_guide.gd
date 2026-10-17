@@ -21,6 +21,8 @@ func reset() -> void:
 	last_player=Vector2(INF,INF)
 
 func destination(game:Node2D) -> Vector2:
+	var marked: Vector2 = game.world.navigation_goal(game)
+	if marked.is_finite(): return marked
 	var no_goal:=Vector2(INF,INF)
 	if game.world.away(game): return game.world.return_gate()
 	if game.episode.active():

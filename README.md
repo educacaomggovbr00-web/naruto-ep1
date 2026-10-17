@@ -365,3 +365,16 @@ NARUTO_PREVIEW_DIR=/tmp godot --audio-driver Dummy --path . --script res://tests
 ```
 
 Testado em Godot 4.4.1, normal e modo leve: travessia das saídas, retorno, rotas locais, conversa e avisos, save da área em disco, arquivos antigos/inválidos, treino livre com contato real e preservação da etapa da história. As suítes de regressão foram executadas nos dois modos; as verificações de áreas conectadas também foram repetidas após os ajustes finais. Vídeo real de 150 quadros a 15 FPS, sem áudio capturado. A expansão continua sendo um RPG 2D com três áreas externas e dois interiores, sem veículos ou uma cidade do tamanho de GTA 5. Android físico ainda precisa validar desempenho, áudio, toque e retomada.
+
+## Mapa dos distritos e orientação opcional
+
+Abra **DIÁRIO (M) → MAPA** para consultar bairro residencial, praça e campo de treino com suas imagens atuais, localização e visitas. **MARCAR CAMINHO** escolhe uma rota opcional; o destino aparece no HUD. Feche o diário para caminhar: o guia usa as saídas reais e passa pela praça ao ir de um distrito lateral ao outro. Dentro da casa ou da Academia, primeiro conduz à porta de saída.
+
+A seleção não teletransporta, não altera missão/recursos e pode ser removida no mapa. Ao chegar, o marcador é retirado automaticamente. Se o guia de chão estiver desativado, o mapa explica como ativá-lo em AJUSTES. A perseguição e outras etapas protegidas não aceitam rotas de exploração.
+
+O mapa pausa o mundo. A rota escolhida é temporária: carregar um save limpa a seleção, preservando os dados de visita que já eram salvos. Não há mudança de formato do save.
+
+```sh
+godot --headless --path . --script res://tests/exploration_map_smoke.gd
+NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests/capture_exploration_map.gd
+```

@@ -123,3 +123,14 @@ jobs:
           NARUTO_LOW_MEMORY=1 timeout 60s godot --headless --audio-driver Dummy --path . --script res://tests/open_world_smoke.gd 2>&1 | tee open-world-mobile.log
           grep -Fq "PASS: connected districts" open-world-mobile.log
           ! grep -Eq "SCRIPT ERROR|Assertion failed" open-world-mobile.log
+
+      - name: Verify district map and optional exploration routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 60s godot --headless --audio-driver Dummy --path . --script res://tests/exploration_map_smoke.gd 2>&1 | tee exploration-map.log
+          grep -Fq "PASS: touch map" exploration-map.log
+          ! grep -Eq "SCRIPT ERROR|Assertion failed" exploration-map.log
+          NARUTO_LOW_MEMORY=1 timeout 60s godot --headless --audio-driver Dummy --path . --script res://tests/exploration_map_smoke.gd 2>&1 | tee exploration-map-mobile.log
+          grep -Fq "PASS: touch map" exploration-map-mobile.log
+          ! grep -Eq "SCRIPT ERROR|Assertion failed" exploration-map-mobile.log

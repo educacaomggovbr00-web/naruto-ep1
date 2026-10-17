@@ -1,6 +1,7 @@
 extends RefCounted
 
 var district:="plaza"
+var tracked_district := ""
 var practice_hits:=0
 var clock:=0.0
 var manifest:Dictionary={}
@@ -72,6 +73,14 @@ func travel(game:Node2D,portal:Dictionary) -> void:
 	game.ui.release_touches()
 	game.travelling=false
 func update(game:Node2D,delta:float) -> void:
+	if not tracked_district.is_empty():
+		if game.stage != 2:
+			tracked_district = ""
+			game.route_guide.reset()
+		elif game.room == "outside" and district == tracked_district:
+			tracked_district = ""
+			game.route_guide.reset()
+			game.ui.toast("Você chegou ao distrito marcado.")
 	if not away(game) or not game.lines.is_empty() or game.travelling: return
 	clock+=delta
 	for a in locals:
@@ -174,3 +183,11 @@ func draw_minimap(canvas:Node2D,game:Node2D) -> void:
 	canvas.draw_circle(at,2.8,Color("f48668"))
 	canvas.draw_style_box(game.polish.panel(),Rect2(18,243,180,18))
 	canvas.draw_string(ThemeDB.fallback_font,Vector2(23,255),"Saída dourada · você em vermelho",HORIZONTAL_ALIGNMENT_LEFT,-1,9,Color("ead3a4"))
+
+func navigation_goal(game: Node2D) -> Vector2:
+	if tracked_district.is_empty() or game.stage != 2: return Vector2(INF, INF)
+	if game.room != "outside": return Vector2(480, 450)
+	if tracked_district == district: return Vector2(INF, INF)
+	for portal in PORTALS[district]:
+		if portal.to == tracked_district: return portal.at
+	return return_gate()

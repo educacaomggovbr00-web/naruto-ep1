@@ -375,10 +375,10 @@ func release_pointer(index: int) -> void:
 func menu_target(at: Vector2) -> Button:
 	var candidates:Array[Button]=[]
 	if practice.visible: candidates=[practice.confirm_button,practice.close_button]
-	elif journal.visible: candidates=[journal.close_button]
+	elif journal.visible: candidates=journal.touch_buttons()
 	elif not modal_open() and journal_button.visible: candidates=[journal_button]
 	for button in candidates:
-		if button.get_global_rect().has_point(at): return button
+		if not button.disabled and button.is_visible_in_tree() and button.get_global_rect().has_point(at): return button
 	return null
 
 func _input(event: InputEvent) -> void:

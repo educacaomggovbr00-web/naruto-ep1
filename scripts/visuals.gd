@@ -112,6 +112,9 @@ func draw_hud(canvas: Node2D, host: Node2D) -> void:
 	canvas.draw_string(ThemeDB.fallback_font,Vector2(42,108),place,HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("e4d1aa"))
 	canvas.draw_style_box(host.polish.panel(),Rect2(235,90,153,29))
 	canvas.draw_string(ThemeDB.fallback_font,Vector2(248,108),host.day_cycle.caption(host.stage),HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("e4d1aa"))
+	if host.stage == 2 and not host.world.tracked_district.is_empty() and host.lines.is_empty():
+		canvas.draw_style_box(host.polish.panel(),Rect2(404,90,298,29))
+		canvas.draw_string(ThemeDB.fallback_font,Vector2(416,108),"ROTA · "+host.world.NAMES[host.world.tracked_district],HORIZONTAL_ALIGNMENT_LEFT,274,10,palette.GOLD)
 	if host.lines.is_empty():
 		canvas.draw_style_box(host.polish.panel(),Rect2(350,502,260,27))
 		canvas.draw_rect(Rect2(350,507,2,17),palette.RED)

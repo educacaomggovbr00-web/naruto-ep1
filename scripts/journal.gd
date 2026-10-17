@@ -18,6 +18,9 @@ var chapter_rows: Array[Label] = []
 var discovery_rows: Array[Label] = []
 var discovery_label: Label
 var close_button: Button
+var map_button: Button
+var contents: Control
+var village_map: Control
 
 func _ready() -> void:
 	size=Vector2(960,540)
@@ -41,18 +44,28 @@ func _ready() -> void:
 	close_button.add_theme_font_size_override("font_size",13)
 	close_button.pressed.connect(close)
 	panel.add_child(close_button)
+	map_button=Button.new()
+	map_button.text="MAPA"
+	map_button.position=Vector2(523,18)
+	map_button.size=Vector2(104,44)
+	game.style_button(map_button)
+	map_button.add_theme_font_size_override("font_size",12)
+	map_button.pressed.connect(toggle_map)
+	panel.add_child(map_button)
 	var rule:=ColorRect.new()
 	rule.position=Vector2(26,82)
 	rule.size=Vector2(744,1)
 	rule.color=Color("64736a")
 	rule.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	panel.add_child(rule)
-	text(panel,"OBJETIVO ATUAL",Vector2(27,96),Vector2(430,19),11,Color("d4b87f"))
-	mission=text(panel,"",Vector2(27,120),Vector2(435,48),19,Color("f5e7c7"))
+	contents=Control.new()
+	panel.add_child(contents)
+	text(contents,"OBJETIVO ATUAL",Vector2(27,96),Vector2(430,19),11,Color("d4b87f"))
+	mission=text(contents,"",Vector2(27,120),Vector2(435,48),19,Color("f5e7c7"))
 	mission.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	guidance=text(panel,"",Vector2(27,174),Vector2(435,92),14,Color("c3d0c5"))
+	guidance=text(contents,"",Vector2(27,174),Vector2(435,92),14,Color("c3d0c5"))
 	guidance.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	progress_label=text(panel,"",Vector2(27,275),Vector2(435,20),11,Color("d4b87f"))
+	progress_label=text(contents,"",Vector2(27,275),Vector2(435,20),11,Color("d4b87f"))
 	progress=ProgressBar.new()
 	progress.position=Vector2(27,302)
 	progress.size=Vector2(435,7)
@@ -63,20 +76,23 @@ func _ready() -> void:
 		style.bg_color=Color("d8bd80") if state=="fill" else Color("324b50")
 		style.set_corner_radius_all(3)
 		progress.add_theme_stylebox_override(state,style)
-	panel.add_child(progress)
+	contents.add_child(progress)
 	# Apply size after replacing theme styles, which initially enforce a taller bar.
 	progress.size=Vector2(435,7)
 	for i in range(6):
-		var row:=text(panel,"",Vector2(27+(i%2)*223,324+(i/2)*23),Vector2(218,21),12,Color.WHITE)
+		var row:=text(contents,"",Vector2(27+(i%2)*223,324+(i/2)*23),Vector2(218,21),12,Color.WHITE)
 		chapter_rows.append(row)
-	text(panel,"EXPLORAÇÃO OPCIONAL",Vector2(501,96),Vector2(269,20),11,Color("d4b87f"))
-	discovery_label=text(panel,"",Vector2(501,123),Vector2(269,26),17,Color("f5e7c7"))
+	text(contents,"EXPLORAÇÃO OPCIONAL",Vector2(501,96),Vector2(269,20),11,Color("d4b87f"))
+	discovery_label=text(contents,"",Vector2(501,123),Vector2(269,26),17,Color("f5e7c7"))
 	for i in range(DISCOVERIES.size()):
-		var row:=text(panel,"",Vector2(501,164+i*29),Vector2(269,29),14,Color.WHITE)
+		var row:=text(contents,"",Vector2(501,164+i*29),Vector2(269,29),14,Color.WHITE)
 		discovery_rows.append(row)
-	errand_label=text(panel,"Estas visitas não bloqueiam a história.\nAs anotações acompanham o save local.",Vector2(501,349),Vector2(267,48),12,Color("aebfb9"))
+	errand_label=text(contents,"Estas visitas não bloqueiam a história.\nAs anotações acompanham o save local.",Vector2(501,349),Vector2(267,48),12,Color("aebfb9"))
 	errand_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	text(panel,"JOGO PAUSADO  ·  Consulte as anotações com calma.",Vector2(27,403),Vector2(744,18),11,Color("aebfb9"))
+	text(contents,"JOGO PAUSADO  ·  Consulte as anotações com calma.",Vector2(27,403),Vector2(744,18),11,Color("aebfb9"))
+	village_map=preload("res://scripts/village_map.gd").new()
+	village_map.game=game
+	panel.add_child(village_map)
 	hide()
 
 func text(parent: Node, value: String, at: Vector2, dimensions: Vector2, font_size: int, color: Color) -> Label:
@@ -92,6 +108,9 @@ func toggle() -> void:
 	game.sprinting=false
 	game.dash_time=0
 	game.attack_flash=0
+	contents.show()
+	village_map.hide()
+	map_button.text="MAPA"
 	refresh()
 	show()
 	game.ui.refresh_controls()
@@ -149,3 +168,14 @@ func hint() -> String:
 			if game.room=="home": return "Contorne a mesa pelo lado direito. Aproxime-se da cama, na parte superior direita, e use E / AÇÃO para descansar."
 			return "Volte à casa sinalizada à esquerda da vila. Use E / AÇÃO na porta para entrar. Depois, aproxime-se da cama para descansar."
 		_: return "Você completou A Noite Antes do Começo. Use CONTINUAR HISTÓRIA para acordar em casa e jogar a manhã na Academia."
+
+func toggle_map() -> void:
+	village_map.visible = not village_map.visible
+	contents.visible = not village_map.visible
+	map_button.text = "OBJETIVOS" if village_map.visible else "MAPA"
+	if village_map.visible: village_map.refresh()
+
+func touch_buttons() -> Array[Button]:
+	var buttons: Array[Button] = [close_button, map_button]
+	buttons.append_array(village_map.touch_buttons())
+	return buttons

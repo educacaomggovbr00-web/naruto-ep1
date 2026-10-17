@@ -105,6 +105,7 @@ func apply(game: Node2D, data: Dictionary) -> bool:
 	game.gait_distance=0
 	game.locomotion.reset()
 	game.route_guide.reset()
+	game.world.tracked_district=""
 	game.ambient.reset_effects()
 	game.population.reset()
 	game.episode.step=int(data.get("episode_step",0))
