@@ -44,6 +44,10 @@ func render(game: Node2D) -> void:
 		game.draw_string(ThemeDB.fallback_font, game.target + Vector2(-28, -48 - radius * 0.25), "ACERTO!", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("ffda83"))
 	if not game.lines.is_empty() or game.stage >= 6 or game.ui.modal_open():
 		return
+	var story_prompt:String=game.episode.prompt(game)
+	if not story_prompt.is_empty():
+		interaction_prompt(game,story_prompt)
+		return
 	if game.room != "outside":
 		var point: Dictionary = game.layout.interiors.nearby(game.player,game.room)
 		if not point.is_empty(): interaction_prompt(game,point["label"])
@@ -69,6 +73,7 @@ func render(game: Node2D) -> void:
 	if not scenery.is_empty() and not (game.stage==2 and game.player.distance_to(game.layout.NARUTO)<95) and not (game.stage==4 and game.player.distance_to(game.target)<85):
 		interaction_prompt(game,scenery.label)
 		return
+	if game.episode.active() and game.episode.step!=5: return
 	var destination: Vector2 = game.target
 	var can_talk := false
 	if game.stage == 2:

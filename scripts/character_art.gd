@@ -84,7 +84,7 @@ func draw_cast_actor(host: Node2D, name_text: String, at: Vector2, moving: bool 
 		Rect2(rect[0],rect[1],rect[2],rect[3]),Color("b7c1d8") if night else Color.WHITE)
 	host.draw_set_transform(Vector2.ZERO)
 	host.ambient.draw_reaction(host,name_text,at)
-	PALETTE.name_tag(host,at+Vector2(0,-90),"Terceiro Hokage" if name_text=="Hiruzen" else name_text,name_style)
+	PALETTE.name_tag(host,Vector2(at.x,maxf(at.y-90,137.0)),"Terceiro Hokage" if name_text=="Hiruzen" else name_text,name_style)
 
 func gallery_dodge_frame(host: Node2D) -> int:
 	var progress := clampf(1.0 - host.dash_time / float(dodge_manifest["duration"]), 0.0, 0.999)

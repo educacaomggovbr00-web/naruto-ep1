@@ -1,6 +1,6 @@
 # Naruto EP -1 — A Noite Antes do Começo
 
-Protótipo de fã em Godot 4.x, desenvolvido na branch **main** a partir do prólogo original `fix/primeiro-mugen-diagnostico`. Henrique Uchiha, 12 anos, treina kunai e Katon, encontra Naruto e Iruka, segue Mizuki à noite e investiga o alarme do Pergaminho dos Selos. A narrativa é uma criação de fã, anterior ao episódio 1.
+Protótipo de fã em Godot 4.x, desenvolvido na branch **main** a partir do prólogo original `fix/primeiro-mugen-diagnostico`. Henrique Uchiha, 12 anos, treina kunai e Katon, encontra Naruto e Iruka, segue Mizuki à noite e investiga o alarme do Pergaminho dos Selos. A narrativa é uma criação de fã. O prólogo agora continua com a manhã jogável na Academia, no início do episódio 1.
 
 Abra `project.godot` e execute com F5. Renderizador Compatibility, interface em paisagem de 960×540, sem plugins ou downloads durante o jogo.
 
@@ -78,7 +78,7 @@ NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests
 
 Referências originais: [Pixel Shippuden](https://www.narutostorm.com/games/english), [The Fight of Konoha](https://timyfreak.itch.io/the-fight-of-konoha) e [Village Tiles / OpenGameArt](https://opengameart.org/content/simple-nes-like-village-tiles).
 
-Naruto e personagens associados pertencem aos respectivos titulares. Projeto independente de fã. Episódio 1, trilha musical e combate completo ainda não estão implementados.
+Naruto e personagens associados pertencem aos respectivos titulares. Projeto independente de fã. O início do episódio 1 está jogável até o retorno da aula. Roubo do pergaminho, confronto completo, trilha musical e combate contra inimigos continuam pendentes.
 
 ## Apresentação cinematográfica
 
@@ -134,7 +134,7 @@ NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests
 
 Depois do treino, aproxime-se das portas sinalizadas **ACADEMIA** e **SUA CASA** e use E/AÇÃO. A saída dos interiores fica no centro da parte de baixo. As transições têm fade e liberam entradas de toque para evitar comandos presos.
 
-- **Academia:** sala de aula com corredor central, carteiras sólidas, Iruka, Sasuke e Sakura. Converse com Iruka e leia o quadro. As conversas são de fã e não iniciam o exame do episódio 1.
+- **Academia:** sala de aula com corredor central, carteiras sólidas, Iruka, Sasuke e Sakura. Converse com Iruka e leia o quadro. Durante o prólogo, as conversas e o treino são opcionais. Na continuação, a sala recebe a chamada e a avaliação de clonagem.
 - **Casa:** mesa, cozinha, cadernos e cama interativos. De dia, Henrique pode explorar; depois da perseguição noturna, usar a cama conclui o prólogo. Há arte diurna e noturna com o mesmo layout.
 - **Ambiente:** os NPCs foram distribuídos entre sala de aula e praça. Ações de combate ficam ocultas nos interiores; o som externo fica mais baixo. Mobília e atores bloqueiam passagem sem fechar o corredor de circulação.
 - **Progresso:** o save guarda interior, posição de retorno e visitas/revisão. Arquivos antigos da versão 1 continuam válidos e retomam do lado de fora. Entrar e sair não reinicia o treino, chakra ou etapa da história.
@@ -254,3 +254,32 @@ Iruka, Sasuke, Sakura, Hiruzen e Teuchi reagem à aproximação com um gesto bre
 Os efeitos têm limite e intervalo entre ações, param nos menus e são descartados ao mudar de área ou carregar o progresso. Não mudam o formato do salvamento. A perseguição mantém a prioridade da história e não oferece as interações opcionais.
 
 Validação: `tests/ambient_world_smoke.gd` verifica acesso aos objetos, limites dos efeitos, pausa, água, recuperação de fôlego, reações, prioridade dos diálogos e limpeza ao carregar. `tests/capture_ambient.gd` grava a execução real em passos de 1/15 s. Multitoque, desempenho, aquecimento e retomada do aplicativo ainda precisam ser conferidos em Android físico.
+
+
+## Continuação narrativa: a manhã na Academia
+
+Ao terminar as falas na cama, use **CONTINUAR HISTÓRIA** (ou Enter). Saves antigos concluídos também oferecem esse botão; não é preciso apagar o progresso.
+
+1. Acorde em casa e saia pela porta inferior.
+2. Entre na Academia e fale com Iruka.
+3. Vá ao lugar marcado à esquerda do corredor e use AÇÃO para acompanhar a aula.
+4. Ao ser chamado, vá ao círculo central e use AÇÃO para demonstrar o Bunshin.
+5. Saia e converse com Naruto, que acaba de ser reprovado. Mizuki se aproxima.
+6. Volte para casa e examine os cadernos. A vila permanece explorável.
+
+A sequência adapta os acontecimentos ao personagem Henrique, com falas originais de fã. A aula avança por exploração e diálogos; não exige o minijogo de chakra. O alarme e o roubo antes mostrados como fatos no final do prólogo foram substituídos pelo sonho e pela passagem da noite: o roubo precisa ocorrer **depois** da reprovação de Naruto. O confronto da floresta do episódio 1 ainda não foi feito.
+
+- O clone reutiliza a arte original do jogador. Naruto e Mizuki aparecem nos espaços correspondentes à etapa, sem usar as poses direcionais como falsas caminhadas.
+- Personagens na praça são desenhados por profundidade a partir dos pés. As placas dos NPCs da sala ficam abaixo da faixa superior da interface.
+- A preparação de uma técnica interrompe o deslocamento; diálogos descartam a pose anterior para permitir partir sem atraso.
+- Botões de combate e furtividade ficam ocultos nesta sequência narrativa; o treino e o combate anteriores do prólogo continuam preservados. Direcional, corrida, AÇÃO, diário e ajustes continuam disponíveis conforme o contexto.
+- A manhã fica em 07h30 durante a aula. Ao concluir as anotações, o relógio avança para 11h e o ciclo livre volta a ficar disponível.
+- `episode_step` é opcional no save v1. Saves sem esse campo permanecem no prólogo. O save conserva a etapa e a fala corrente; não repete a perseguição antiga ao falar com Naruto.
+
+Validação em Godot 4.4.1 Compatibility: progressão completa do novo trecho, navegação real com colisões em torno dos móveis, interação com toque simulado, retomada durante diálogo, arquivos antigos e inválidos, controles contextuais e regressões do prólogo. Capturas são do jogo em execução, não de uma cena de apresentação. Android físico, multitoque real, áudio, desempenho e retomada no aparelho ainda dependem de teste no dispositivo.
+
+```sh
+godot --headless --audio-driver Dummy --path . --script res://tests/episode_smoke.gd
+NARUTO_LOW_MEMORY=1 godot --headless --audio-driver Dummy --path . --script res://tests/episode_smoke.gd
+NARUTO_PREVIEW_DIR=/tmp godot --audio-driver Dummy --path . --script res://tests/capture_episode.gd
+```

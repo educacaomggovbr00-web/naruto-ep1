@@ -22,7 +22,7 @@ func marker(host: Node2D, at: Vector2, clock: float) -> void:
 func render(host: Node2D) -> void:
 	if host.room != "outside":
 		var data: Dictionary = host.layout.interiors.config(host.room)
-		if host.room=="academy":
+		if host.room=="academy" and not host.episode.active():
 			var circle:=Vector2(480,349)
 			host.draw_circle(circle,23,Color(0.85,0.72,0.44,0.1))
 			host.draw_arc(circle,23,0,TAU,32,Color("bda568"),1.5,true)
@@ -30,11 +30,15 @@ func render(host: Node2D) -> void:
 		var actors: Array[Dictionary] = [{"name":"player","at":host.player}]
 		for name_text in data["actors"]:
 			actors.append({"name":name_text,"at":data["actors"][name_text]})
+		for name_text in host.episode.extra_actors(host):
+			actors.append({"name":name_text,"at":host.episode.extra_actors(host)[name_text]})
 		actors.sort_custom(func(a,b):return a["at"].y < b["at"].y)
 		for person in actors:
 			if person["name"] == "player": character_art.draw_henrique(host)
+			elif person["name"]=="Naruto": character_art.draw_naruto(host,person["at"])
 			else: character_art.draw_cast_actor(host,person["name"],person["at"])
 		host.draw_string(ThemeDB.fallback_font,Vector2(413,495),"PORTA · E / AÇÃO",HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("ead3a4"))
+		host.episode.draw(host)
 		host.polish.render(host)
 		return
 	host.day_cycle.draw_sky(host)
@@ -47,10 +51,17 @@ func render(host: Node2D) -> void:
 		marker(host, host.target + Vector2(0, 36), host.visual_clock)
 		host.draw_string(ThemeDB.fallback_font, host.target + Vector2(-16, 45), "%d / 3" % host.hits, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("fcdfa2"))
 	elif host.stage == 2:
+		var cast:Array[Dictionary]=[{"name":"player","at":host.player}]
 		for name_text in host.layout.VILLAGE_CAST:
-			character_art.draw_cast_actor(host,name_text,host.layout.VILLAGE_CAST[name_text],false,night)
-		character_art.draw_naruto(host, host.layout.NARUTO)
-		marker(host, host.layout.NARUTO, host.visual_clock)
+			cast.append({"name":name_text,"at":host.layout.VILLAGE_CAST[name_text]})
+		if not host.episode.active() or host.episode.step>=5: cast.append({"name":"Naruto","at":host.layout.NARUTO})
+		for name_text in host.episode.extra_actors(host): cast.append({"name":name_text,"at":host.episode.extra_actors(host)[name_text]})
+		cast.sort_custom(func(a,b):return a.at.y<b.at.y)
+		for person in cast:
+			if person.name=="player": character_art.draw_henrique(host)
+			elif person.name=="Naruto": character_art.draw_naruto(host,person.at)
+			else: character_art.draw_cast_actor(host,person.name,person.at,false,night)
+		if not host.episode.active() or host.episode.step==5: marker(host, host.layout.NARUTO, host.visual_clock)
 		preload("res://scripts/ui_palette.gd").name_tag(host,Vector2(344,221),"ACADEMIA",character_art.name_style,10)
 	if host.stage in [2,5]:
 		preload("res://scripts/ui_palette.gd").name_tag(host,Vector2(110,221),"SUA CASA",character_art.name_style,10)
@@ -61,7 +72,7 @@ func render(host: Node2D) -> void:
 		marker(host, host.target + Vector2(0, 70), host.visual_clock)
 	if host.stage == 5:
 		marker(host, host.layout.HOME + Vector2(0, 80), host.visual_clock)
-	character_art.draw_henrique(host)
+	if host.stage!=2: character_art.draw_henrique(host)
 	host.combat.draw(host)
 	host.day_cycle.draw_leaves(host)
 	host.ambient.draw(host)
@@ -96,6 +107,6 @@ func draw_hud(canvas: Node2D, host: Node2D) -> void:
 	if host.lines.is_empty():
 		canvas.draw_style_box(host.polish.panel(),Rect2(350,502,260,27))
 		canvas.draw_rect(Rect2(350,507,2,17),palette.RED)
-		canvas.draw_string(ThemeDB.fallback_font,Vector2(364,520),"PRÓLOGO  ·  %02d / 07" % (host.stage+1),HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("e4d1aa"))
+		canvas.draw_string(ThemeDB.fallback_font,Vector2(364,520),("EPISÓDIO 1  ·  %02d / 07" % host.episode.step if host.episode.active() else "PRÓLOGO  ·  %02d / 07" % (host.stage+1)),HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("e4d1aa"))
 		for i in range(7):
-			canvas.draw_circle(Vector2(514+i*12,516),2.5,palette.GOLD if i<=host.stage else Color("43514f"))
+			canvas.draw_circle(Vector2(514+i*12,516),2.5,palette.GOLD if i<=(host.episode.step-1 if host.episode.active() else host.stage) else Color("43514f"))

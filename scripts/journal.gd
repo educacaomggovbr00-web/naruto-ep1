@@ -8,6 +8,7 @@ const DISCOVERIES := [
 ]
 
 var game: Node2D
+var chapter_title: Label
 var mission: Label
 var guidance: Label
 var progress: ProgressBar
@@ -30,7 +31,7 @@ func _ready() -> void:
 	panel.add_theme_stylebox_override("panel",game.ui.panel_style())
 	add_child(panel)
 	text(panel,"DIÁRIO SHINOBI",Vector2(26,17),Vector2(420,30),24,Color("f0ce8a"))
-	text(panel,"HENRIQUE UCHIHA  /  A NOITE ANTES DO COMEÇO",Vector2(27,51),Vector2(520,20),11,Color("aebfb9"))
+	chapter_title=text(panel,"HENRIQUE UCHIHA  /  A NOITE ANTES DO COMEÇO",Vector2(27,51),Vector2(520,20),11,Color("aebfb9"))
 	close_button=Button.new()
 	close_button.text="VOLTAR  ·  M"
 	close_button.position=Vector2(638,36)
@@ -100,6 +101,7 @@ func close() -> void:
 	game.ui.refresh_controls()
 
 func refresh() -> void:
+	chapter_title.text="HENRIQUE UCHIHA  /  EPISÓDIO 1 · A MANHÃ NA ACADEMIA" if game.episode.active() else "HENRIQUE UCHIHA  /  A NOITE ANTES DO COMEÇO"
 	var stage:int=game.stage
 	mission.text="Prólogo concluído" if stage==6 else CHAPTERS[stage]
 	if stage==0: mission.text+="  ·  %d / 3" % game.hits
@@ -111,6 +113,16 @@ func refresh() -> void:
 		var mark: String="✓" if i<stage else "›" if i==stage else "·"
 		chapter_rows[i].text=mark+"  "+(CHAPTERS[i] if known else "Ainda não revelado")
 		chapter_rows[i].modulate=Color("b4d5b4") if i<stage else Color("f0ce8a") if i==stage else Color("829896")
+	if game.episode.active():
+		mission.text=game.episode.TITLES[game.episode.step]
+		guidance.text=game.episode.GOALS[game.episode.step]+" Use E / AÇÃO perto das pessoas e dos pontos marcados. A saída das salas fica embaixo."
+		progress.max_value=6
+		progress.value=game.episode.step-1
+		progress_label.text="EPISÓDIO 1 · %d / 6 ETAPAS CONCLUÍDAS" % (game.episode.step-1)
+		for i in range(6):
+			var known:bool=i+1<=game.episode.step
+			chapter_rows[i].modulate=Color("b4d5b4") if i+1<game.episode.step else Color("f0ce8a") if i+1==game.episode.step else Color("829896")
+			chapter_rows[i].text=("✓  " if i+1<game.episode.step else "›  ")+(game.episode.TITLES[i+1] if known else "Ainda não revelado")
 	var found:=0
 	for i in range(DISCOVERIES.size()):
 		var done:bool=game.visited.get(DISCOVERIES[i][0],false)
@@ -131,4 +143,4 @@ func hint() -> String:
 		5:
 			if game.room=="home": return "Contorne a mesa pelo lado direito. Aproxime-se da cama, na parte superior direita, e use E / AÇÃO para descansar."
 			return "Volte à casa sinalizada à esquerda da vila. Use E / AÇÃO na porta para entrar. Depois, aproxime-se da cama para descansar."
-		_: return "Você completou A Noite Antes do Começo. O episódio 1 ainda não está implementado. Use Jogar novamente para iniciar outra jornada."
+		_: return "Você completou A Noite Antes do Começo. Use CONTINUAR HISTÓRIA para acordar em casa e jogar a manhã na Academia."

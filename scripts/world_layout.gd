@@ -10,6 +10,7 @@ const NARUTO := Vector2(640, 260)
 const IRUKA := Vector2(730, 260)
 const HOME := Vector2(110, 235)
 const VILLAGE_CAST := {"Hiruzen": Vector2(495,245), "Teuchi": Vector2(858,260)}
+var episode_step := 0
 var interiors = preload("res://scripts/interiors.gd").new()
 
 func village(stage: int) -> bool:
@@ -42,6 +43,6 @@ func blocked(at: Vector2, stage: int, room: String = "outside") -> bool:
 	if stage == 2:
 		for npc in VILLAGE_CAST.values():
 			if at.distance_to(npc) < 22: return true
-		for npc in [NARUTO]:
-			if at.distance_to(npc) < 22: return true
+		if episode_step==0 or episode_step>=5:
+			if at.distance_to(NARUTO) < 22: return true
 	return false

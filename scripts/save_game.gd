@@ -6,7 +6,7 @@ var path := "user://prologue_save.json"
 var last_error := ""
 
 func snapshot(game: Node2D) -> Dictionary:
-	return {"version": VERSION, "stage": game.stage, "room":game.room,
+	return {"version": VERSION, "episode_step":game.episode.step, "stage": game.stage, "room":game.room,
 		"day_cycle":{"phase":game.day_cycle.phase,"mode":game.day_cycle.mode},
 		"return_position":[game.return_position.x,game.return_position.y],"visited":game.visited.duplicate(),"hits": game.hits,
 		"chakra": game.chakra, "stamina": game.stamina,
@@ -24,6 +24,9 @@ func valid_vector(value: Variant, low: float, high: float) -> bool:
 func validate(data: Variant) -> bool:
 	if not data is Dictionary or data.get("version") != VERSION:
 		return false
+	var episode_step:Variant=data.get("episode_step",0)
+	if not valid_number(episode_step,0,7) or floor(float(episode_step))!=float(episode_step): return false
+	if episode_step>0 and data.get("stage")!=2: return false
 	if data.has("day_cycle"):
 		var clock:Variant=data.day_cycle
 		if not clock is Dictionary: return false
@@ -96,6 +99,9 @@ func apply(game: Node2D, data: Dictionary) -> bool:
 	game.day_cycle.restore(data.get("day_cycle",{}))
 	game.gait_distance=0
 	game.ambient.reset_effects()
+	game.episode.step=int(data.get("episode_step",0))
+	game.episode.echo_time=0
+	game.layout.episode_step=game.episode.step
 	game.stage = int(data.stage)
 	game.room = str(data.get("room","outside"))
 	var return_at: Array = data.get("return_position",[170,270])
@@ -128,7 +134,8 @@ func apply(game: Node2D, data: Dictionary) -> bool:
 	game.background.set_area(game.stage,game.room,game.day_cycle.is_night(game.stage))
 	game.audio.set_night(game.day_cycle.is_night(game.stage))
 	game.audio.set_indoor(game.room != "outside")
-	game.restart.visible = game.stage == 6
+	game.restart.text="CONTINUAR HISTÓRIA ›"
+	game.restart.visible = game.stage == 6 and game.lines.is_empty()
 	if game.lines.is_empty(): game.dialogue.hide()
 	else: game.ui.show_line(game.lines[game.line_index])
 	return true

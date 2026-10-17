@@ -156,7 +156,7 @@ func _ready() -> void:
 	load_button.pressed.connect(load_checkpoint)
 	settings_panel.add_child(load_button)
 	game.restart = button_at("Jogar novamente", Vector2(375, 275), Vector2(210, 46))
-	game.restart.pressed.connect(game.restart_game)
+	game.restart.pressed.connect(game.continue_story)
 	game.restart.hide()
 	toast_panel = Panel.new()
 	toast_panel.position = Vector2(240, 321)
@@ -227,7 +227,7 @@ func save_preferences() -> void:
 	settings_file.save("user://interface.cfg")
 
 func change_light(index: int) -> void:
-	if game.stage>=3: return
+	if game.stage>=3 or (game.episode.active() and game.episode.step<7): return
 	game.day_cycle.set_mode(index)
 	game.background.set_area(game.stage,game.room,game.day_cycle.is_night(game.stage))
 	game.audio.set_night(game.day_cycle.is_night(game.stage))
@@ -294,9 +294,9 @@ func _process(delta: float) -> void:
 	settings_button.visible = not resume_overlay.visible
 	journal_button.visible=not resume_overlay.visible and game.lines.is_empty() and not game.travelling
 	journal_button.disabled=journal.visible or practice.visible
-	light_selector.disabled=game.stage>=3
+	light_selector.disabled=game.stage>=3 or (game.episode.active() and game.episode.step<7)
 	light_selector.select(game.day_cycle.mode)
-	light_note.text="A história mantém a noite nesta etapa." if game.stage>=3 else "Dia completo: 8 min de exploração."
+	light_note.text="A aula acontece de manhã." if game.episode.active() and game.episode.step<7 else "A história mantém a noite nesta etapa." if game.stage>=3 else "Dia completo: 8 min de exploração."
 	toast_time = maxf(0, toast_time - delta)
 	toast_panel.visible = toast_time > 0 and game.lines.is_empty() and not modal_open()
 	refresh_controls()
@@ -317,7 +317,7 @@ func refresh_controls() -> void:
 		if button.get_meta("latched", false):
 			button.set_pressed_no_signal(bool(game.held.get(button.get_meta("action"), false)))
 		button.visible = not modal_open() and (game.lines.is_empty() or button.get_meta("action") == "interact")
-		if game.room != "outside" and action in ["kunai","katon","dodge"]: button.visible=false
+		if (game.room != "outside" or game.episode.active()) and action in ["kunai","katon","dodge","sneak"]: button.visible=false
 		if game.stage == 6 and (game.lines.is_empty() or action != "interact"): button.visible=false
 
 func release_touches() -> void:
@@ -461,6 +461,7 @@ func offer_resume(data: Dictionary) -> void:
 	resume_data = data
 	game.background.set_area(int(data.stage),str(data.get("room","outside")))
 	resume_subtitle.text = "%s · Etapa %d de 7" % [game.OBJECTIVES[int(data.stage)].split(" • ")[0], int(data.stage) + 1]
+	if int(data.get("episode_step",0))>0: resume_subtitle.text="EPISÓDIO 1 · "+game.episode.TITLES[int(data.episode_step)]
 	game.dialogue.hide()
 	resume_overlay.show()
 	release_touches()
