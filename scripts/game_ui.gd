@@ -98,7 +98,7 @@ func _ready() -> void:
 	settings_button.pressed.connect(toggle_settings)
 	settings_panel = Panel.new()
 	settings_panel.position = Vector2(648, 136)
-	settings_panel.size = Vector2(296, 326)
+	settings_panel.size = Vector2(296, 362)
 	settings_panel.add_theme_stylebox_override("panel", panel_style())
 	settings_panel.z_index = 20
 	add_child(settings_panel)
@@ -141,16 +141,25 @@ func _ready() -> void:
 	light_selector.item_selected.connect(change_light)
 	settings_panel.add_child(light_selector)
 	light_note=child_label(settings_panel,"",Vector2(16,250),Vector2(264,22),10,Color("aebeb7"))
+	var route_toggle:=CheckButton.new()
+	route_toggle.text="Guia de caminho no chão"
+	route_toggle.position=Vector2(12,280)
+	route_toggle.size=Vector2(270,30)
+	route_toggle.add_theme_font_size_override("font_size",13)
+	route_toggle.button_pressed=bool(settings_file.get_value("world","route_guide",true))
+	game.route_guide.enabled=route_toggle.button_pressed
+	route_toggle.toggled.connect(func(value:bool): game.route_guide.enabled=value; game.route_guide.reset(); settings_file.set_value("world","route_guide",value); save_preferences())
+	settings_panel.add_child(route_toggle)
 	var save_button := Button.new()
 	save_button.text = "SALVAR"
-	save_button.position = Vector2(12, 282)
+	save_button.position = Vector2(12, 318)
 	save_button.size = Vector2(129, 30)
 	game.style_button(save_button)
 	save_button.pressed.connect(func(): game.save_checkpoint())
 	settings_panel.add_child(save_button)
 	var load_button := Button.new()
 	load_button.text = "CARREGAR"
-	load_button.position = Vector2(151, 282)
+	load_button.position = Vector2(151, 318)
 	load_button.size = Vector2(129, 30)
 	game.style_button(load_button)
 	load_button.pressed.connect(load_checkpoint)

@@ -100,6 +100,7 @@ func apply(game: Node2D, data: Dictionary) -> bool:
 	game.day_cycle.restore(data.get("day_cycle",{}))
 	game.gait_distance=0
 	game.locomotion.reset()
+	game.route_guide.reset()
 	game.ambient.reset_effects()
 	game.episode.step=int(data.get("episode_step",0))
 	game.episode.echo_time=0

@@ -20,6 +20,7 @@ func marker(host: Node2D, at: Vector2, clock: float) -> void:
 	host.draw_colored_polygon(PackedVector2Array([Vector2(at.x - 6, y), Vector2(at.x + 6, y), Vector2(at.x, y + 7)]), Color("f4d085"))
 
 func render(host: Node2D) -> void:
+	host.route_guide.draw(host)
 	if host.room != "outside":
 		var data: Dictionary = host.layout.interiors.config(host.room)
 		if host.room=="academy" and not host.episode.active():

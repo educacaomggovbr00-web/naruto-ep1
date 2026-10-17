@@ -308,3 +308,21 @@ NARUTO_PREVIEW_DIR=/tmp godot --audio-driver Dummy --path . --script res://tests
 ```
 
 Verificado em Godot 4.4.1: aceleração, troca andar/correr, parada, orientação vertical, save antigo/novo, equivalência de ciclo e passos em 30/60 FPS, bloqueios, pausa e esquiva. O vídeo usa 150 quadros reais a 15 FPS, sem captura do áudio do sistema. Android físico ainda precisa validar multitoque, áudio, desempenho e retomada.
+
+
+## Mapa, água e fluidez da exploração
+
+- **Guia opcional no chão:** pontos dourados indicam um caminho até o objetivo atual, usando as colisões reais. A rota contorna o canal, passa pela ponte e desvia dos móveis; não move o personagem. Ela acompanha as portas e as etapas da Academia, fica oculta em diálogos/menus e não aparece na perseguição nem revela missões futuras. Desligue em **AJUSTES → Guia de caminho no chão**; a preferência fica gravada no aparelho.
+- O guia usa uma grade pequena de 16 pixels, reutilizada enquanto a área e os atores permanecem iguais. O caminho só é recalculado ao mudar o objetivo, deslocar-se ou vencer um intervalo curto. Entrar num interior prepara a grade durante o fade.
+- **Água:** a pintura do canal recebeu uma corrente leve e reflexos em movimento. A máscara suaviza as margens e exclui a ponte inteira; casas, móveis, piso e ponte permanecem imóveis. Não há simulação de fluidos ou nova arte substituindo os cenários.
+- **Movimento:** a aceleração agora usa a integral do deslocamento, evitando que o personagem percorra distâncias diferentes a 30 e 60 FPS. Um quadro atrasado limita a movimentação comum a 0,12 s por atualização, para não lançar Henrique pelo mapa. A esquiva mantém seu alcance limitado próprio.
+- **Câmera:** uma zona central estável evita pequenas correções constantes. Um avanço suave acompanha o deslocamento e respeita as margens da pintura. Desligar a câmera dinâmica continua removendo o tremor.
+- A história, os sprites, as colisões principais e o formato do save permanecem preservados. A opção nova é uma preferência de interface, não um requisito para carregar saves antigos.
+
+```sh
+godot --headless --audio-driver Dummy --path . --script res://tests/map_flow_smoke.gd
+NARUTO_LOW_MEMORY=1 godot --headless --audio-driver Dummy --path . --script res://tests/map_flow_smoke.gd
+NARUTO_PREVIEW_DIR=/tmp godot --audio-driver Dummy --path . --script res://tests/capture_map_flow.gd
+```
+
+Testado em Godot 4.4.1, modos normal e leve: caminhos livres e cache, ponte, mesa da casa, perseguição protegida, deslocamento equivalente em 30/60 FPS, quadro lento, limites da câmera, ajustes e regressões dos sistemas existentes. A gravação tem 120 quadros reais a 15 FPS, sem áudio capturado. Não é uma medição de desempenho em celular. Multitoque físico, áudio, desempenho e retomada em Android real continuam pendentes.

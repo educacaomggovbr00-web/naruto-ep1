@@ -11,6 +11,7 @@ var area_title: Label
 var title_timer := 0.0
 var displayed_night:=0.0
 var displayed_warmth:=0.0
+var look_ahead:=Vector2.ZERO
 
 func _ready() -> void:
 	camera = Camera2D.new()
@@ -48,10 +49,19 @@ func kick(amount: float) -> void:
 func _process(delta: float) -> void:
 	clock += delta
 	trauma = maxf(0, trauma - delta * 2.8)
-	var focus := Vector2(480, 270)
-	if motion_enabled:
-		focus += Vector2(clampf((game.player.x - 480) * 0.035, -12, 12), clampf((game.player.y - 270) * 0.035, -4, 4))
-	camera.position = camera.position.lerp(focus, 1.0 - exp(-delta * 4.0))
+	var center:=Vector2(480,270)
+	var focus:=center
+	var desired_look:=Vector2.ZERO
+	if motion_enabled and game.lines.is_empty() and not game.ui.modal_open():
+		var offset:Vector2=game.player-center
+		var drift:=Vector2(signf(offset.x)*maxf(0,absf(offset.x)-95)*0.025,signf(offset.y)*maxf(0,absf(offset.y)-45)*0.02)
+		if game.movement!=Vector2.ZERO: desired_look=game.motion_velocity*0.012
+		focus+=drift
+	look_ahead=look_ahead.lerp(desired_look,1.0-exp(-delta*5.0))
+	if motion_enabled: focus+=look_ahead
+	var margin:=Vector2(480,270)*(Vector2.ONE-Vector2.ONE/camera.zoom)-Vector2(2,2)
+	focus=focus.clamp(center-margin,center+margin)
+	camera.position=camera.position.lerp(focus,1.0-exp(-delta*4.0))
 	camera.offset = Vector2(sin(clock * 83), cos(clock * 97)) * trauma * trauma * 6 if motion_enabled else Vector2.ZERO
 	var night_target:float=game.day_cycle.night_amount(game.stage)
 	var weight:=1.0-exp(-delta*2.0)

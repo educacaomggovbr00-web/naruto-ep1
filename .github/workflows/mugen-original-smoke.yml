@@ -90,3 +90,14 @@ jobs:
           NARUTO_LOW_MEMORY=1 timeout 60s godot --headless --audio-driver Dummy --path . --script res://tests/locomotion_smoke.gd 2>&1 | tee locomotion-mobile.log
           grep -Fq "PASS: stride continuity" locomotion-mobile.log
           ! grep -Eq "SCRIPT ERROR|Assertion failed" locomotion-mobile.log
+
+      - name: Verify map routes and smooth movement
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 60s godot --headless --audio-driver Dummy --path . --script res://tests/map_flow_smoke.gd 2>&1 | tee map-flow.log
+          grep -Fq "PASS: cached obstacle-aware route" map-flow.log
+          ! grep -Eq "SCRIPT ERROR|Assertion failed" map-flow.log
+          NARUTO_LOW_MEMORY=1 timeout 60s godot --headless --audio-driver Dummy --path . --script res://tests/map_flow_smoke.gd 2>&1 | tee map-flow-mobile.log
+          grep -Fq "PASS: cached obstacle-aware route" map-flow-mobile.log
+          ! grep -Eq "SCRIPT ERROR|Assertion failed" map-flow-mobile.log

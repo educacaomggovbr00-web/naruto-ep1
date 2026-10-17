@@ -38,6 +38,7 @@ var audio: Node
 var ui: CanvasLayer
 var visual_clock := 0.0
 var gait_distance := 0.0
+var route_guide=preload("res://scripts/route_guide.gd").new()
 var locomotion=preload("res://scripts/locomotion.gd").new()
 var ambient=preload("res://scripts/ambient_world.gd").new()
 var day_cycle=preload("res://scripts/day_cycle.gd").new()
@@ -116,6 +117,8 @@ func travel_to(destination: String) -> void:
 	episode.room_entered(self)
 	facing=Vector2.UP if room != "outside" else Vector2.DOWN
 	locomotion.reset()
+	route_guide.reset()
+	route_guide.update(self,0)
 	polish.dust.clear()
 	background.set_area(stage,room,day_cycle.is_night(stage))
 	audio.set_indoor(room != "outside")
@@ -242,8 +245,7 @@ func _process(delta: float) -> void:
 			move_with_collisions(movement * speed * minf(delta, dash_time))
 			dash_time = maxf(0, dash_time - delta)
 		else:
-			motion_velocity=Vector2.ZERO if movement==Vector2.ZERO else motion_velocity.move_toward(movement*speed,2000.0*delta)
-			move_with_collisions(motion_velocity * delta)
+			advance_motion(movement,speed,delta)
 		gait_distance+=player.distance_to(previous)
 		locomotion.update(self,player-previous,delta,was_dodging)
 		if player.is_equal_approx(previous):
@@ -277,6 +279,7 @@ func _process(delta: float) -> void:
 	if stage == 3:
 		objective.text += "  %d%%" % int(trail_progress / 12 * 100)
 	if episode.active(): objective.text="EPISÓDIO 1 • "+episode.GOALS[episode.step]
+	route_guide.update(self,delta)
 	polish.update(self, delta)
 	queue_redraw()
 
@@ -390,6 +393,23 @@ func blocked(at: Vector2) -> bool:
 	for actor_at in episode.extra_actors(self).values():
 		if at.distance_to(actor_at)<22: return true
 	return layout.blocked(at, stage,room)
+
+func advance_motion(direction:Vector2,speed:float,delta:float) -> void:
+	if direction==Vector2.ZERO:
+		motion_velocity=Vector2.ZERO
+		return
+	# Exact integral of acceleration toward the requested velocity. The result
+	# does not depend on whether the render frame lasts 1/30 or 1/60 second.
+	var dt:=clampf(delta,0,0.12)
+	var target_velocity:=direction*speed
+	var difference:=target_velocity-motion_velocity
+	var acceleration:=2000.0
+	var accelerating:=minf(dt,difference.length()/acceleration)
+	var force:=difference.normalized()*acceleration
+	var displacement:=motion_velocity*accelerating+force*accelerating*accelerating*0.5
+	motion_velocity=motion_velocity.move_toward(target_velocity,acceleration*accelerating)
+	displacement+=motion_velocity*(dt-accelerating)
+	move_with_collisions(displacement)
 
 func move_with_collisions(displacement: Vector2) -> void:
 	var steps := maxi(1, int(ceil(displacement.length() / 6.0)))
