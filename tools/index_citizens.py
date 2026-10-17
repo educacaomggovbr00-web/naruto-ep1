@@ -4,8 +4,8 @@ from pathlib import Path
 from PIL import Image
 import numpy as np
 ROOT=Path(__file__).resolve().parents[1]/'assets'/'characters'
-def main():
-    source=ROOT/'citizens-generated.png'
+def main(source_name="citizens-generated.png",manifest_name="citizens.json",definitions=None):
+    source=ROOT/source_name
     image=Image.open(source).convert('RGBA'); data=np.array(image)
     width,height=image.size
     def edges(projection,extent):
@@ -22,7 +22,8 @@ def main():
     x_edges=edges((data[:,:,3]>100).sum(axis=0),width)
     y_edges=edges((data[:,:,3]>100).sum(axis=1),height)
     actors={}
-    for row,(name,world_height) in enumerate([('Comerciante',78),('Moradora',76),('Mensageiro',76),('Criança',62)]):
+    if definitions is None: definitions=[('Comerciante',78),('Moradora',76),('Mensageiro',76),('Criança',62)]
+    for row,(name,world_height) in enumerate(definitions):
         frames=[]; heights=[]
         for col in range(4):
             x,y=x_edges[col],y_edges[row]
@@ -40,7 +41,7 @@ def main():
                 portrait=[x+head_x,y+top,int((xx.max()-xx.min())*.70),int(h*.38)]
         actors[name]={'frames':frames,'scale':world_height/max(heights),'portrait':portrait,'height':world_height}
     assert np.min(data[:,:,3])==0 and np.max(data[:,:,3])==255
-    output={'texture':'citizens-generated.png','sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'actors':actors,'generated':True,'layout':'four rows, four right-facing walk poses per row; left is mirrored'}
-    (ROOT/'citizens.json').write_text(json.dumps(output,ensure_ascii=False,indent=2)+'\n')
+    output={'texture':source_name,'sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'actors':actors,'generated':True,'layout':'four rows, four right-facing walk poses per row; left is mirrored'}
+    (ROOT/manifest_name).write_text(json.dumps(output,ensure_ascii=False,indent=2)+'\n')
     print(f'PASS: indexed 16 original generated poses in {width}x{height} transparent atlas; PNG bytes unchanged')
 if __name__=='__main__':main()

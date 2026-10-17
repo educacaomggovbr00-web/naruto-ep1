@@ -20,7 +20,7 @@ func reset() -> void:
 func aim_direction(game: Node2D, kind: String) -> Vector2:
 	var direction: Vector2=game.facing.normalized()
 	if direction==Vector2.ZERO: direction=Vector2.RIGHT
-	if game.stage<=1 and game.room=="outside":
+	if game.target_active():
 		var offset: Vector2=game.target-game.player
 		var reach:=280.0 if kind=="kunai" else 220.0
 		if offset.length()<=reach and offset.length()>1 and direction.dot(offset.normalized())>=0.96:
@@ -71,14 +71,14 @@ func update(game: Node2D, delta: float) -> void:
 		shot["travel"]+=distance
 		shot["at"]=next
 		var hit:=false
-		if game.stage<=1 and game.room=="outside":
+		if game.target_active():
 			var closest:=Geometry2D.get_closest_point_to_segment(game.target,previous,next)
 			hit=closest.distance_to(game.target)<=15.0+float(shot["radius"])
 		if hit:
 			hits.append(shot)
 		elif shot["travel"]<shot["range"]:
 			alive.append(shot)
-		elif game.stage<=1:
+		elif game.target_active():
 			game.ui.toast("A técnica passou pelo alvo. Ajuste a direção e a distância.")
 	shots=alive
 	for shot in hits:

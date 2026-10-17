@@ -127,6 +127,7 @@ func refresh() -> void:
 			var known:bool=i+1<=game.episode.step
 			chapter_rows[i].modulate=Color("b4d5b4") if i+1<game.episode.step else Color("f0ce8a") if i+1==game.episode.step else Color("829896")
 			chapter_rows[i].text=("✓  " if i+1<game.episode.step else "›  ")+(game.episode.TITLES[i+1] if known else "Ainda não revelado")
+	if game.world.away(game): guidance.text="Você está em "+game.world.NAMES[game.world.district]+". Use AÇÃO na saída sinalizada para voltar à praça. O minimapa mostra a saída em dourado."
 	var found:=0
 	for i in range(DISCOVERIES.size()):
 		var done:bool=game.visited.get(DISCOVERIES[i][0],false)

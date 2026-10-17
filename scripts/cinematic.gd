@@ -73,6 +73,6 @@ func _process(delta: float) -> void:
 	if game.background.area != previous_area:
 		previous_area = game.background.area
 		title_timer = 2.5
-		area_title.text = ["CAMPO DE TREINO", "VILA OCULTA DA FOLHA", "FLORESTA DE KONOHA","ACADEMIA NINJA","CASA DO HENRIQUE"][maxi(previous_area, 0)]
+		area_title.text = ["CAMPO DE TREINO", "VILA OCULTA DA FOLHA", "FLORESTA DE KONOHA","ACADEMIA NINJA","CASA DO HENRIQUE","BAIRRO RESIDENCIAL"][maxi(previous_area, 0)]
 	title_timer = maxf(0, title_timer - delta)
 	area_title.modulate.a = minf(1, title_timer) * (0.0 if not game.lines.is_empty() else 1.0)

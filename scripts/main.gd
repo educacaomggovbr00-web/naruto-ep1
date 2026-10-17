@@ -5,7 +5,7 @@ var player := Vector2(140, 270)
 var stage := 0
 var room := "outside"
 var return_position := Vector2(170,270)
-var visited := {"academy":false,"home":false,"class_intro":false,"board":false,"notes":false,"chakra_drill":false,"parcel_started":false,"parcel_delivered":false}
+var visited := {"academy":false,"home":false,"class_intro":false,"board":false,"notes":false,"chakra_drill":false,"parcel_started":false,"parcel_delivered":false,"residential":false,"free_training":false}
 var episode=preload("res://scripts/episode_one.gd").new()
 var travelling := false
 var hits := 0
@@ -38,6 +38,7 @@ var audio: Node
 var ui: CanvasLayer
 var visual_clock := 0.0
 var gait_distance := 0.0
+var world=preload("res://scripts/open_world.gd").new()
 var population=preload("res://scripts/village_life.gd").new()
 var route_guide=preload("res://scripts/route_guide.gd").new()
 var locomotion=preload("res://scripts/locomotion.gd").new()
@@ -217,6 +218,7 @@ func _process(delta: float) -> void:
 	day_cycle.update(self,delta)
 	episode.update(self,delta)
 	population.update(self,delta)
+	world.update(self,delta)
 	ambient.update(self,delta)
 	background.animate(day_cycle.elapsed,day_cycle.wind_strength(),ambient.shake_at,ambient.shake_life)
 	audio.set_night(day_cycle.is_night(stage))
@@ -282,6 +284,8 @@ func _process(delta: float) -> void:
 		objective.text += "  %d%%" % int(trail_progress / 12 * 100)
 	if episode.active(): objective.text="EPISÓDIO 1 • "+episode.GOALS[episode.step]
 	route_guide.update(self,delta)
+	if stage==2 and room=="outside" and episode.step==7 and world.district=="plaza": objective.text="EXPLORAÇÃO • Bairro à esquerda · Campo de treino à direita · Use AÇÃO nas saídas."
+	if world.away(self): objective.text="EXPLORAÇÃO • "+world.NAMES[world.district]+". Use AÇÃO nas saídas sinalizadas para voltar à praça."
 	polish.update(self, delta)
 	queue_redraw()
 
@@ -292,13 +296,14 @@ func act(action: String) -> void:
 		if action == "interact": next_line()
 		return
 	if stage == 6: return
-	if episode.active() and action in ["kunai","katon","dodge"]:
+	if episode.active() and episode.step<7 and action in ["kunai","katon","dodge"]:
 		ui.toast("Hoje é dia de aula. Use AÇÃO para conversar e explorar.")
 		return
 	if room != "outside" and action in ["kunai","katon","dodge"]:
 		ui.toast("Guarde as técnicas para o campo de treino.")
 		return
 	if action == "interact":
+		if world.interact(self): return
 		if room=="outside" and episode.interact(self): return
 		if room != "outside":
 			interior_action()
@@ -360,6 +365,10 @@ func act(action: String) -> void:
 		else: ambient.interact(self)
 
 func training_hit(kind: String) -> void:
+	if world.away(self) and world.district=="training":
+		world.practice_hits+=1
+		ui.toast("Alvo atingido · treino livre %d" % world.practice_hits)
+		return
 	if stage==0 and kind=="kunai":
 		hits=mini(3,hits+1)
 		ui.toast("Acerto %d / 3" % hits)
@@ -392,7 +401,11 @@ func _notification(what: int) -> void:
 		movement = Vector2.ZERO
 		sprinting = false
 
+func target_active() -> bool:
+	return room=="outside" and (stage<=1 or (world.away(self) and world.district=="training"))
+
 func blocked(at: Vector2) -> bool:
+	layout.district=world.district
 	layout.episode_step=episode.step
 	for actor_at in episode.extra_actors(self).values():
 		if at.distance_to(actor_at)<22: return true

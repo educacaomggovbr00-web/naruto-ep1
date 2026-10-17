@@ -15,6 +15,8 @@ func active() -> bool:
 
 func begin(game: Node2D) -> void:
 	if step != 0 or game.stage != 6 or not game.lines.is_empty(): return
+	game.world.district="plaza"
+	game.layout.district="plaza"
 	step=1
 	game.stage=2
 	game.room="home"
@@ -36,6 +38,7 @@ func room_entered(game: Node2D) -> void:
 	if step==1 and game.room=="outside": step=2
 
 func extra_actors(game: Node2D) -> Dictionary:
+	if game.room=="outside" and game.world.district!="plaza": return {}
 	if not active(): return {}
 	if game.room=="academy":
 		var actors:Dictionary={"Mizuki":MIZUKI}

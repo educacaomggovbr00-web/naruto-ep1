@@ -22,6 +22,7 @@ func reset() -> void:
 
 func destination(game:Node2D) -> Vector2:
 	var no_goal:=Vector2(INF,INF)
+	if game.world.away(game): return game.world.return_gate()
 	if game.episode.active():
 		match game.episode.step:
 			1: return Vector2(480,450) if game.room=="home" else game.layout.interiors.ACADEMY_DOOR
@@ -69,7 +70,7 @@ func update(game:Node2D,delta:float) -> void:
 		points.clear()
 		return
 	cooldown=maxf(0,cooldown-delta)
-	var key:="%d:%s:%d" % [game.stage,game.room,game.episode.step]
+	var key:="%d:%s:%d:%s" % [game.stage,game.room,game.episode.step,game.world.district]
 	if grid==null or key!=area_key:
 		grid=AStarGrid2D.new()
 		grid.region=Rect2i(0,0,61,35)

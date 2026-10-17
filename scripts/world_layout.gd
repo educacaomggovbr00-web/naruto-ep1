@@ -11,6 +11,7 @@ const IRUKA := Vector2(730, 260)
 const HOME := Vector2(110, 235)
 const VILLAGE_CAST := {"Hiruzen": Vector2(495,245), "Teuchi": Vector2(858,260)}
 var episode_step := 0
+var district:="plaza"
 var interiors = preload("res://scripts/interiors.gd").new()
 
 func village(stage: int) -> bool:
@@ -18,6 +19,8 @@ func village(stage: int) -> bool:
 
 func bounds(stage: int, room: String = "outside") -> Rect2:
 	if room != "outside": return interiors.config(room)["bounds"]
+	if stage==2 and district=="residential": return Rect2(30,258,900,142)
+	if stage==2 and district=="training": return CLEARING_FLOOR
 	return VILLAGE_FLOOR if village(stage) else CLEARING_FLOOR
 
 func clamp_position(at: Vector2, stage: int, room: String = "outside") -> Vector2:
@@ -36,6 +39,7 @@ func restore_position(at: Vector2, stage: int, room: String = "outside") -> Vect
 
 func blocked(at: Vector2, stage: int, room: String = "outside") -> bool:
 	if room != "outside": return interiors.blocked(at,room)
+	if stage==2 and district!="plaza": return false
 	if village(stage):
 		if WATER.has_point(at) and not BRIDGE.has_point(at): return true
 		for bench in BENCHES:

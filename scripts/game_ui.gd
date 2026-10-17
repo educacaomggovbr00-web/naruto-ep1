@@ -284,6 +284,11 @@ func update_portrait(speaker: String) -> void:
 	if speaker == "Naruto":
 		atlas.atlas = art.get_naruto_gallery_texture()
 		atlas.region = Rect2(22, 18, 52, 60)
+	elif game.world.manifest.get("actors",{}).has(speaker):
+		if game.world.texture==null: game.world.texture=load("res://assets/characters/shinobi-neighbors.png") as Texture2D
+		atlas.atlas=game.world.texture
+		var crop:Array=game.world.manifest.actors[speaker].portrait
+		atlas.region=Rect2(crop[0],crop[1],crop[2],crop[3])
 	elif game.population.manifest.actors.has(speaker):
 		atlas.atlas=game.population.get_texture()
 		var crop:Array=game.population.manifest.actors[speaker].portrait
@@ -339,7 +344,7 @@ func refresh_controls() -> void:
 		if button.get_meta("latched", false):
 			button.set_pressed_no_signal(bool(game.held.get(button.get_meta("action"), false)))
 		button.visible = not modal_open() and (game.lines.is_empty() or button.get_meta("action") == "interact")
-		if (game.room != "outside" or game.episode.active()) and action in ["kunai","katon","dodge","sneak"]: button.visible=false
+		if (game.room != "outside" or (game.episode.active() and game.episode.step<7)) and action in ["kunai","katon","dodge","sneak"]: button.visible=false
 		if game.stage == 6 and (game.lines.is_empty() or action != "interact"): button.visible=false
 
 func release_touches() -> void:

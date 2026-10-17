@@ -17,6 +17,7 @@ var shake_at:=Vector2.ZERO
 var area_key:=""
 
 func nearby(game:Node2D) -> Dictionary:
+	if game.world.away(game): return {}
 	if game.room!="outside" or game.stage in [3,6]: return {}
 	var points:Array=[]
 	if game.stage<=1: points=[CLEARING_BRANCH]

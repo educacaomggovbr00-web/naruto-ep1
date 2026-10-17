@@ -346,3 +346,22 @@ NARUTO_PREVIEW_DIR=/tmp godot --audio-driver Dummy --path . --script res://tests
 ```
 
 Verificado em Godot 4.4.1, nos modos normal e leve: sprites/índice, rotas com colisões, pausa, escolha da entrega, recompensa única, compatibilidade de saves, horários, minimapa e regressões do prólogo/Academia. Capturas usam o jogo real com renderizador Compatibility. O vídeo tem 150 quadros a 15 FPS, sem captura do áudio do sistema. Desempenho, áudio, multitoque e retomada em Android físico permanecem pendentes.
+
+## Exploração por áreas conectadas
+
+Depois do treino inicial, a praça possui duas saídas: **BAIRRO RESIDENCIAL** à esquerda e **CAMPO DE TREINO** à direita. Aproxime-se da borda sinalizada e use **E / AÇÃO**. Cada área tem uma saída para voltar à praça. Há um fade curto entre mapas; não é um cenário 3D contínuo.
+
+- **Bairro novo:** rua residencial com casas, jardins, varais e quadro de avisos. Guardião e artesão fazem pequenos percursos e conversam. As casas de fundo são privadas e não têm interiores nesta etapa; a casa de Henrique e a Academia continuam acessíveis pela praça.
+- **Campo livre:** reaproveita a clareira do prólogo como área visitável, com alvo, aprendiz e ninja médica. Após a aula do episódio 1, kunai, Katon e esquiva ficam disponíveis para exploração. Acertar o alvo no campo livre não reinicia o tutorial nem muda a história. Antes da conclusão da aula, suas restrições de técnicas continuam valendo.
+- **Arte coerente:** um fundo novo no estilo da vila e quatro NPCs ninja/artesão, com 16 poses laterais, roupas tradicionais, bandanas, coletes e perneiras. Arquivos, origem e descrição visual em [assets/environments/OPEN_WORLD.md](assets/environments/OPEN_WORLD.md). Os sprites anteriores foram preservados.
+- **Navegação:** minimapa acompanha a área atual e mostra saídas em dourado. O guia de caminho aponta a volta à praça quando você está longe do objetivo da história. Placas não ficam escondidas atrás do minimapa ou do direcional.
+- **Progresso:** `district` é opcional no save v1: `plaza`, `residential` ou `training`. Saves antigos retomam na praça. Novas áreas são válidas somente durante exploração externa da etapa 2, preservando perseguição, interiores e cenas do prólogo. As visitas usam `visited.residential` e `visited.free_training`.
+
+```sh
+python3 tools/index_shinobi_neighbors.py
+godot --headless --audio-driver Dummy --path . --script res://tests/open_world_smoke.gd
+NARUTO_LOW_MEMORY=1 godot --headless --audio-driver Dummy --path . --script res://tests/open_world_smoke.gd
+NARUTO_PREVIEW_DIR=/tmp godot --audio-driver Dummy --path . --script res://tests/capture_open_world.gd
+```
+
+Testado em Godot 4.4.1, normal e modo leve: travessia das saídas, retorno, rotas locais, conversa e avisos, save da área em disco, arquivos antigos/inválidos, treino livre com contato real e preservação da etapa da história. As suítes de regressão foram executadas nos dois modos; as verificações de áreas conectadas também foram repetidas após os ajustes finais. Vídeo real de 150 quadros a 15 FPS, sem áudio capturado. A expansão continua sendo um RPG 2D com três áreas externas e dois interiores, sem veículos ou uma cidade do tamanho de GTA 5. Android físico ainda precisa validar desempenho, áudio, toque e retomada.

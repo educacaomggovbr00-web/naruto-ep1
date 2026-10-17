@@ -112,3 +112,14 @@ jobs:
           NARUTO_LOW_MEMORY=1 timeout 60s godot --headless --audio-driver Dummy --path . --script res://tests/village_life_smoke.gd 2>&1 | tee village-life-mobile.log
           grep -Fq "PASS: generated walk sprites" village-life-mobile.log
           ! grep -Eq "SCRIPT ERROR|Assertion failed" village-life-mobile.log
+
+      - name: Verify connected exploration districts and district saves
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 60s godot --headless --audio-driver Dummy --path . --script res://tests/open_world_smoke.gd 2>&1 | tee open-world.log
+          grep -Fq "PASS: connected districts" open-world.log
+          ! grep -Eq "SCRIPT ERROR|Assertion failed" open-world.log
+          NARUTO_LOW_MEMORY=1 timeout 60s godot --headless --audio-driver Dummy --path . --script res://tests/open_world_smoke.gd 2>&1 | tee open-world-mobile.log
+          grep -Fq "PASS: connected districts" open-world-mobile.log
+          ! grep -Eq "SCRIPT ERROR|Assertion failed" open-world-mobile.log

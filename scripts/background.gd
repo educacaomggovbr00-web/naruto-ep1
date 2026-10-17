@@ -23,9 +23,13 @@ func _ready() -> void:
 
 func set_area(stage: int, room: String = "outside", clock_night: bool = false) -> void:
 	var next_area := 3 if room == "academy" else 4 if room == "home" else 0 if stage <= 1 else 1 if stage == 2 or stage >= 5 else 2
+	if stage==2 and room=="outside" and get_parent()!=null:
+		var district:String=get_parent().world.district
+		if district=="training": next_area=0
+		elif district=="residential": next_area=5
 	var next_night := stage >= 3 or clock_night
 	if next_area != area or (room == "home" and next_night != night):
-		var path: String = INTERIORS.ROOMS[room]["image"] if room != "outside" else ENVIRONMENTS[next_area]
+		var path: String = "res://assets/environments/residential-generated.png" if next_area==5 else INTERIORS.ROOMS[room]["image"] if room != "outside" else ENVIRONMENTS[next_area]
 		if room == "home" and next_night: path="res://assets/environments/home-night-interior.jpg"
 		previous_environment=environment if next_area==area and room=="home" else null
 		fade=0.0 if previous_environment!=null else 1.0

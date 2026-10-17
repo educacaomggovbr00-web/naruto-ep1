@@ -21,6 +21,9 @@ func marker(host: Node2D, at: Vector2, clock: float) -> void:
 
 func render(host: Node2D) -> void:
 	host.route_guide.draw(host)
+	if host.world.away(host):
+		host.world.render(host)
+		return
 	if host.room != "outside":
 		var data: Dictionary = host.layout.interiors.config(host.room)
 		if host.room=="academy" and not host.episode.active():
@@ -64,6 +67,7 @@ func render(host: Node2D) -> void:
 			elif person.name=="player": character_art.draw_henrique(host)
 			elif person.name=="Naruto": character_art.draw_naruto(host,person.at)
 			else: character_art.draw_cast_actor(host,person.name,person.at,false,night)
+		host.world.draw_portals(host)
 		if not host.episode.active() or host.episode.step==5: marker(host, host.layout.NARUTO, host.visual_clock)
 		preload("res://scripts/ui_palette.gd").name_tag(host,Vector2(344,221),"ACADEMIA",character_art.name_style,10)
 	if host.stage in [2,5]:
@@ -101,6 +105,7 @@ func draw_hud(canvas: Node2D, host: Node2D) -> void:
 	canvas.draw_rect(Rect2(644,28,212*host.stamina/100.0,3),palette.GOLD)
 	canvas.draw_string(ThemeDB.fallback_font,Vector2(873,21),"%03d / 100" % int(host.chakra),HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("e0dec8"))
 	var place: String="CAMPO DE TREINO" if host.stage<=1 else "KONOHA · PRAÇA" if host.stage==2 else "FLORESTA · NOITE" if host.stage<=4 else "KONOHA · CASA"
+	if host.world.away(host): place=host.world.NAMES[host.world.district]
 	if host.room!="outside": place=host.layout.interiors.config(host.room)["title"]
 	canvas.draw_style_box(host.polish.panel(),Rect2(16,90,205,29))
 	canvas.draw_colored_polygon(PackedVector2Array([Vector2(29,100),Vector2(33,104),Vector2(29,108),Vector2(25,104)]),palette.GOLD)

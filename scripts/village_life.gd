@@ -33,7 +33,7 @@ func restore_schedule(game:Node2D) -> void:
 			agents[i].hidden=true
 
 func active(game:Node2D) -> bool:
-	return game.stage==2 and game.room=="outside"
+	return game.stage==2 and game.room=="outside" and game.world.district=="plaza"
 func get_texture() -> Texture2D:
 	if texture==null: texture=load(SHEET) as Texture2D
 	return texture
@@ -195,6 +195,9 @@ func draw_actor(game:Node2D,a:Dictionary) -> void:
 
 func draw_minimap(canvas:Node2D,game:Node2D) -> void:
 	if not minimap_enabled or game.room!="outside" or not game.stage in [2,5] or not game.lines.is_empty() or game.ui.modal_open(): return
+	if game.world.away(game):
+		game.world.draw_minimap(canvas,game)
+		return
 	var box:=Rect2(18,138,180,101.25)
 	canvas.draw_style_box(game.polish.panel(),box.grow(4))
 	if game.background.environment!=null: canvas.draw_texture_rect(game.background.environment,box,false,Color(0.75,0.83,0.79,0.96))

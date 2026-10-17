@@ -41,6 +41,11 @@ func render(game: Node2D) -> void:
 		game.draw_string(ThemeDB.fallback_font, game.target + Vector2(-28, -48 - radius * 0.25), "ACERTO!", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("ffda83"))
 	if not game.lines.is_empty() or game.stage >= 6 or game.ui.modal_open():
 		return
+	var district_prompt:String=game.world.prompt(game)
+	if not district_prompt.is_empty():
+		interaction_prompt(game,district_prompt)
+		return
+	if game.world.away(game): return
 	var story_prompt:String=game.episode.prompt(game)
 	if not story_prompt.is_empty():
 		interaction_prompt(game,story_prompt)
