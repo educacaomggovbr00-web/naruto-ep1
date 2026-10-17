@@ -2,19 +2,16 @@ extends RefCounted
 
 # Procedural accents preserve the original atlas, MUGEN sprites and map layout.
 var dust: Array[Dictionary] = []
-var step_timer := 0.0
 var hit_timer := 0.0
 var last_hits := 0
 var cached_panel: StyleBoxFlat = null
 
 func update(game: Node2D, delta: float) -> void:
-	step_timer += delta
 	hit_timer = maxf(0.0, hit_timer - delta)
 	if game.hits > last_hits:
 		hit_timer = 0.35
 	last_hits = game.hits
-	if game.movement != Vector2.ZERO and step_timer > (0.16 if game.sprinting else 0.36 if game.down("sneak",KEY_SHIFT) else 0.25):
-		step_timer = 0.0
+	if game.locomotion.footfalls>0 and game.movement!=Vector2.ZERO and game.dash_time<=0:
 		game.audio.play("step")
 		if game.room=="outside": dust.append({"at": game.player + Vector2(0, 13), "life": 0.4})
 	for particle in dust:

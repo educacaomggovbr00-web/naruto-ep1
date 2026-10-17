@@ -129,6 +129,8 @@ def main():
     expanded.paste(Image.fromarray(images['player'][y:y+h,x:x+w]).convert('RGBA'),(0,512))
     expanded.save(ROOT/'attached-henrique.png')
     (ROOT/'attached-henrique.json').write_text(json.dumps(pm,indent=2)+'\n')
+    from calibrate_locomotion import main as calibrate_locomotion
+    calibrate_locomotion()
 
 
 if __name__=='__main__':main()

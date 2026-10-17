@@ -38,6 +38,7 @@ var audio: Node
 var ui: CanvasLayer
 var visual_clock := 0.0
 var gait_distance := 0.0
+var locomotion=preload("res://scripts/locomotion.gd").new()
 var ambient=preload("res://scripts/ambient_world.gd").new()
 var day_cycle=preload("res://scripts/day_cycle.gd").new()
 var sprinting := false
@@ -82,6 +83,7 @@ func say(texts: Array) -> void:
 	sprinting = false
 	dash_time = 0
 	attack_flash = 0
+	locomotion.settle_time=0
 	lines.assign(texts)
 	line_index = 0
 	ui.show_line(lines[0])
@@ -113,6 +115,7 @@ func travel_to(destination: String) -> void:
 		visited[room]=true
 	episode.room_entered(self)
 	facing=Vector2.UP if room != "outside" else Vector2.DOWN
+	locomotion.reset()
 	polish.dust.clear()
 	background.set_area(stage,room,day_cycle.is_night(stage))
 	audio.set_indoor(room != "outside")
@@ -230,6 +233,7 @@ func _process(delta: float) -> void:
 		sprinting = down("run", KEY_R) and not sneaking
 		var previous := player
 		var speed := 95.0 if sneaking else 240.0 if sprinting else 180.0
+		var was_dodging:=dash_time>0
 		if dash_time > 0:
 			motion_velocity=Vector2.ZERO
 			movement = dash_direction
@@ -238,9 +242,10 @@ func _process(delta: float) -> void:
 			move_with_collisions(movement * speed * minf(delta, dash_time))
 			dash_time = maxf(0, dash_time - delta)
 		else:
-			motion_velocity=Vector2.ZERO if movement==Vector2.ZERO else motion_velocity.move_toward(movement*speed,2800.0*delta)
+			motion_velocity=Vector2.ZERO if movement==Vector2.ZERO else motion_velocity.move_toward(movement*speed,2000.0*delta)
 			move_with_collisions(motion_velocity * delta)
 		gait_distance+=player.distance_to(previous)
+		locomotion.update(self,player-previous,delta,was_dodging)
 		if player.is_equal_approx(previous):
 			movement = Vector2.ZERO
 			sprinting = false
@@ -260,6 +265,8 @@ func _process(delta: float) -> void:
 					stage = 4
 					target = mizuki
 					say(["Henrique: Ele sumiu entre as árvores...", "Há uma kunai no chão. Será que ele deixou cair?"])
+	else:
+		locomotion.update(self,Vector2.ZERO,delta,false)
 	hud.text = "HENRIQUE UCHIHA  /  12 ANOS"
 	objective.text = OBJECTIVES[stage]
 	if room == "academy" and stage < 6:

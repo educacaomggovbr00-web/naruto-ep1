@@ -15,7 +15,7 @@
           128
         ],
         "origin": [
-          64,
+          63,
           124
         ],
         "source_rect": [
@@ -39,7 +39,7 @@
           128
         ],
         "origin": [
-          64,
+          62,
           124
         ],
         "source_rect": [
@@ -63,7 +63,7 @@
           128
         ],
         "origin": [
-          64,
+          63,
           124
         ],
         "source_rect": [
@@ -87,7 +87,7 @@
           128
         ],
         "origin": [
-          64,
+          62,
           124
         ],
         "source_rect": [
@@ -111,7 +111,7 @@
           128
         ],
         "origin": [
-          64,
+          62,
           124
         ],
         "source_rect": [
@@ -135,7 +135,7 @@
           128
         ],
         "origin": [
-          64,
+          63,
           124
         ],
         "source_rect": [
@@ -161,7 +161,7 @@
           128
         ],
         "origin": [
-          64,
+          65,
           124
         ],
         "source_rect": [
@@ -175,7 +175,8 @@
           8,
           52,
           97
-        ]
+        ],
+        "rest_frame": 3
       },
       {
         "rect": [
@@ -199,7 +200,8 @@
           8,
           52,
           97
-        ]
+        ],
+        "rest_frame": 4
       }
     ],
     "run": [
@@ -211,7 +213,7 @@
           128
         ],
         "origin": [
-          64,
+          65,
           124
         ],
         "source_rect": [
@@ -225,7 +227,8 @@
           12,
           74,
           96
-        ]
+        ],
+        "rest_frame": 4
       },
       {
         "rect": [
@@ -235,7 +238,7 @@
           128
         ],
         "origin": [
-          64,
+          62,
           124
         ],
         "source_rect": [
@@ -249,7 +252,8 @@
           14,
           76,
           96
-        ]
+        ],
+        "rest_frame": 0
       },
       {
         "rect": [
@@ -259,7 +263,7 @@
           128
         ],
         "origin": [
-          64,
+          65,
           124
         ],
         "source_rect": [
@@ -273,7 +277,8 @@
           11,
           74,
           95
-        ]
+        ],
+        "rest_frame": 5
       },
       {
         "rect": [
@@ -297,7 +302,8 @@
           11,
           76,
           96
-        ]
+        ],
+        "rest_frame": 1
       },
       {
         "rect": [
@@ -307,7 +313,7 @@
           128
         ],
         "origin": [
-          64,
+          65,
           124
         ],
         "source_rect": [
@@ -321,7 +327,8 @@
           11,
           76,
           96
-        ]
+        ],
+        "rest_frame": 4
       },
       {
         "rect": [
@@ -331,7 +338,7 @@
           128
         ],
         "origin": [
-          64,
+          60,
           124
         ],
         "source_rect": [
@@ -345,7 +352,8 @@
           11,
           75,
           97
-        ]
+        ],
+        "rest_frame": 1
       }
     ],
     "dodge": [
@@ -677,5 +685,18 @@
     512,
     220,
     145
-  ]
+  ],
+  "locomotion": {
+    "atlas_sha256": "8bfc9e42308406b866934d99c90bf5d8583a9aa6713df40400af625f9b38a208",
+    "registration": "bottom alpha pixel plus one; median lower torso x",
+    "walk_directions": [
+      "source three-quarter pose; mirrored for left"
+    ],
+    "missing": [
+      "front walk cycle",
+      "back walk cycle",
+      "additional clean walk in-between frames"
+    ],
+    "image_pixels_modified": false
+  }
 }

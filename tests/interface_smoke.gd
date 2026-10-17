@@ -42,7 +42,11 @@ func run_checks() -> void:
 	touch(game, 1, center(game, "run"), true)
 	assert(game.held.get("right", false) and game.held.get("run", false), "Two fingers must hold direction and run together")
 	game._process(0.1)
-	assert(is_equal_approx(game.player.x, start.x + 24), "Simultaneous direction and sprint must move the player")
+	var first_step:float=game.player.x-start.x
+	assert(first_step>0 and first_step<24, "Simultaneous touch must start sprinting with acceleration")
+	var accelerated:Vector2=game.player
+	game._process(0.1)
+	assert(game.player.x-accelerated.x>first_step and is_equal_approx(game.player.x-accelerated.x,24), "Held touch must reach full sprint after accelerating")
 	touch(game, 0, center(game, "right"), false)
 	assert(not game.held.has("right") and game.held.get("run", false), "Releasing one finger must preserve the other")
 	touch(game, 1, center(game, "run"), false)

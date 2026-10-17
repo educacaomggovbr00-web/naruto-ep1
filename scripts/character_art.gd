@@ -36,7 +36,8 @@ func get_cast_texture() -> Texture2D:
 func attached_action(host: Node2D) -> String:
 	if host.dash_time > 0 and host.lines.is_empty(): return "dodge"
 	if host.attack_flash > 0: return "katon" if host.effect_kind == "katon" else "kunai"
-	if host.movement != Vector2.ZERO and host.lines.is_empty(): return "run" if host.sprinting else "walk"
+	if host.movement != Vector2.ZERO and host.lines.is_empty(): return host.locomotion.action
+	if host.locomotion.settle_time>0 and host.lines.is_empty(): return host.locomotion.last_action
 	return "idle"
 
 func attached_frame(host: Node2D, action: String) -> Dictionary:
@@ -47,7 +48,8 @@ func attached_frame(host: Node2D, action: String) -> Dictionary:
 		var remaining: float = host.dash_time if action == "dodge" else host.attack_flash
 		index = int(clampf(1.0 - remaining / duration, 0, 0.999) * frames.size())
 	else:
-		index = (int(host.gait_distance/(18.0 if action=="run" else 30.0)) if action in ["walk","run"] else int(host.visual_clock*float(attached_player["fps"][action]))) % frames.size()
+		index = host.locomotion.frame_index(host,action)
+		if host.locomotion.settle_time>0 and action in ["walk","run"]: index=mini(host.locomotion.last_frame,frames.size()-1)
 	return frames[index]
 
 func draw_attached_player(host: Node2D) -> void:
@@ -55,9 +57,10 @@ func draw_attached_player(host: Node2D) -> void:
 	var rect: Array = frame["rect"]
 	var origin: Array = frame["origin"]
 	var factor := float(attached_player["scale"])
-	var mirror: bool = (host.dash_direction.x if host.dash_time > 0 else host.facing.x) < 0
+	var mirror: bool = host.dash_direction.x<0 if host.dash_time>0 else host.facing.x<0 if host.attack_flash>0 else host.locomotion.mirror
 	shadow(host, host.player)
-	host.draw_set_transform(host.player + Vector2(0, 14), 0, Vector2(-1 if mirror else 1, 1))
+	var breath:=1.0+sin(host.locomotion.breathing_clock*2.0)*0.003 if attached_action(host)=="idle" else 1.0
+	host.draw_set_transform(host.player + Vector2(0, 14), 0, Vector2(-1 if mirror else 1, breath))
 	host.draw_texture_rect_region(player_texture,
 		Rect2(-Vector2(origin[0],origin[1])*factor,Vector2(rect[2],rect[3])*factor),
 		Rect2(rect[0],rect[1],rect[2],rect[3]),Color("b7c1d8") if host.stage >= 3 and host.room == "outside" else Color.WHITE)
@@ -110,13 +113,13 @@ func draw_henrique(host: Node2D) -> void:
 		draw_attached_player(host)
 		return
 	var dodging: bool = host.dash_time > 0 and host.lines.is_empty()
-	var mirror: bool = (host.dash_direction.x if dodging else host.facing.x) < 0
+	var mirror: bool = host.dash_direction.x<0 if dodging else host.locomotion.mirror
 	shadow(host, host.player)
 	host.draw_set_transform(host.player + Vector2(0, 14), 0, Vector2(-1 if mirror else 1, 1))
 	if compact_mode:
 		# Optional nine-frame fallback for explicitly requested low-memory runs.
 		var direction_row := 2 if absf(host.facing.x) > 0.4 else 1 if host.facing.y < -0.4 else 0
-		var step := int(host.visual_clock * (13.0 if host.sprinting else 9.0)) % 3 if host.movement != Vector2.ZERO and host.lines.is_empty() else 0
+		var step := mini(int(host.locomotion.phase*3),2) if host.movement != Vector2.ZERO and host.lines.is_empty() else 0
 		var region := Rect2((direction_row * 3 + step) * 24, 0, 24, 28)
 		host.draw_texture_rect_region(COMPACT_HENRIQUE, Rect2(-36, -70, 72, 84), region, Color("b7c1d8") if host.stage >= 3 and host.room == "outside" else Color.WHITE)
 	elif dodging:

@@ -85,3 +85,8 @@ alcance dos polegares, suspensão/retomada e persistência após reabrir o app.
 `tools/import_katon_fire.py` copia os canais RGB e remove o fundo azul somente
 pelo alpha, incluindo azul preso entre as pontas da chama. A arte anterior não
 foi apagada. O efeito gira com a direção do ataque e acompanha o projétil real.
+
+
+### Registro e caminhada
+
+O PNG `attached-henrique.png` permanece idêntico. O manifesto recebeu origens horizontais medidas no tronco e índices das poses originais de repouso mais próximas, reproduzíveis por `tools/calibrate_locomotion.py`. A base dos pés já estava alinhada em y=124; ela não foi deslocada. São usados dois quadros de caminhada e seis de corrida, sem quadros novos ou interpolação de pixels. Ainda faltam ciclos frontal/traseiro e poses intermediárias limpas da roupa preta/vermelha. O hash do atlas é registrado em `locomotion.atlas_sha256` no manifesto.

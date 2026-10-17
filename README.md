@@ -283,3 +283,28 @@ godot --headless --audio-driver Dummy --path . --script res://tests/episode_smok
 NARUTO_LOW_MEMORY=1 godot --headless --audio-driver Dummy --path . --script res://tests/episode_smoke.gd
 NARUTO_PREVIEW_DIR=/tmp godot --audio-driver Dummy --path . --script res://tests/capture_episode.gd
 ```
+
+
+## Caminhada e transições de Henrique
+
+A animação usa um ciclo de passada contínuo, calculado pela distância realmente percorrida: 92 passos de mapa por ciclo ao andar e 112 ao correr. Trocar entre caminhada e corrida conserva a fase; parar e recomeçar inicia uma passada nova. Furtividade reduz o ritmo pelo deslocamento menor, sem um relógio independente de animação.
+
+- Os dois quadros limpos de caminhada e os seis de corrida continuam sendo os próprios recortes enviados. As imagens PNG não foram alteradas.
+- O atlas já tinha a base dos pés na mesma linha. O registro horizontal do tronco agora corrige deslocamentos de até quatro pixels em relação à origem antiga, sem recentrar o personagem a cada troca do pé de apoio.
+- Ao parar, não há inércia de posição. A última pose permanece por até 0,07 s e dá lugar à pose de repouso original mais próxima. O personagem parado não percorre seis poses diferentes continuamente; mantém uma pose com respiração leve.
+- Andar verticalmente mantém o último lado para o qual o sprite estava orientado. A orientação muda de acordo com o movimento efetivo, inclusive ao inverter a direção, e fica guardada em `visual_left`, um booleano opcional no save v1.
+- Os sons dos passos e a poeira acompanham os meios ciclos da passada. Ficar bloqueado por móveis, paredes ou personagens interrompe os passos; esquivar não é contado como caminhada. Menus pausam o ciclo.
+- O modo leve também acompanha a distância, usando os três quadros direcionais já existentes no SVG de fallback. Ele continua tendo arte diferente do atlas principal.
+
+**Limite dos arquivos atuais:** o Henrique preto/vermelho ainda não tem ciclos completos de caminhada de frente e de costas, nem poses intermediárias limpas além dos dois recortes laterais. O ritmo e o registro foram melhorados, mas dois quadros não entregam a suavidade de um ciclo completo. Para completar esse movimento sem redesenhar a arte, falta uma folha da mesma roupa/personagem com ao menos quatro a seis quadros consecutivos de caminhada por direção. Os NPCs continuam precisando das suas próprias folhas de caminhada; as poses direcionais deles não foram transformadas em passos.
+
+`tools/calibrate_locomotion.py` reproduz o registro e a escolha de repouso; usa Pillow e NumPy apenas no desenvolvimento e verifica que o hash do PNG permanece idêntico.
+
+```sh
+python3 tools/calibrate_locomotion.py
+godot --headless --audio-driver Dummy --path . --script res://tests/locomotion_smoke.gd
+NARUTO_LOW_MEMORY=1 godot --headless --audio-driver Dummy --path . --script res://tests/locomotion_smoke.gd
+NARUTO_PREVIEW_DIR=/tmp godot --audio-driver Dummy --path . --script res://tests/capture_locomotion.gd
+```
+
+Verificado em Godot 4.4.1: aceleração, troca andar/correr, parada, orientação vertical, save antigo/novo, equivalência de ciclo e passos em 30/60 FPS, bloqueios, pausa e esquiva. O vídeo usa 150 quadros reais a 15 FPS, sem captura do áudio do sistema. Android físico ainda precisa validar multitoque, áudio, desempenho e retomada.

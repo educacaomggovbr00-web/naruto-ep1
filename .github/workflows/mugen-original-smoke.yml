@@ -79,3 +79,14 @@ jobs:
           NARUTO_LOW_MEMORY=1 timeout 60s godot --headless --audio-driver Dummy --path . --script res://tests/episode_smoke.gd 2>&1 | tee episode-mobile.log
           grep -Fq "PASS: narrative morning" episode-mobile.log
           ! grep -Eq "SCRIPT ERROR|Assertion failed" episode-mobile.log
+
+      - name: Verify distance-driven locomotion and orientation
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 60s godot --headless --audio-driver Dummy --path . --script res://tests/locomotion_smoke.gd 2>&1 | tee locomotion-smoke.log
+          grep -Fq "PASS: stride continuity" locomotion-smoke.log
+          ! grep -Eq "SCRIPT ERROR|Assertion failed" locomotion-smoke.log
+          NARUTO_LOW_MEMORY=1 timeout 60s godot --headless --audio-driver Dummy --path . --script res://tests/locomotion_smoke.gd 2>&1 | tee locomotion-mobile.log
+          grep -Fq "PASS: stride continuity" locomotion-mobile.log
+          ! grep -Eq "SCRIPT ERROR|Assertion failed" locomotion-mobile.log
