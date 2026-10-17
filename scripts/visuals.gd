@@ -57,9 +57,11 @@ func render(host: Node2D) -> void:
 			cast.append({"name":name_text,"at":host.layout.VILLAGE_CAST[name_text]})
 		if not host.episode.active() or host.episode.step>=5: cast.append({"name":"Naruto","at":host.layout.NARUTO})
 		for name_text in host.episode.extra_actors(host): cast.append({"name":name_text,"at":host.episode.extra_actors(host)[name_text]})
+		for citizen in host.population.visible_agents(host): cast.append({"name":citizen.name,"at":citizen.at,"citizen":citizen})
 		cast.sort_custom(func(a,b):return a.at.y<b.at.y)
 		for person in cast:
-			if person.name=="player": character_art.draw_henrique(host)
+			if person.has("citizen"): host.population.draw_actor(host,person.citizen)
+			elif person.name=="player": character_art.draw_henrique(host)
 			elif person.name=="Naruto": character_art.draw_naruto(host,person.at)
 			else: character_art.draw_cast_actor(host,person.name,person.at,false,night)
 		if not host.episode.active() or host.episode.step==5: marker(host, host.layout.NARUTO, host.visual_clock)

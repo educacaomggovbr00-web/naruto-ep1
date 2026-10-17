@@ -5,7 +5,7 @@ var player := Vector2(140, 270)
 var stage := 0
 var room := "outside"
 var return_position := Vector2(170,270)
-var visited := {"academy":false,"home":false,"class_intro":false,"board":false,"notes":false,"chakra_drill":false}
+var visited := {"academy":false,"home":false,"class_intro":false,"board":false,"notes":false,"chakra_drill":false,"parcel_started":false,"parcel_delivered":false}
 var episode=preload("res://scripts/episode_one.gd").new()
 var travelling := false
 var hits := 0
@@ -38,6 +38,7 @@ var audio: Node
 var ui: CanvasLayer
 var visual_clock := 0.0
 var gait_distance := 0.0
+var population=preload("res://scripts/village_life.gd").new()
 var route_guide=preload("res://scripts/route_guide.gd").new()
 var locomotion=preload("res://scripts/locomotion.gd").new()
 var ambient=preload("res://scripts/ambient_world.gd").new()
@@ -215,6 +216,7 @@ func _process(delta: float) -> void:
 		return
 	day_cycle.update(self,delta)
 	episode.update(self,delta)
+	population.update(self,delta)
 	ambient.update(self,delta)
 	background.animate(day_cycle.elapsed,day_cycle.wind_strength(),ambient.shake_at,ambient.shake_life)
 	audio.set_night(day_cycle.is_night(stage))
@@ -335,6 +337,7 @@ func act(action: String) -> void:
 			pending_forest_transition = true
 			say(["Naruto: Ei! Por que você está sempre com essa cara séria?", "Henrique: E você, por que está sempre arrumando confusão?", "Iruka: Naruto! Volte para a Academia!", "Mais tarde, ao anoitecer...", "Henrique: Mizuki? O que um instrutor está fazendo perto da floresta a esta hora?"])
 		elif stage == 2:
+			if population.interact(self): return
 			var nearest := ""
 			var distance := 60.0
 			for person in layout.VILLAGE_CAST:
@@ -346,6 +349,7 @@ func act(action: String) -> void:
 				"Sakura": "Sakura: Você já terminou seu treino de hoje, Henrique?",
 				"Hiruzen": "Hiruzen: Aproveite o tempo na Academia para aprender com seus colegas.",
 				"Teuchi": "Teuchi: Depois do treino, passe no Ichiraku. Um lámen quente cai bem!"}
+			if nearest=="Teuchi" and population.deliver(self): return
 			if greetings.has(nearest):
 				var greeting_lines: Array[String] = [greetings[nearest]]
 				say(greeting_lines)

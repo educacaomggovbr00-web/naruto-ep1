@@ -326,3 +326,23 @@ NARUTO_PREVIEW_DIR=/tmp godot --audio-driver Dummy --path . --script res://tests
 ```
 
 Testado em Godot 4.4.1, modos normal e leve: caminhos livres e cache, ponte, mesa da casa, perseguição protegida, deslocamento equivalente em 30/60 FPS, quadro lento, limites da câmera, ajustes e regressões dos sistemas existentes. A gravação tem 120 quadros reais a 15 FPS, sem áudio capturado. Não é uma medição de desempenho em celular. Multitoque físico, áudio, desempenho e retomada em Android real continuam pendentes.
+
+## Vila com moradores e atividades livres
+
+Quatro moradores originais, com 16 poses geradas para este projeto, agora circulam pela praça: comerciante, moradora, mensageiro e criança. Os sprites enviados e os personagens da história continuam preservados. Origem, arquivos e prompt integral em [assets/characters/CITIZENS.md](assets/characters/CITIZENS.md).
+
+- Eles seguem percursos na área transitável, fazem pequenas pausas, esperam ou se afastam de Henrique e retornam às suas entradas ao anoitecer. Os trajetos usam uma pequena grade de navegação e respeitam água, bancos e personagens da história. Não criam colisões que prendam o jogador em portas. Diálogos e menus pausam suas rotinas.
+- O **minimapa da vila** mostra a posição de Henrique, dos moradores, das entradas principais e do caminho ativo. Ele pode ser desligado em AJUSTES e fica oculto nos interiores, diálogos e na perseguição.
+- **Entrega opcional:** converse com o comerciante. Ele explica o pedido; fale novamente para aceitar o pacote de temperos. Leve a Teuchi, no Ichiraku, à direita da praça. A recompensa única recupera fôlego e até 20 de chakra. Não bloqueia, pula ou conclui a história principal.
+- O diário acompanha o pacote. `visited.parcel_started` e `visited.parcel_delivered` são booleanos opcionais no save v1; arquivos antigos recebem `false`. A conclusão exige que a entrega tenha sido iniciada, e carregar não permite repetir a recompensa.
+- As posições temporárias dos moradores não entram no save. Ao carregar, suas rotinas recomeçam de acordo com o horário; um save noturno mantém os moradores recolhidos.
+- O mundo continua sendo a vila 2D existente, com Academia e casa exploráveis. Esta etapa acrescenta população e uma atividade livre; não é uma cidade 3D, nem acrescenta veículos ou toda a escala/sistemas de GTA 5.
+
+```sh
+python3 tools/index_citizens.py
+godot --headless --audio-driver Dummy --path . --script res://tests/village_life_smoke.gd
+NARUTO_LOW_MEMORY=1 godot --headless --audio-driver Dummy --path . --script res://tests/village_life_smoke.gd
+NARUTO_PREVIEW_DIR=/tmp godot --audio-driver Dummy --path . --script res://tests/capture_village_life.gd
+```
+
+Verificado em Godot 4.4.1, nos modos normal e leve: sprites/índice, rotas com colisões, pausa, escolha da entrega, recompensa única, compatibilidade de saves, horários, minimapa e regressões do prólogo/Academia. Capturas usam o jogo real com renderizador Compatibility. O vídeo tem 150 quadros a 15 FPS, sem captura do áudio do sistema. Desempenho, áudio, multitoque e retomada em Android físico permanecem pendentes.

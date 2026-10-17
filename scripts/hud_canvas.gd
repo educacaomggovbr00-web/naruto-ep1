@@ -4,3 +4,4 @@ func _process(_delta: float) -> void:
 	queue_redraw()
 func _draw() -> void:
 	game.art.draw_hud(self, game)
+	game.population.draw_minimap(self,game)

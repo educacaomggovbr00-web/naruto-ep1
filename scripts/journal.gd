@@ -8,6 +8,7 @@ const DISCOVERIES := [
 ]
 
 var game: Node2D
+var errand_label:Label
 var chapter_title: Label
 var mission: Label
 var guidance: Label
@@ -73,8 +74,8 @@ func _ready() -> void:
 	for i in range(DISCOVERIES.size()):
 		var row:=text(panel,"",Vector2(501,164+i*29),Vector2(269,29),14,Color.WHITE)
 		discovery_rows.append(row)
-	var note:=text(panel,"Estas visitas não bloqueiam a história.\nAs anotações acompanham o save local.",Vector2(501,349),Vector2(267,48),12,Color("aebfb9"))
-	note.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	errand_label=text(panel,"Estas visitas não bloqueiam a história.\nAs anotações acompanham o save local.",Vector2(501,349),Vector2(267,48),12,Color("aebfb9"))
+	errand_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	text(panel,"JOGO PAUSADO  ·  Consulte as anotações com calma.",Vector2(27,403),Vector2(744,18),11,Color("aebfb9"))
 	hide()
 
@@ -101,6 +102,9 @@ func close() -> void:
 	game.ui.refresh_controls()
 
 func refresh() -> void:
+	errand_label.text="ENTREGA OPCIONAL · Converse com o comerciante na praça para conhecer a encomenda."
+	if game.visited.parcel_started: errand_label.text="ENTREGA · Leve o pacote ao Teuchi, no Ichiraku à direita da praça."
+	if game.visited.parcel_delivered: errand_label.text="✓ ENTREGA · Pacote entregue a Teuchi. O lámen recuperou seus recursos."
 	chapter_title.text="HENRIQUE UCHIHA  /  EPISÓDIO 1 · A MANHÃ NA ACADEMIA" if game.episode.active() else "HENRIQUE UCHIHA  /  A NOITE ANTES DO COMEÇO"
 	var stage:int=game.stage
 	mission.text="Prólogo concluído" if stage==6 else CHAPTERS[stage]

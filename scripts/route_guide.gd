@@ -30,7 +30,7 @@ func destination(game:Node2D) -> Vector2:
 			4: return game.episode.EXAM if game.room=="academy" else Vector2(480,450) if game.room=="home" else game.layout.interiors.ACADEMY_DOOR
 			5: return game.layout.NARUTO if game.room=="outside" else Vector2(480,450)
 			6: return Vector2(225,220) if game.room=="home" else Vector2(480,450) if game.room=="academy" else game.layout.HOME
-			_: return no_goal
+			_: return game.layout.VILLAGE_CAST.Teuchi if game.room=="outside" and game.visited.parcel_started and not game.visited.parcel_delivered else no_goal
 	match game.stage:
 		2: return game.layout.NARUTO if game.room=="outside" else Vector2(480,450)
 		4: return game.target

@@ -97,8 +97,8 @@ func _ready() -> void:
 	settings_button.add_theme_font_size_override("font_size", 10)
 	settings_button.pressed.connect(toggle_settings)
 	settings_panel = Panel.new()
-	settings_panel.position = Vector2(648, 136)
-	settings_panel.size = Vector2(296, 362)
+	settings_panel.position = Vector2(648, 126)
+	settings_panel.size = Vector2(296, 398)
 	settings_panel.add_theme_stylebox_override("panel", panel_style())
 	settings_panel.z_index = 20
 	add_child(settings_panel)
@@ -150,16 +150,25 @@ func _ready() -> void:
 	game.route_guide.enabled=route_toggle.button_pressed
 	route_toggle.toggled.connect(func(value:bool): game.route_guide.enabled=value; game.route_guide.reset(); settings_file.set_value("world","route_guide",value); save_preferences())
 	settings_panel.add_child(route_toggle)
+	var minimap_toggle:=CheckButton.new()
+	minimap_toggle.text="Minimapa da vila"
+	minimap_toggle.position=Vector2(12,316)
+	minimap_toggle.size=Vector2(270,30)
+	minimap_toggle.add_theme_font_size_override("font_size",13)
+	minimap_toggle.button_pressed=bool(settings_file.get_value("world","minimap",true))
+	game.population.minimap_enabled=minimap_toggle.button_pressed
+	minimap_toggle.toggled.connect(func(value:bool): game.population.minimap_enabled=value; settings_file.set_value("world","minimap",value); save_preferences())
+	settings_panel.add_child(minimap_toggle)
 	var save_button := Button.new()
 	save_button.text = "SALVAR"
-	save_button.position = Vector2(12, 318)
+	save_button.position = Vector2(12, 354)
 	save_button.size = Vector2(129, 30)
 	game.style_button(save_button)
 	save_button.pressed.connect(func(): game.save_checkpoint())
 	settings_panel.add_child(save_button)
 	var load_button := Button.new()
 	load_button.text = "CARREGAR"
-	load_button.position = Vector2(151, 318)
+	load_button.position = Vector2(151, 354)
 	load_button.size = Vector2(129, 30)
 	game.style_button(load_button)
 	load_button.pressed.connect(load_checkpoint)
@@ -275,6 +284,10 @@ func update_portrait(speaker: String) -> void:
 	if speaker == "Naruto":
 		atlas.atlas = art.get_naruto_gallery_texture()
 		atlas.region = Rect2(22, 18, 52, 60)
+	elif game.population.manifest.actors.has(speaker):
+		atlas.atlas=game.population.get_texture()
+		var crop:Array=game.population.manifest.actors[speaker].portrait
+		atlas.region=Rect2(crop[0],crop[1],crop[2],crop[3])
 	elif art.attached_cast["actors"].has(speaker):
 		atlas.atlas = art.get_cast_texture()
 		var crop: Array = art.attached_cast["actors"][speaker]["portrait"]

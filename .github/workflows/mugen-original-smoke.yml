@@ -101,3 +101,14 @@ jobs:
           NARUTO_LOW_MEMORY=1 timeout 60s godot --headless --audio-driver Dummy --path . --script res://tests/map_flow_smoke.gd 2>&1 | tee map-flow-mobile.log
           grep -Fq "PASS: cached obstacle-aware route" map-flow-mobile.log
           ! grep -Eq "SCRIPT ERROR|Assertion failed" map-flow-mobile.log
+
+      - name: Verify civilian routines and optional delivery
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 60s godot --headless --audio-driver Dummy --path . --script res://tests/village_life_smoke.gd 2>&1 | tee village-life.log
+          grep -Fq "PASS: generated walk sprites" village-life.log
+          ! grep -Eq "SCRIPT ERROR|Assertion failed" village-life.log
+          NARUTO_LOW_MEMORY=1 timeout 60s godot --headless --audio-driver Dummy --path . --script res://tests/village_life_smoke.gd 2>&1 | tee village-life-mobile.log
+          grep -Fq "PASS: generated walk sprites" village-life-mobile.log
+          ! grep -Eq "SCRIPT ERROR|Assertion failed" village-life-mobile.log

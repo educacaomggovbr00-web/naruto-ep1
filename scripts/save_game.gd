@@ -42,8 +42,9 @@ func validate(data: Variant) -> bool:
 	if data.has("return_position") and not valid_vector(data.return_position,0,960): return false
 	if data.has("visited"):
 		if not data.visited is Dictionary: return false
-		for key in ["academy","home","class_intro","board","notes","chakra_drill"]:
+		for key in ["academy","home","class_intro","board","notes","chakra_drill","parcel_started","parcel_delivered"]:
 			if data.visited.has(key) and not data.visited[key] is bool: return false
+	if data.get("visited",{}).get("parcel_delivered",false) and not data.get("visited",{}).get("parcel_started",false): return false
 	if not valid_number(data.get("hits"), 0, 3) or not valid_number(data.get("chakra"), 0, 100) or not valid_number(data.get("stamina"), 0, 100):
 		return false
 	for key in ["player", "target", "mizuki"]:
@@ -102,6 +103,7 @@ func apply(game: Node2D, data: Dictionary) -> bool:
 	game.locomotion.reset()
 	game.route_guide.reset()
 	game.ambient.reset_effects()
+	game.population.reset()
 	game.episode.step=int(data.get("episode_step",0))
 	game.episode.echo_time=0
 	game.layout.episode_step=game.episode.step
@@ -132,6 +134,7 @@ func apply(game: Node2D, data: Dictionary) -> bool:
 	game.movement = Vector2.ZERO
 	game.sprinting = false
 	game.save_clock = 0
+	game.population.restore_schedule(game)
 	game.ui.practice.close()
 	game.ui.journal.hide()
 	game.ui.release_touches()

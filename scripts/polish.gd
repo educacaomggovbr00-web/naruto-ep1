@@ -66,6 +66,10 @@ func render(game: Node2D) -> void:
 		if not nearest.is_empty():
 			interaction_prompt(game,"Conversar com "+nearest)
 			return
+	var civilian:Dictionary=game.population.nearby(game)
+	if not civilian.is_empty():
+		interaction_prompt(game,"Conversar com "+str(civilian.name))
+		return
 	var scenery:Dictionary=game.ambient.nearby(game)
 	if not scenery.is_empty() and not (game.stage==2 and game.player.distance_to(game.layout.NARUTO)<95) and not (game.stage==4 and game.player.distance_to(game.target)<85):
 		interaction_prompt(game,scenery.label)
