@@ -440,7 +440,7 @@ func toast(text: String) -> void:
 	toast_time = 2.2
 
 func modal_open() -> bool:
-	return settings_panel.visible or resume_overlay.visible or (journal!=null and journal.visible) or (practice!=null and practice.visible) or game.travelling
+	return (game.duel!=null and game.duel.active) or settings_panel.visible or resume_overlay.visible or (journal!=null and journal.visible) or (practice!=null and practice.visible) or game.travelling
 
 func build_resume_menu() -> void:
 	resume_overlay = Control.new()

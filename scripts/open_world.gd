@@ -118,7 +118,7 @@ func prompt(game:Node2D) -> String:
 	if not gate.is_empty(): return "Ir para "+str(NAMES[gate.to])
 	if not away(game): return ""
 	for a in locals:
-		if game.player.distance_to(a.at)<55: return "Conversar com "+str(a.name)
+		if game.player.distance_to(a.at)<55: return "Duelo de treino" if a.name=="Aprendiz" else "Conversar com "+str(a.name)
 	if district=="residential" and game.player.distance_to(Vector2(90,265))<45: return "Ler avisos do bairro"
 	return ""
 func interact(game:Node2D) -> bool:
@@ -129,6 +129,9 @@ func interact(game:Node2D) -> bool:
 	if not away(game): return false
 	for a in locals:
 		if game.player.distance_to(a.at)<55:
+			if a.name=="Aprendiz":
+				game.duel.offer()
+				return true
 			var lines:={"Guardião":"Guardião: Minha ronda fica neste bairro. A praça e a Academia estão pela saída à direita.","Artesão":"Artesão: Trabalho nos reparos das casas. Passeie à vontade, mas respeite as entradas dos moradores.","Ninja Médica":"Ninja Médica: No treino, mantenha distância do alvo antes de lançar uma técnica. Faça uma pausa quando precisar.","Aprendiz":"Aprendiz: Venho praticar aqui quando a aula termina. Ainda estou acertando a mira!"}
 			game.say([lines[a.name]])
 			return true

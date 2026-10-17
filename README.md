@@ -378,3 +378,13 @@ O mapa pausa o mundo. A rota escolhida é temporária: carregar um save limpa a 
 godot --headless --path . --script res://tests/exploration_map_smoke.gd
 NARUTO_PREVIEW_DIR=/tmp godot --path . --audio-driver Dummy --script res://tests/capture_exploration_map.gd
 ```
+
+## Duelo lateral inspirado em MUGEN
+
+No campo de treino, durante a exploração livre após o prólogo, interaja com o Aprendiz ("Duelo de treino") ou pressione **F**. Henrique enfrenta Naruto em melhor de três rounds, com limite de 60 segundos por round, adversário controlado pelo jogo e dificuldade normal ou assistida. Ao terminar, volte ao RPG ou escolha revanche. Vitórias e melhor combo ficam no mesmo save; saves anteriores continuam compatíveis.
+
+No Android, use as setas à esquerda, salto acima delas e ações à direita. É possível segurar defesa e usar outro dedo para movimentar ou atacar. A pausa e a perda de foco interrompem a luta e liberam os comandos pressionados. No teclado: A/D ou setas para mover, W/Espaço para saltar, J golpe, L forte, U kunai, I Katon, K defesa, Q esquiva e Esc pausa.
+
+Golpes têm preparação, alcance, recuperação e colisão; kunai e Katon percorrem a arena. Defesa só protege pela frente e pode quebrar. Esquivas gastam fôlego e Katon gasta chakra. Encadeie golpes leves para finalizar com um golpe forte. A dificuldade assistida reduz o dano inimigo e aumenta seu tempo de preparação.
+
+Este modo implementa combate próprio no Godot inspirado em jogos de luta; não executa personagens ou arquivos de lógica do motor MUGEN. Preserva os sprites disponíveis da galeria e as poses originais de Naruto. Golpes próximos reutilizam essas poses com efeitos: animações exclusivas de socos, chutes e salto ainda precisam de sprites próprios. As capturas em `tests/capture_duel.gd` mostram a renderização real do jogo. Testes automáticos cobrem regras, integração e toque; desempenho e conforto no aparelho dependem do teste Android.

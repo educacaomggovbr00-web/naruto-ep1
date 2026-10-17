@@ -134,3 +134,15 @@ jobs:
           NARUTO_LOW_MEMORY=1 timeout 60s godot --headless --audio-driver Dummy --path . --script res://tests/exploration_map_smoke.gd 2>&1 | tee exploration-map-mobile.log
           grep -Fq "PASS: touch map" exploration-map-mobile.log
           ! grep -Eq "SCRIPT ERROR|Assertion failed" exploration-map-mobile.log
+
+      - name: Verify side-view duel rules and RPG touch integration
+        shell: bash
+        run: |
+          set -euo pipefail
+          for test in duel_smoke duel_integration_smoke; do
+            for memory in 0 1; do
+              NARUTO_LOW_MEMORY=$memory timeout 60s godot --headless --audio-driver Dummy --path . --script res://tests/$test.gd 2>&1 | tee duel-check.log
+              grep -Fq "PASS:" duel-check.log
+              ! grep -Eq "SCRIPT ERROR|Assertion failed" duel-check.log
+            done
+          done

@@ -6,7 +6,7 @@ var path := "user://prologue_save.json"
 var last_error := ""
 
 func snapshot(game: Node2D) -> Dictionary:
-	return {"version": VERSION, "episode_step":game.episode.step, "visual_left":game.locomotion.mirror, "stage": game.stage, "room":game.room,"district":game.world.district,
+	return {"duels":game.sparring_stats.duplicate(),"version": VERSION, "episode_step":game.episode.step, "visual_left":game.locomotion.mirror, "stage": game.stage, "room":game.room,"district":game.world.district,
 		"day_cycle":{"phase":game.day_cycle.phase,"mode":game.day_cycle.mode},
 		"return_position":[game.return_position.x,game.return_position.y],"visited":game.visited.duplicate(),"hits": game.hits,
 		"chakra": game.chakra, "stamina": game.stamina,
@@ -33,6 +33,11 @@ func validate(data: Variant) -> bool:
 		if not clock is Dictionary: return false
 		if not valid_number(clock.get("phase"),0,1) or not valid_number(clock.get("mode"),0,3): return false
 		if floor(float(clock.mode))!=float(clock.mode): return false
+	if data.has("duels"):
+		if not data.duels is Dictionary: return false
+		for key in ["wins","best_combo"]:
+			var value: Variant=data.duels.get(key)
+			if not valid_number(value,0,9999 if key=="wins" else 99) or float(value)!=floor(float(value)): return false
 	if not data.get("stage") is int or not valid_number(data.stage, 0, 6):
 		return false
 	var room: Variant = data.get("room","outside")
@@ -45,7 +50,7 @@ func validate(data: Variant) -> bool:
 	if data.has("return_position") and not valid_vector(data.return_position,0,960): return false
 	if data.has("visited"):
 		if not data.visited is Dictionary: return false
-		for key in ["academy","home","class_intro","board","notes","chakra_drill","parcel_started","parcel_delivered","residential","free_training"]:
+		for key in ["academy","home","class_intro","board","notes","chakra_drill","parcel_started","parcel_delivered","residential","free_training","sparring_won"]:
 			if data.visited.has(key) and not data.visited[key] is bool: return false
 	if data.get("visited",{}).get("parcel_delivered",false) and not data.get("visited",{}).get("parcel_started",false): return false
 	if not valid_number(data.get("hits"), 0, 3) or not valid_number(data.get("chakra"), 0, 100) or not valid_number(data.get("stamina"), 0, 100):
@@ -101,6 +106,8 @@ func write_save(game: Node2D) -> bool:
 
 func apply(game: Node2D, data: Dictionary) -> bool:
 	if not validate(data): return false
+	if game.duel!=null and game.duel.active: game.duel.close(false)
+	game.sparring_stats={"wins":int(data.get("duels",{}).get("wins",0)),"best_combo":int(data.get("duels",{}).get("best_combo",0))}
 	game.day_cycle.restore(data.get("day_cycle",{}))
 	game.gait_distance=0
 	game.locomotion.reset()

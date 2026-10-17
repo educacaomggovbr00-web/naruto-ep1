@@ -5,9 +5,11 @@ var player := Vector2(140, 270)
 var stage := 0
 var room := "outside"
 var return_position := Vector2(170,270)
-var visited := {"academy":false,"home":false,"class_intro":false,"board":false,"notes":false,"chakra_drill":false,"parcel_started":false,"parcel_delivered":false,"residential":false,"free_training":false}
+var visited := {"academy":false,"home":false,"class_intro":false,"board":false,"notes":false,"chakra_drill":false,"parcel_started":false,"parcel_delivered":false,"residential":false,"free_training":false,"sparring_won":false}
 var episode=preload("res://scripts/episode_one.gd").new()
 var travelling := false
+var duel: CanvasLayer
+var sparring_stats := {"wins":0,"best_combo":0}
 var hits := 0
 var chakra := 100.0
 var stamina := 100.0
@@ -77,6 +79,9 @@ func _ready() -> void:
 	ui = preload("res://scripts/game_ui.gd").new()
 	ui.game = self
 	add_child(ui)
+	duel=preload("res://scripts/duel.gd").new()
+	duel.game=self
+	add_child(duel)
 	say(["NARUTO EP -1 — A Noite Antes do Começo", "Henrique Uchiha, 12 anos. Um fim de tarde em Konoha, antes do início da história de Naruto.", "Henrique: Ainda tenho muito para aprender. Vou começar pelo treino de kunai.", "WASD/setas: andar. R: correr. Q: esquiva. J/K: kunai e Katon. E ou toque: revelar a fala e depois continuar."])
 	ui.offer_resume(savegame.read_save())
 
@@ -202,6 +207,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			KEY_E, KEY_SPACE:
 				if ui.practice.visible: ui.practice.confirm()
 				else: act("interact")
+			KEY_F:
+				if not ui.modal_open(): duel.offer()
 			KEY_J: act("kunai")
 			KEY_K: act("katon")
 
